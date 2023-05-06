@@ -1,0 +1,408 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+"http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>[gimp] Log of /trunk/data/palettes/Gold.gpl</title>
+<meta name="generator" content="ViewVC 1.2-dev" />
+<link rel="icon" type="image/png" href="http://developer.gnome.org/images/gnome-16.png" />
+<link rel="stylesheet" type="text/css" href="/default.css" />
+<link rel="stylesheet" href="/css/layout.css" type="text/css" />
+<link rel="stylesheet" href="/css/style.css" type="text/css" />
+<link rel="stylesheet" href="/viewvc/*docroot*/styles.css" type="text/css" />
+<link rel="alternate" type="application/rss+xml" title="RSS [gimp]trunk/data/palettes/Gold.gpl" href="/viewvc/gimp/trunk/data/palettes?date=month&amp;view=query&amp;file=Gold.gpl&amp;file_match=exact&amp;format=rss" />
+</head>
+<body>
+<!-- site header -->
+<div id="page">
+<ul id="general">
+<li id="siteaction-gnome_home" class="home">
+<a href="http://www.gnome.org/" title="Home">Home</a>
+</li>
+<li id="siteaction-gnome_news">
+<a href="http://news.gnome.org" title="News">News</a>
+</li>
+<li id="siteaction-gnome_projects">
+<a href="http://www.gnome.org/projects/" title="Projects">Projects</a>
+</li>
+<li id="siteaction-gnome_art">
+<a href="http://art.gnome.org" title="Art">Art</a>
+</li>
+<li id="siteaction-gnome_support">
+<a href="http://www.gnome.org/support/" title="Support">Support</a>
+</li>
+<li id="siteaction-gnome_development">
+<a href="http://developer.gnome.org" title="Development">Development</a>
+</li>
+<li id="siteaction-gnome_community">
+<a href="http://www.gnome.org/community/" title="Community">Community</a>
+</li>
+</ul>
+<div id="header">
+<h1>
+GNOME Subversion source code repository
+</h1>
+<div id="tabs">
+<ul id="portal-globalnav">
+<li id="portaltab-root">
+<a href="/"><span>Home</span></a>
+</li>
+<li class="selected"><a href="/viewvc/"><span>ViewVC Interface</span></a></li>
+<li><a href="http://live.gnome.org/Subversion"><span>Subversion wiki page</span></a></li>
+<li><a href="http://bzr-playground.gnome.org/"><span>Bzr Playground</span></a></li>
+</ul>
+</div> <!-- end of #tabs -->
+</div> <!-- end of #header -->
+</div>
+<!-- end site header -->
+<div class="body">
+<div id="content">
+<div class="vc_navheader">
+<table><tr>
+<td><strong><a href="/viewvc"><span class="pathdiv">/</span></a><a href="/viewvc/gimp/">[gimp]</a><span class="pathdiv">/</span><a href="/viewvc/gimp/trunk/">trunk</a><span class="pathdiv">/</span><a href="/viewvc/gimp/trunk/data/">data</a><span class="pathdiv">/</span><a href="/viewvc/gimp/trunk/data/palettes/">palettes</a><span class="pathdiv">/</span>Gold.gpl</strong></td>
+<td style="text-align: right;"></td>
+</tr></table>
+</div>
+
+<p style="margin:0;">
+
+<a href="/viewvc/gimp/trunk/data/palettes/"><img src="/viewvc/*docroot*/images/back_small.png" class="vc_icon" alt="Parent Directory" /> Parent Directory</a>
+
+| <a href="/viewvc/gimp/trunk/data/palettes/Gold.gpl?view=log"><img src="/viewvc/*docroot*/images/log.png" class="vc_icon" alt="Revision Log" /> Revision Log</a>
+
+
+
+
+</p>
+
+<hr />
+<table class="auto">
+
+
+
+<tr>
+<td>Links to HEAD:</td>
+<td>
+(<a href="/viewvc/gimp/trunk/data/palettes/Gold.gpl?view=markup">view</a>)
+
+
+(<a href="/viewvc/gimp/trunk/data/palettes/Gold.gpl?view=annotate">annotate</a>)
+</td>
+</tr>
+
+
+
+<tr>
+<td>Sticky Revision:</td>
+<td><form method="get" action="/viewvc/gimp" style="display: inline">
+<div style="display: inline">
+<input type="hidden" name="orig_pathtype" value="FILE"/><input type="hidden" name="orig_view" value="log"/><input type="hidden" name="orig_path" value="trunk/data/palettes/Gold.gpl"/><input type="hidden" name="view" value="redirect_pathrev"/>
+
+<input type="text" name="pathrev" value="" size="6"/>
+
+<input type="submit" value="Set" />
+</div>
+</form>
+
+</td>
+</tr>
+</table>
+ 
+
+
+
+
+
+
+
+
+
+
+<div>
+<hr />
+
+<a name="rev5618"></a>
+
+
+Revision <a href="/viewvc/gimp?view=revision&amp;revision=5618"><strong>5618</strong></a> -
+
+
+(<a href="/viewvc/gimp/trunk/data/palettes/Gold.gpl?revision=5618&amp;view=markup">view</a>)
+
+
+
+
+(<a href="/viewvc/gimp/trunk/data/palettes/Gold.gpl?annotate=5618">annotate</a>)
+
+
+
+- <a href="/viewvc/gimp/trunk/data/palettes/Gold.gpl?r1=5618&amp;view=log">[select for diffs]</a>
+
+
+
+
+<br />
+
+Modified
+
+<em>Mon Feb 12 18:05:12 2001 UTC</em>
+(7 years, 11 months ago)
+by <em>mitch</em>
+
+
+
+
+
+
+
+
+
+<br />File length: 5390 byte(s)
+
+
+
+
+
+
+
+<br />Diff to <a href="/viewvc/gimp/trunk/data/palettes/Gold.gpl?r1=5611&amp;r2=5618">previous 5611</a>
+
+
+
+
+
+
+
+<pre class="vc_log">2001-02-12  Michael Natterer  &lt;&#109;&#105;&#116;&#99;&#104; {at} &#103;&#105;&#109;&#112;&#46;&#111;&#114;&#103;&gt;
+
+	* app/brush_select.[ch]
+	* app/pattern_select.[ch]: removed almost all code by using
+	the GimpContainerGridView.
+
+	* app/brushes.c
+	* app/patterns.c: brush|pattern_select_freeze|thaw_all() don't
+	exist any more.
+
+	* app/devices.c: made it work again.
+
+	* app/gimpgradientpreview.c: the gradient popup is 128 x 32 again.
+
+	* app/plug_in.c: follow the brush and pattern dialog function
+	renaming.
+
+	* app/gimppalette.[ch]
+	* app/gimppalettepreview.c: added a "Columns" attribute and show
+	the popups accordingly.
+
+	The palette file format has changed again. It now can have an
+	optional "Columns: &lt;n&gt;" line after the palette's name.
+
+	* data/palettes/Bgold.gpl
+	* data/palettes/Borders.gpl
+	* data/palettes/Cascade.gpl
+	* data/palettes/China.gpl
+	* data/palettes/Coldfire.gpl
+	* data/palettes/Dark_pastels.gpl
+	* data/palettes/Ega.gpl
+	* data/palettes/Gold.gpl
+	* data/palettes/Grayblue.gpl
+	* data/palettes/Hilite.gpl
+	* data/palettes/Kahki.gpl
+	* data/palettes/Named_Colors.gpl
+	* data/palettes/News3.gpl
+	* data/palettes/Op2.gpl
+	* data/palettes/Plasma.gpl
+	* data/palettes/Visibone.gpl
+	* data/palettes/Visibone_2.gpl
+	* data/palettes/Web.gpl: added the "Columns" parameter where it
+	makes sense and remove those ugly black colors which were hanging
+	around as first color of may palettes.
+</pre>
+</div>
+
+
+
+<div>
+<hr />
+
+<a name="rev5611"></a>
+
+
+Revision <a href="/viewvc/gimp?view=revision&amp;revision=5611"><strong>5611</strong></a> -
+
+
+(<a href="/viewvc/gimp/trunk/data/palettes/Gold.gpl?revision=5611&amp;view=markup">view</a>)
+
+
+
+
+(<a href="/viewvc/gimp/trunk/data/palettes/Gold.gpl?annotate=5611">annotate</a>)
+
+
+
+- <a href="/viewvc/gimp/trunk/data/palettes/Gold.gpl?r1=5611&amp;view=log">[select for diffs]</a>
+
+
+
+
+<br />
+
+Added
+
+<em>Sun Feb 11 16:14:25 2001 UTC</em>
+(7 years, 11 months ago)
+by <em>mitch</em>
+
+
+
+
+
+
+
+<br />File length: 5390 byte(s)
+
+
+
+
+
+
+
+
+
+
+
+<pre class="vc_log">2001-02-11  Michael Natterer  &lt;&#109;&#105;&#116;&#99;&#104; {at} &#103;&#105;&#109;&#112;&#46;&#111;&#114;&#103;&gt;
+
+	Made a GimpContainer out of the palette list:
+
+	* app/Makefile.am
+	* app/palettes.[ch]: new files for the global palette list.
+
+	* app/gimpgradientpreview.[ch]
+	* app/gimppalettepreview.[ch]: new widgets.
+
+	* app/gimppalette.[ch]: derive it from GimpData to get all the
+	preview etc. stuff.
+
+	* app/datafiles.[ch]: new function datafiles_check_extension(),
+	added a "loader_data" parameter to datafiles_read_directories()
+	and pass it to the loader function.
+
+	* app/gimpcontext.[ch]: added the palette (not really used yet
+	except by the test dialogs).
+
+	* app/gimpdatalist.[ch]: new function gimp_data_list_save_and_clear()
+	which does everything needed for patterns_free(), brushes_free() ...
+
+	* app/gimpdnd.c: added palette DND.
+
+	* app/app_procs.c
+	* app/brushes.c
+	* app/color_notebook.h
+	* app/commands.c
+	* app/convert.c
+	* app/gimpbrush.h
+	* app/gimpbrushpipe.h
+	* app/gimpgradient.c
+	* app/gimppattern.h
+	* app/gimppreview.c
+	* app/gradients.c
+	* app/module_db.c
+	* app/palette.[ch]
+	* app/paletteP.h
+	* app/palette_import.c
+	* app/palette_select.[ch]
+	* app/patterns.c
+	* app/plug_in.c
+	* app/pdb/convert_cmds.c
+	* app/pdb/palette_cmds.c
+	* tools/pdbgen/pdb/convert.pdb
+	* tools/pdbgen/pdb/palette.pdb: lotsa stuff: changed due to the above
+	API changes, #define the file extensions in the GimpData subclasses'
+	header files instead of hardcoding them in several places, ...
+
+	* data/palettes/*: The same file format change as for the gradient
+	files:
+
+	- Save the palette name in a parsable form (as part of the file
+	  format, not in a comment.
+	- Removed unserscores from the palette names.
+	- Added an extension (Gimp PaLettes are ".gpl" files now ;-)
+</pre>
+</div>
+
+ 
+
+
+
+
+
+ <hr />
+<p><a name="diff"></a>
+This form allows you to request diffs between any two revisions of this file.
+For each of the two "sides" of the diff,
+
+enter a numeric revision.
+
+</p>
+<form method="get" action="/viewvc/gimp/trunk/data/palettes/Gold.gpl" id="diff_select">
+<table cellpadding="2" cellspacing="0" class="auto">
+<tr>
+<td>&nbsp;</td>
+<td>
+<input type="hidden" name="view" value="diff"/>
+Diffs between
+
+<input type="text" size="12" name="r1"
+value="5618" />
+
+and
+
+<input type="text" size="12" name="r2" value="5611" />
+
+</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>
+Type of Diff should be a
+<select name="diff_format" onchange="submit()">
+<option value="h" selected="selected">Colored Diff</option>
+<option value="l" >Long Colored Diff</option>
+<option value="f" >Full Colored Diff</option>
+<option value="u" >Unidiff</option>
+<option value="c" >Context Diff</option>
+<option value="s" >Side by Side</option>
+</select>
+<input type="submit" value=" Get Diffs " />
+</td>
+</tr>
+</table>
+</form>
+
+
+
+
+
+</div>
+<div id="footer">
+<p>Copyright &copy; 2004-2008, <a href="http://www.gnome.org/">The GNOME Project</a>
+<br />
+GNOME and the Foot Logo are trademarks of
+<a href="http://foundation.gnome.org/">The GNOME Foundation</a>
+<br />
+Maintained in the
+<a href="http://svn.gnome.org/viewvc/viewcvs-web/">viewcvs-web</a> module
+on <a href="http://svn.gnome.org/">svn.gnome.org</a>
+<br/>
+<p>Hosted by <a href="http://www.canonical.com/">Canonical</a>.
+</p>
+<p>Powered by <a href="http://viewvc.tigris.org/">ViewVC 1.2-dev</a></p>
+</div>
+</body>
+</html>
+
+

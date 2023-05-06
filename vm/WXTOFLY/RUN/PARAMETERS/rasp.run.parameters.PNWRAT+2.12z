@@ -1,0 +1,51 @@
+@REGION_DOLIST = ( 'PNWRAT+2' );
+$GRIBFILE_MODEL = 'ETA';
+
+$LSEND = 2;
+if( not defined $LSEND ) { $LSEND =  0; }
+if( not defined $LSAVE ) { $LSAVE =  0; }
+
+$LRUN_WINDOW{'PNWRAT+2'} = 0 ;
+
+@{$PARAMETER_DOLIST{'PNWRAT+2'}} = ('sfcwind','sfcwind0','sfcwind2','tenmwind','wstar',
+	'wblmaxmin','hwcrit','dwcrit','hglider','bsratio','hglider','hbl','dbl','blwind',
+	'blwindshear','bltopwind','cape','zsfclcl','zsfclclmask','zblclmask','blcloudpct',
+	'sfcshf','sfctemp','sfcdewpt','mslpress','rain1','bltopvariab','zblcl','zblcldif');
+
+$LOCALTIME_ID{'PNWRAT+2'} = PDT;
+$LOCALTIME_ADJ{'PNWRAT+2'} = -7;
+
+$GRIBFILES_PER_FORECAST_PERIOD{'PNWRAT+2'} = 6 ;
+%GRIBFILE_DOLIST = ( 'PNWRAT+2'   => [ '12Z+48','12Z+51','12Z+54','12Z+57','12Z+60','12Z+63' ], );
+
+$FORECAST_PERIODHRS{'PNWRAT+2'}[0] = 15;
+$DOMAIN1_STARTHH{'PNWRAT+2'}[0] = '12';
+$DOMAIN1_ENDHH{'PNWRAT+2'}[0] = '03';
+$DOMAIN2_START_DELTAMINS{'PNWRAT+2'}[0] = 0;
+$DOMAIN2_END_DELTAMINS{'PNWRAT+2'}[0] = 0;
+$DOMAIN3_START_DELTAMINS{'PNWRAT+2'}[0] = 0;
+$DOMAIN3_END_DELTAMINS{'PNWRAT+2'}[0] = 0;
+$DOMAIN1_TIMESTEP{'PNWRAT+2'}[0] = 72;
+$BOUNDARY_UPDATE_PERIODHRS{'PNWRAT+2'}[0] = 3; 
+$NDOWN_BOUNDARY_UPDATE_PERIODHRS{'PNWRAT+2'}[0] = 0;
+@{$PLOT_IMAGE_SIZE{'PNWRAT+2'}[0]} = ( '', '2000x2000' );
+@{$PLOT_HHMMLIST{'PNWRAT+2'}[0]} =  ('1500','1600','1700','1800','1900','2000','2100','2200','2300','0000','0100','0200','0300' );
+
+$FORECAST_PERIODHRS{'PNWRAT+2'}[1] = 12;
+$DOMAIN1_STARTHH{'PNWRAT+2'}[1] = '15';
+$DOMAIN1_ENDHH{'PNWRAT+2'}[1] = '03';          
+$DOMAIN2_START_DELTAMINS{'PNWRAT+2'}[1] = 0;
+$DOMAIN2_END_DELTAMINS{'PNWRAT+2'}[1] = 0;
+$DOMAIN3_START_DELTAMINS{'PNWRAT+2'}[1] = 0;
+$DOMAIN3_END_DELTAMINS{'PNWRAT+2'}[1] = 0;
+$DOMAIN1_TIMESTEP{'PNWRAT+2'}[1] = 24 ;
+$BOUNDARY_UPDATE_PERIODHRS{'PNWRAT+2'}[1] = 1;     
+$NDOWN_BOUNDARY_UPDATE_PERIODHRS{'PNWRAT+2'}[1] = 1 ;  
+@{$PLOT_IMAGE_SIZE{'PNWRAT+2'}[1]} = ( '', '1200x1200' );
+@{$PLOT_HHMMLIST{'PNWRAT+2'}[1]} =  ('1600','1700','1800','1900','2000','2100','2200','2300','0000','0100','0200','0300');
+
+##############  END OF REGION DEPENDENT PARAMETERS  ##############
+##################################################################
+##########    ADDITIONS MUST BE MADE ABOVE THIS LINE    ##########
+##################################################################
+1.;

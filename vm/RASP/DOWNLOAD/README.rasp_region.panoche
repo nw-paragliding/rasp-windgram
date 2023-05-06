@@ -1,0 +1,64 @@
+
+============
+INSTALLATION
+============
+
+The installation of this tar file, and all RASP installation tar
+files, is described at
+   http://www.drjack.info/twiki/bin/view/RASPop/ProgramInstall
+Additional relevant information is at
+   http://www.drjack.info/twiki/bin/view/RASPop/
+
+
+========
+LICENSES
+========
+
+This tarfile includes WRF programs which are subject to the 
+license described at
+  http://ngwww.ucar.edu/ncl/license.html
+By using these programs you implicitly accept that license
+
+
+=============
+RELEASE NOTES
+=============
+   Nov 2005: 
+-------------
+   Dec 2005: changed #soundsteps 12->4
+-------------
+Jan  1, 2006: $LSEND,$LSAVE now set in rasp.run.parameters... (jobarg bypasses for -T,-t,-q,...)
+-------------
+Feb 11, 2006: correct window start/end time (now 18/21z) and forecast time (now 12 hrs)
+-------------
+Feb 17, 2006: require $GRIBFILE_MODEL to be ETA
+------------
+7 Mar 2006: change WRFSI, TEMPLATES, DOMAINS directories to wrfsi, templates, domains
+------------
+26 Mar 2006: now using rasp.run.parameters.PANOCHE.TEMPLATE
+------------
+5 Oct 2006: removed link to GRIB directory
+------------
+10 Nov 2006: changed time_step_sound from 12 to 4 in template and domain wrf.nl files
+------------
+25 Dec 2006: namelist changes needed for WRF v2.2
+------------
+ 2 Jan 2007: add successful printout example 
+------------
+ 3 Jan 2007: now chmod edited files
+------------
+23 Jan 2007: correct exclusion of GRIB directory
+------------
+31 Jan 2007: add DOMAIN1_TIMESTEP as input parameter
+------------
+30 Aor 2007: ensure WRR/WRFSI is a link
+------------
+11 Jun 2007: add commented-out 15hr run parameters
+------------
+07 Jul 2007: corrected WRF/wrfsi/templates/default/dataroot.txt
+------------
+30 Sep 2007: rasp.run.parameters.PANOCHE.TEMPLATE: change sfcsun to sfcsunpct
+------------
+ 1 Oct 2007: rasp.run.parameters.PANOCHE.TEMPLATE: remove experimental parameters
+------------
+ 2 Mar 2008: wrfsi.nl - give global write permission

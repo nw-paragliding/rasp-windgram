@@ -1,0 +1,41 @@
+
+============
+INSTALLATION
+============
+
+The installation of this tar file, and all RASP installation tar
+files, is described at
+   http://www.drjack.info/twiki/bin/view/RASPop/ProgramInstall
+Additional relevant information is at
+   http://www.drjack.info/twiki/bin/view/RASPop/
+
+
+========
+LICENSES
+========
+
+This tarfile includes WRF programs which are subject to the 
+license described at
+  http://ngwww.ucar.edu/ncl/license.html
+By using these programs you implicitly accept that license
+
+
+=============
+RELEASE NOTES
+=============
+-------------
+Nov 15 2005 - Changes following successful SW_SOUTHAFRICA installation
+-------------
+Nov 2005: Initial release for SW_SOUTHAFRICA installation (Ian Forbes)
+-------------
+1 Feb 2006: updated WRFV2 execs to version 2.1.1 with additioanl YSU fix (SI not altered)
+-------------
+17 Feb 2006: O1 compile of v2.1.2 ndown.exe, nest_init_utils fix for 2.1.2 wrf.exe
+-------------
+6 Mar 2006: moved wrfsi and gui executables to wrf_misc and wrf_gui respectively
+-------------
+22 Mar 2006: moved WRFV2 file/links from old wrf_misc tar file (now re-named wrfsi_misc)
+-------------
+25 Dec 2006: WRF v2.2 execs
+-------------
+ 1 Oct 2007: add source Fortran files I have modified (with ".jack" tail added)

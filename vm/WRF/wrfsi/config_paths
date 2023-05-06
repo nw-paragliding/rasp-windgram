@@ -1,0 +1,33 @@
+$DATAROOT='[BASEDIR]/WRF/wrfsi/domains';
+$EXT_DATAROOT='[BASEDIR]/WRF/wrfsi/extdata';
+$GEOG_DATAROOT='[BASEDIR]/WRF/wrfsi/extdata/GEOG';
+$TEMPLATES='[BASEDIR]/WRF/wrfsi/templates';
+$INSTALLROOT='[BASEDIR]/WRF/wrfsi';
+$SOURCE_ROOT='[BASEDIR]/WRF/wrfsi';
+$UI_TEMPDIR='/tmp';
+# This file records the values for the default paths as
+# defined when the install script (install_wrfsi.pl) ran.
+# This file was designed for the WRF SI GUI. Definitions:
+#
+# DATAROOT:  Directory under which MOAD_DATAROOTs will be created.
+#
+# EXT_DATAROOT:  Directory containing configuration files, 
+# work space, and output from the grib_prep program. This
+# EXT_DATAROOT can support multiple MOAD_DATAROOTs.
+#
+# GEOG_DATAROOT:  Top directory containing subdirectories of 
+# tile land use, topography, etc. data for use when localizing.
+#
+# TEMPLATES:  Directory containing template files.
+#
+# INSTALLROOT:  Path to compile/installed code and scripts.
+#
+# SOURCE_ROOT:  Path to original source code.
+
+$NCARG_ROOT='[BASEDIR]/UTIL/NCARG';
+$NCL_COMMAND='[BASEDIR]/UTIL/NCARG/bin/ncl';
+
+# When NCARG_ROOT and NCL_COMMAND are set there will be an additional user 
+# interface tab 'Domain Graphics' located under gui's 'Domain Selection' Tool.
+# See wrfsi.noaa.gov/gui/faq_ncl for more info. 
+

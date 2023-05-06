@@ -1,0 +1,49 @@
+
+============
+INSTALLATION
+============
+
+The installation of this tar file, and all RASP installation tar
+files, is described at
+   http://www.drjack.info/twiki/bin/view/RASPop/ProgramInstall
+Additional relevant information is at
+   http://www.drjack.info/twiki/bin/view/RASPop/
+
+
+========
+LICENSES
+========
+
+The installation of this file, and all RASP installation files, is
+described at
+   http://www.drjack.info/twiki/bin/view/RASPop/ProgramInstall
+
+This tarfile includes WRF programs which are subject to the 
+license described at
+  http://ngwww.ucar.edu/ncl/license.html
+By using these programs you implicitly accept that license
+
+
+=============
+RELEASE NOTES
+=============
+-------------
+Nov 15 2005 - Changes following successful SW_SOUTHAFRICA installation
+-------------
+Nov 2005: Initial release for SW_SOUTHAFRICA installation (Ian Forbes)
+-------------
+1 Jan 2006: Now use WRF/WRFSI/extdata/static/grib_prep.nl.TEMPLATE 
+-------------
+6 Mar 2006: v2.1.2 wrfsi adding wrfsi executables except for gui
+-------------
+7 Mar 2006: use directories wrfsi, templates, and domains with links WRFSI, TEMPLATES, DOMAINS
+-------------
+8 Mar 2006: created on SM
+-------------
+22 Mar 2006: moved WRFV2 files/links to wrf_execs tar file
+-------------
+17 Oct 2006: corrected writing of links such as WRF/WRFSI
+-------------
+25 Dec 2006: namelist changes needed for WRF v2.2
+-------------
+30 Apr 2007: ensure WRFSI is a link

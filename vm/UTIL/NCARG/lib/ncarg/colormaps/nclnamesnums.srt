@@ -1,0 +1,753 @@
+  0   0   0		black   ncl
+  0   0   0		gray0   ncl
+  0   0   0		grey0   ncl
+  0   0 128		navy blue   ncl
+  0   0 128		NavyBlue   ncl
+  0   0 128		navy   ncl
+  0   0 139		blue4   ncl
+0     0 139		dark blue   ncl
+0     0 139		DarkBlue   ncl
+  0   0 205		blue3   ncl
+  0   0 205		medium blue   ncl
+  0   0 205		MediumBlue   ncl
+  0   0 238		blue2   ncl
+  0   0 255		blue1   ncl
+  0   0 255		blue   ncl
+  0 100   0		dark green   ncl
+  0 100   0		DarkGreen   ncl
+  0 104 139		DeepSkyBlue4   ncl
+  0 134 139		turquoise4   ncl
+  0 139	  0		green4   ncl
+  0 139 139		cyan4   ncl
+0   139 139		dark cyan   ncl
+0   139 139		DarkCyan   ncl
+  0 139	 69		SpringGreen4   ncl
+  0 154 205		DeepSkyBlue3   ncl
+  0 178 238		DeepSkyBlue2   ncl
+  0 191 255		DeepSkyBlue1   ncl
+  0 191 255		deep sky blue   ncl
+  0 191 255		DeepSkyBlue   ncl
+  0 197 205		turquoise3   ncl
+  0 205	  0		green3   ncl
+  0 205 102		SpringGreen3   ncl
+  0 205 205		cyan3   ncl
+  0 206 209		dark turquoise   ncl
+  0 206 209		DarkTurquoise   ncl
+  0 229 238		turquoise2   ncl
+  0 238	  0		green2   ncl
+  0 238 118		SpringGreen2   ncl
+  0 238 238		cyan2   ncl
+  0 245 255		turquoise1   ncl
+  0 250 154		medium spring green   ncl
+  0 250 154		MediumSpringGreen   ncl
+  0 255	  0		green1   ncl
+  0 255   0		green   ncl
+  0 255 127		SpringGreen1   ncl
+  0 255 127		spring green   ncl
+  0 255 127		SpringGreen   ncl
+  0 255 255		cyan1   ncl
+  0 255 255		cyan   ncl
+100 149 237		cornflower blue   ncl
+100 149 237		CornflowerBlue   ncl
+ 10  10  10 		gray4   ncl
+ 10  10  10 		grey4   ncl
+102 102 102 		gray40   ncl
+102 102 102 		grey40   ncl
+102 139 139		PaleTurquoise4   ncl
+102 205	  0		chartreuse3   ncl
+102 205 170		aquamarine3   ncl
+102 205 170		medium aquamarine   ncl
+102 205 170		MediumAquamarine   ncl
+104 131 139		LightBlue4   ncl
+104  34 139		DarkOrchid4   ncl
+105 105 105		dim gray   ncl
+105 105 105		DimGray   ncl
+105 105 105		dim grey   ncl
+105 105 105		DimGrey   ncl
+105 105 105 		gray41   ncl
+105 105 105 		grey41   ncl
+105 139 105		DarkSeaGreen4   ncl
+105 139	 34		OliveDrab4   ncl
+105  89 205		SlateBlue3   ncl
+106  90 205		slate blue   ncl
+106  90 205		SlateBlue   ncl
+107 107 107 		gray42   ncl
+107 107 107 		grey42   ncl
+107 142  35		olive drab   ncl
+107 142  35		OliveDrab   ncl
+108 123 139		SlateGray4   ncl
+108 166 205		SkyBlue3   ncl
+110 110 110 		gray43   ncl
+110 110 110 		grey43   ncl
+110 123 139		LightSteelBlue4   ncl
+110 139	 61		DarkOliveGreen4   ncl
+112 112 112 		gray44   ncl
+112 112 112 		grey44   ncl
+112 128 144		slate gray   ncl
+112 128 144		SlateGray   ncl
+112 128 144		slate grey   ncl
+112 128 144		SlateGrey   ncl
+115 115 115 		gray45   ncl
+115 115 115 		grey45   ncl
+117 117 117 		gray46   ncl
+117 117 117 		grey46   ncl
+118 238	  0		chartreuse2   ncl
+118 238 198		aquamarine2   ncl
+119 136 153		light slate gray   ncl
+119 136 153		LightSlateGray   ncl
+119 136 153		light slate grey   ncl
+119 136 153		LightSlateGrey   ncl
+120 120 120 		gray47   ncl
+120 120 120 		grey47   ncl
+121 205 205		DarkSlateGray3   ncl
+122 103 238		SlateBlue2   ncl
+122 122 122 		gray48   ncl
+122 122 122 		grey48   ncl
+122 139 139		LightCyan4   ncl
+122 197 205		CadetBlue3   ncl
+122  55 139		MediumOrchid4   ncl
+123 104 238		medium slate blue   ncl
+123 104 238		MediumSlateBlue   ncl
+124 205 124		PaleGreen3   ncl
+124 252   0		lawn green   ncl
+124 252   0		LawnGreen   ncl
+125 125 125 		gray49   ncl
+125 125 125 		grey49   ncl
+125  38 205		purple3   ncl
+126 192 238		SkyBlue2   ncl
+127 127 127 		gray50   ncl
+127 127 127 		grey50   ncl
+127 255	  0		chartreuse1   ncl
+127 255   0		chartreuse   ncl
+127 255 212		aquamarine1   ncl
+127 255 212		aquamarine   ncl
+130 130 130 		gray51   ncl
+130 130 130 		grey51   ncl
+131 111 255		SlateBlue1   ncl
+131 139 131		honeydew4   ncl
+131 139 139		azure4   ncl
+ 13  13  13 		gray5   ncl
+ 13  13  13 		grey5   ncl
+132 112 255		light slate blue   ncl
+132 112 255		LightSlateBlue   ncl
+133 133 133 		gray52   ncl
+133 133 133 		grey52   ncl
+135 135 135 		gray53   ncl
+135 135 135 		grey53   ncl
+135 206 235		sky blue   ncl
+135 206 235		SkyBlue   ncl
+135 206 250		light sky blue   ncl
+135 206 250		LightSkyBlue   ncl
+135 206 255		SkyBlue1   ncl
+137 104 205		MediumPurple3   ncl
+138 138 138 		gray54   ncl
+138 138 138 		grey54   ncl
+138  43 226		blue violet   ncl
+138  43 226		BlueViolet   ncl
+139   0   0		dark red   ncl
+139   0   0		DarkRed   ncl
+139   0	  0		red4   ncl
+139   0 139		dark magenta   ncl
+139   0 139		DarkMagenta   ncl
+139   0 139		magenta4   ncl
+139 101	  8		DarkGoldenrod4   ncl
+139 102 139		plum4   ncl
+139 105 105		RosyBrown4   ncl
+139 105	 20		goldenrod4   ncl
+139  10	 80		DeepPink4   ncl
+139 115	 85		burlywood4   ncl
+139 117	  0		gold4   ncl
+139 119 101		PeachPuff4   ncl
+139 121	 94		NavajoWhite4   ncl
+139 123 139		thistle4   ncl
+139 125 107		bisque4   ncl
+139 125 123		MistyRose4   ncl
+139 126 102		wheat4   ncl
+139 129	 76		LightGoldenrod4   ncl
+139 131 120		AntiqueWhite4   ncl
+139 131 134		LavenderBlush4   ncl
+139 134 130		seashell4   ncl
+139 134	 78		khaki4   ncl
+139 136 120		cornsilk4   ncl
+139 137 112		LemonChiffon4   ncl
+139 137 137		snow4   ncl
+139 139	  0		yellow4   ncl
+139 139 122		LightYellow4   ncl
+139 139 131		ivory4   ncl
+139  26	 26		firebrick4   ncl
+139  28	 98		maroon4   ncl
+139  34	 82		VioletRed4   ncl
+139  35	 35		brown4   ncl
+139  37	  0		OrangeRed4   ncl
+139  54	 38		tomato4   ncl
+139  58	 58		IndianRed4   ncl
+139  58  98		HotPink4   ncl
+139  62	 47		coral4   ncl
+139  69	  0		DarkOrange4   ncl
+139  69	 19		chocolate4   ncl
+139  69  19		saddle brown   ncl
+139  69  19		SaddleBrown   ncl
+139  71 137		orchid4   ncl
+139  71	 38		sienna4   ncl
+139  71	 93		PaleVioletRed4   ncl
+139  76	 57		salmon4   ncl
+139  87	 66		LightSalmon4   ncl
+139  90	  0		orange4   ncl
+139  90	 43		tan4   ncl
+139  95 101		LightPink4   ncl
+139  99 108		pink4   ncl
+140 140 140 		gray55   ncl
+140 140 140 		grey55   ncl
+141 182 205		LightSkyBlue3   ncl
+141 238 238		DarkSlateGray2   ncl
+142 229 238		CadetBlue2   ncl
+143 143 143 		gray56   ncl
+143 143 143 		grey56   ncl
+143 188 143		dark sea green   ncl
+143 188 143		DarkSeaGreen   ncl
+144 238 144		light green   ncl
+144 238 144		LightGreen   ncl
+144 238 144		PaleGreen2   ncl
+145 145 145 		gray57   ncl
+145 145 145 		grey57   ncl
+145  44 238		purple2   ncl
+147 112 219		medium purple   ncl
+147 112 219		MediumPurple   ncl
+148   0 211		dark violet   ncl
+148   0 211		DarkViolet   ncl
+148 148 148 		gray58   ncl
+148 148 148 		grey58   ncl
+150 150 150 		gray59   ncl
+150 150 150 		grey59   ncl
+150 205 205		PaleTurquoise3   ncl
+151 255 255		DarkSlateGray1   ncl
+ 15  15  15 		gray6   ncl
+ 15  15  15 		grey6   ncl
+152 245 255		CadetBlue1   ncl
+152 251 152		pale green   ncl
+152 251 152		PaleGreen   ncl
+153 153 153 		gray60   ncl
+153 153 153 		grey60   ncl
+153  50 204		dark orchid   ncl
+153  50 204		DarkOrchid   ncl
+154 192 205		LightBlue3   ncl
+154 205	 50		OliveDrab3   ncl
+154 205  50		yellow green   ncl
+154 205  50		YellowGreen   ncl
+154 255 154		PaleGreen1   ncl
+154  50 205		DarkOrchid3   ncl
+155 205 155		DarkSeaGreen3   ncl
+155  48 255		purple1   ncl
+156 156 156 		gray61   ncl
+156 156 156 		grey61   ncl
+158 158 158 		gray62   ncl
+158 158 158 		grey62   ncl
+159 121 238		MediumPurple2   ncl
+159 182 205		SlateGray3   ncl
+160  32 240		purple   ncl
+160  82  45		sienna   ncl
+161 161 161 		gray63   ncl
+161 161 161 		grey63   ncl
+162 181 205		LightSteelBlue3   ncl
+162 205	 90		DarkOliveGreen3   ncl
+163 163 163 		gray64   ncl
+163 163 163 		grey64   ncl
+164 211 238		LightSkyBlue2   ncl
+165  42  42		brown   ncl   .647  .1647  .1647
+166 166 166 		gray65   ncl
+166 166 166 		grey65   ncl
+ 16  78 139		DodgerBlue4   ncl
+168 168 168 		gray66   ncl
+168 168 168 		grey66   ncl
+169 169 169		dark gray   ncl
+169 169 169		DarkGray   ncl
+169 169 169		dark grey   ncl
+169 169 169		DarkGrey   ncl
+171 130 255		MediumPurple1   ncl
+171 171 171 		gray67   ncl
+171 171 171 		grey67   ncl
+173 173 173 		gray68   ncl
+173 173 173 		grey68   ncl
+173 216 230		light blue   ncl
+173 216 230		LightBlue   ncl
+173 255  47		green yellow   ncl
+173 255  47		GreenYellow   ncl
+174 238 238		PaleTurquoise2   ncl
+175 238 238		pale turquoise   ncl
+175 238 238		PaleTurquoise   ncl
+176 176 176 		gray69   ncl
+176 176 176 		grey69   ncl
+176 196 222		light steel blue   ncl
+176 196 222		LightSteelBlue   ncl
+176 224 230		powder blue   ncl
+176 224 230		PowderBlue   ncl
+176 226 255		LightSkyBlue1   ncl
+176  48  96		maroon   ncl
+178 223 238		LightBlue2   ncl
+178  34  34		firebrick   ncl
+178  58 238		DarkOrchid2   ncl
+179 179 179 		gray70   ncl
+179 179 179 		grey70   ncl
+179 238	 58		OliveDrab2   ncl
+180 205 205		LightCyan3   ncl
+180 238 180		DarkSeaGreen2   ncl
+180  82 205		MediumOrchid3   ncl
+181 181 181 		gray71   ncl
+181 181 181 		grey71   ncl
+ 18  18  18 		gray7   ncl
+ 18  18  18 		grey7   ncl
+184 134  11		dark goldenrod   ncl
+184 134  11		DarkGoldenrod   ncl
+184 184 184 		gray72   ncl
+184 184 184 		grey72   ncl
+185 211 238		SlateGray2   ncl
+186 186 186 		gray73   ncl
+186 186 186 		grey73   ncl
+186  85 211		medium orchid   ncl
+186  85 211		MediumOrchid   ncl
+187 255 255		PaleTurquoise1   ncl
+188 143 143		rosy brown   ncl
+188 143 143		RosyBrown   ncl
+188 210 238		LightSteelBlue2   ncl
+188 238 104		DarkOliveGreen2   ncl
+189 183 107		dark khaki   ncl
+189 183 107		DarkKhaki   ncl
+189 189 189 		gray74   ncl
+189 189 189 		grey74   ncl
+190 190 190		gray   ncl
+190 190 190		grey   ncl
+191 191 191 		gray75   ncl
+191 191 191 		grey75   ncl
+191 239 255		LightBlue1   ncl
+191  62 255		DarkOrchid1   ncl
+192 255	 62		OliveDrab1   ncl
+193 205 193		honeydew3   ncl
+193 205 205		azure3   ncl
+193 255 193		DarkSeaGreen1   ncl
+194 194 194 		gray76   ncl
+194 194 194 		grey76   ncl
+196 196 196 		gray77   ncl
+196 196 196 		grey77   ncl
+198 226 255		SlateGray1   ncl
+199 199 199 		gray78   ncl
+199 199 199 		grey78   ncl
+199  21 133		medium violet red   ncl
+199  21 133		MediumVioletRed   ncl
+201 201 201 		gray79   ncl
+201 201 201 		grey79   ncl
+ 20  20  20 		gray8   ncl
+ 20  20  20 		grey8   ncl
+202 225 255		LightSteelBlue1   ncl
+202 255 112		DarkOliveGreen1   ncl
+204 204 204 		gray80   ncl
+204 204 204 		grey80   ncl
+205   0	  0		red3   ncl
+205   0 205		magenta3   ncl
+205 102	  0		DarkOrange3   ncl
+205 102	 29		chocolate3   ncl
+205 104 137		PaleVioletRed3   ncl
+205 104	 57		sienna3   ncl
+205 105 201		orchid3   ncl
+205 112	 84		salmon3   ncl
+205 129	 98		LightSalmon3   ncl
+205 133	  0		orange3   ncl
+205 133  63		peru   ncl
+205 133	 63		tan3   ncl
+205 140 149		LightPink3   ncl
+205 145 158		pink3   ncl
+205 149	 12		DarkGoldenrod3   ncl
+205 150 205		plum3   ncl
+205 155 155		RosyBrown3   ncl
+205 155	 29		goldenrod3   ncl
+205  16 118		DeepPink3   ncl
+205 170 125		burlywood3   ncl
+205 173	  0		gold3   ncl
+205 175 149		PeachPuff3   ncl
+205 179 139		NavajoWhite3   ncl
+205 181 205		thistle3   ncl
+205 183 158		bisque3   ncl
+205 183 181		MistyRose3   ncl
+205 186 150		wheat3   ncl
+205 190 112		LightGoldenrod3   ncl
+205 192 176		AntiqueWhite3   ncl
+205 193 197		LavenderBlush3   ncl
+205 197 191		seashell3   ncl
+205 198 115		khaki3   ncl
+205 200 177		cornsilk3   ncl
+205 201 165		LemonChiffon3   ncl
+205 201 201		snow3   ncl
+205 205	  0		yellow3   ncl
+205 205 180		LightYellow3   ncl
+205 205 193		ivory3   ncl
+205  38	 38		firebrick3   ncl
+205  41 144		maroon3   ncl
+205  50 120		VioletRed3   ncl
+205  51	 51		brown3   ncl
+205  55	  0		OrangeRed3   ncl
+205  79	 57		tomato3   ncl
+205  85	 85		IndianRed3   ncl
+205  91	 69		coral3   ncl
+205  92  92		indian red   ncl
+205  92  92		IndianRed   ncl
+205  96 144		HotPink3   ncl
+207 207 207 		gray81   ncl
+207 207 207 		grey81   ncl
+208  32 144		violet red   ncl
+208  32 144		VioletRed   ncl
+209 209 209 		gray82   ncl
+209 209 209 		grey82   ncl
+209 238 238		LightCyan2   ncl
+209  95 238		MediumOrchid2   ncl
+210 105  30		chocolate   ncl
+210 180 140		tan   ncl
+211 211 211		light gray   ncl
+211 211 211		LightGray   ncl
+211 211 211		light grey   ncl
+211 211 211		LightGrey   ncl
+212 212 212 		gray83   ncl
+212 212 212 		grey83   ncl
+214 214 214 		gray84   ncl
+214 214 214 		grey84   ncl
+216 191 216		thistle   ncl
+217 217 217 		gray85   ncl
+217 217 217 		grey85   ncl
+218 112 214		orchid   ncl
+218 165  32		goldenrod   ncl
+219 112 147		pale violet red   ncl
+219 112 147		PaleVioletRed   ncl
+219 219 219 		gray86   ncl
+219 219 219 		grey86   ncl
+220 220 220		gainsboro   ncl
+221 160 221		plum   ncl
+222 184 135		burlywood   ncl
+222 222 222 		gray87   ncl
+222 222 222 		grey87   ncl
+224 102 255		MediumOrchid1   ncl
+224 224 224 		gray88   ncl
+224 224 224 		grey88   ncl
+224 238 224		honeydew2   ncl
+224 238 238		azure2   ncl
+224 255 255		LightCyan1   ncl
+224 255 255		light cyan   ncl
+224 255 255		LightCyan   ncl
+227 227 227 		gray89   ncl
+227 227 227 		grey89   ncl
+229 229 229 		gray90   ncl
+229 229 229 		grey90   ncl
+230 230 250		lavender   ncl
+232 232 232 		gray91   ncl
+232 232 232 		grey91   ncl
+ 23  23  23 		gray9   ncl
+ 23  23  23 		grey9   ncl
+233 150 122		dark salmon   ncl
+233 150 122		DarkSalmon   ncl
+235 235 235 		gray92   ncl
+235 235 235 		grey92   ncl
+237 237 237 		gray93   ncl
+237 237 237 		grey93   ncl
+238   0	  0		red2   ncl
+238   0 238		magenta2   ncl
+238 106 167		HotPink2   ncl
+238 106	 80		coral2   ncl
+238 118	  0		DarkOrange2   ncl
+238 118	 33		chocolate2   ncl
+238 121 159		PaleVioletRed2   ncl
+238 121	 66		sienna2   ncl
+238 122 233		orchid2   ncl
+238 130 238		violet   ncl
+238 130	 98		salmon2   ncl
+238 149 114		LightSalmon2   ncl
+238 154	  0		orange2   ncl
+238 154	 73		tan2   ncl
+238 162 173		LightPink2   ncl
+238 169 184		pink2   ncl
+238 173	 14		DarkGoldenrod2   ncl
+238 174 238		plum2   ncl
+238 180 180		RosyBrown2   ncl
+238 180	 34		goldenrod2   ncl
+238  18 137		DeepPink2   ncl
+238 197 145		burlywood2   ncl
+238 201	  0		gold2   ncl
+238 203 173		PeachPuff2   ncl
+238 207 161		NavajoWhite2   ncl
+238 210 238		thistle2   ncl
+238 213 183		bisque2   ncl
+238 213 210		MistyRose2   ncl
+238 216 174		wheat2   ncl
+238 220 130		LightGoldenrod2   ncl
+238 221 130		light goldenrod   ncl
+238 221 130		LightGoldenrod   ncl
+238 223 204		AntiqueWhite2   ncl
+238 224 229		LavenderBlush2   ncl
+238 229 222		seashell2   ncl
+238 230 133		khaki2   ncl
+238 232 170		pale goldenrod   ncl
+238 232 170		PaleGoldenrod   ncl
+238 232 205		cornsilk2   ncl
+238 233 191		LemonChiffon2   ncl
+238 233 233		snow2   ncl
+238 238	  0		yellow2   ncl
+238 238 209		LightYellow2   ncl
+238 238 224		ivory2   ncl
+238  44	 44		firebrick2   ncl
+238  48 167		maroon2   ncl
+238  58 140		VioletRed2   ncl
+238  59	 59		brown2   ncl
+238  64	  0		OrangeRed2   ncl
+238  92	 66		tomato2   ncl
+238  99	 99		IndianRed2   ncl
+240 128 128		light coral   ncl
+240 128 128		LightCoral   ncl
+240 230 140		khaki   ncl
+240 240 240 		gray94   ncl
+240 240 240 		grey94   ncl
+240 248 255		alice blue   ncl
+240 248 255		AliceBlue   ncl
+240 255 240		honeydew1   ncl
+240 255 240		honeydew   ncl
+240 255 255		azure1   ncl
+240 255 255		azure   ncl
+ 24 116 205		DodgerBlue3   ncl
+242 242 242 		gray95   ncl
+242 242 242 		grey95   ncl
+244 164  96		sandy brown   ncl
+244 164  96		SandyBrown   ncl
+245 222 179		wheat   ncl
+245 245 220		beige   ncl
+245 245 245 		gray96   ncl
+245 245 245 		grey96   ncl
+245 245 245		white smoke   ncl
+245 245 245		WhiteSmoke   ncl
+245 255 250		mint cream   ncl
+245 255 250		MintCream   ncl
+247 247 247 		gray97   ncl
+247 247 247 		grey97   ncl
+248 248 255		ghost white   ncl
+248 248 255		GhostWhite   ncl
+250 128 114		salmon   ncl
+250 235 215		antique white   ncl
+250 235 215		AntiqueWhite   ncl
+250 240 230		linen   ncl
+250 250 210		light goldenrod yellow   ncl
+250 250 210		LightGoldenrodYellow   ncl
+250 250 250 		gray98   ncl
+250 250 250 		grey98   ncl
+252 252 252 		gray99   ncl
+252 252 252 		grey99   ncl
+ 25  25 112		midnight blue   ncl
+ 25  25 112		MidnightBlue   ncl
+253 245 230		old lace   ncl
+253 245 230		OldLace   ncl
+255   0	  0		red1   ncl
+255   0   0		red   ncl
+255   0 255		magenta1   ncl
+255   0 255		magenta   ncl
+255 105 180		hot pink   ncl
+255 105 180		HotPink   ncl
+255 106 106		IndianRed1   ncl
+255 110 180		HotPink1   ncl
+255 114	 86		coral1   ncl
+255 127	  0		DarkOrange1   ncl
+255 127	 36		chocolate1   ncl
+255 127  80		coral   ncl
+255 130 171		PaleVioletRed1   ncl
+255 130	 71		sienna1   ncl
+255 131 250		orchid1   ncl
+255 140   0		dark orange   ncl
+255 140   0		DarkOrange   ncl
+255 140 105		salmon1   ncl
+255 160 122		LightSalmon1   ncl
+255 160 122		light salmon   ncl
+255 160 122		LightSalmon   ncl
+255 165	  0		orange1   ncl
+255 165   0		orange   ncl
+255 165	 79		tan1   ncl
+255 174 185		LightPink1   ncl
+255 181 197		pink1   ncl
+255 182 193		light pink   ncl
+255 182 193		LightPink   ncl
+255 185	 15		DarkGoldenrod1   ncl
+255 187 255		plum1   ncl
+255 192 203		pink   ncl
+255 193 193		RosyBrown1   ncl
+255 193	 37		goldenrod1   ncl
+255  20 147		DeepPink1   ncl
+255  20 147		deep pink   ncl
+255  20 147		DeepPink   ncl
+255 211 155		burlywood1   ncl
+255 215	  0		gold1   ncl
+255 215   0 		gold   ncl
+255 218 185		PeachPuff1   ncl
+255 218 185		peach puff   ncl
+255 218 185		PeachPuff   ncl
+255 222 173		NavajoWhite1   ncl
+255 222 173		navajo white   ncl
+255 222 173		NavajoWhite   ncl
+255 225 255		thistle1   ncl
+255 228 181		moccasin   ncl
+255 228 196		bisque1   ncl
+255 228 196		bisque   ncl
+255 228 225		MistyRose1   ncl
+255 228 225		misty rose   ncl
+255 228 225		MistyRose   ncl
+255 231 186		wheat1   ncl
+255 235 205		blanched almond   ncl
+255 235 205		BlanchedAlmond   ncl
+255 236 139		LightGoldenrod1   ncl
+255 239 213		papaya whip   ncl
+255 239 213		PapayaWhip   ncl
+255 239 219		AntiqueWhite1   ncl
+255 240 245		LavenderBlush1   ncl
+255 240 245		lavender blush   ncl
+255 240 245		LavenderBlush   ncl
+255 245 238		seashell1   ncl
+255 245 238		seashell   ncl
+255 246 143		khaki1   ncl
+255 248 220		cornsilk1   ncl
+255 248 220		cornsilk   ncl
+255 250 205		LemonChiffon1   ncl
+255 250 205		lemon chiffon   ncl
+255 250 205		LemonChiffon   ncl
+255 250 240		floral white   ncl
+255 250 240		FloralWhite   ncl
+255 250 250		snow1   ncl
+255 250 250		snow   ncl
+255 255	  0		yellow1   ncl
+255 255   0		yellow   ncl
+255 255 224		LightYellow1   ncl
+255 255 224		light yellow   ncl
+255 255 224		LightYellow   ncl
+255 255 240		ivory1   ncl
+255 255 240		ivory   ncl
+255 255 255 		gray100   ncl
+255 255 255 		grey100   ncl
+255 255 255		white   ncl
+255  48	 48		firebrick1   ncl
+255  52 179		maroon1   ncl
+255  62 150		VioletRed1   ncl
+255  64	 64		brown1   ncl
+255  69	  0		OrangeRed1   ncl
+255  69   0		orange red   ncl
+255  69   0		OrangeRed   ncl
+255  99	 71		tomato1   ncl
+255  99  71		tomato   ncl
+ 26  26  26 		gray10   ncl
+ 26  26  26 		grey10   ncl
+ 28 134 238		DodgerBlue2   ncl
+ 28  28  28 		gray11   ncl
+ 28  28  28 		grey11   ncl
+ 30 144 255		DodgerBlue1   ncl
+ 30 144 255		dodger blue   ncl
+ 30 144 255		DodgerBlue   ncl
+ 31  31  31 		gray12   ncl
+ 31  31  31 		grey12   ncl
+ 32 178 170		light sea green   ncl
+ 32 178 170		LightSeaGreen   ncl
+ 33  33  33 		gray13   ncl
+ 33  33  33 		grey13   ncl
+  3   3   3		gray1   ncl
+  3   3   3		grey1   ncl
+ 34 139  34		forest green   ncl
+ 34 139  34		ForestGreen   ncl
+ 36  36  36 		gray14   ncl
+ 36  36  36 		grey14   ncl
+ 38  38  38 		gray15   ncl
+ 38  38  38 		grey15   ncl
+ 39  64 139		RoyalBlue4   ncl
+ 41  41  41 		gray16   ncl
+ 41  41  41 		grey16   ncl
+ 43  43  43 		gray17   ncl
+ 43  43  43 		grey17   ncl
+ 46 139	 87		SeaGreen4   ncl
+ 46 139  87		sea green   ncl
+ 46 139  87		SeaGreen   ncl
+ 46  46  46 		gray18   ncl
+ 46  46  46 		grey18   ncl
+ 47  79  79		dark slate gray   ncl
+ 47  79  79		DarkSlateGray   ncl
+ 47  79  79		dark slate grey   ncl
+ 47  79  79		DarkSlateGrey   ncl
+ 48  48  48 		gray19   ncl
+ 48  48  48 		grey19   ncl
+ 50 205  50		lime green   ncl
+ 50 205  50		LimeGreen   ncl
+ 51  51  51 		gray20   ncl
+ 51  51  51 		grey20   ncl
+ 54 100 139		SteelBlue4   ncl
+ 54  54  54 		gray21   ncl
+ 54  54  54 		grey21   ncl
+  5   5   5		gray2   ncl
+  5   5   5		grey2   ncl
+ 56  56  56 		gray22   ncl
+ 56  56  56 		grey22   ncl
+ 58  95 205		RoyalBlue3   ncl
+ 59  59  59 		gray23   ncl
+ 59  59  59 		grey23   ncl
+ 60 179 113		medium sea green   ncl
+ 60 179 113		MediumSeaGreen   ncl
+ 61  61  61 		gray24   ncl
+ 61  61  61 		grey24   ncl
+ 64 224 208		turquoise   ncl
+ 64  64  64 		gray25   ncl
+ 64  64  64 		grey25   ncl
+ 65 105 225		royal blue   ncl
+ 65 105 225		RoyalBlue   ncl
+ 66  66  66 		gray26   ncl
+ 66  66  66 		grey26   ncl
+ 67 110 238		RoyalBlue2   ncl
+ 67 205 128		SeaGreen3   ncl
+ 69 139	  0		chartreuse4   ncl
+ 69 139 116		aquamarine4   ncl
+ 69  69  69 		gray27   ncl
+ 69  69  69 		grey27   ncl
+ 70 130 180		steel blue   ncl
+ 70 130 180		SteelBlue   ncl
+ 71  60 139		SlateBlue4   ncl
+ 71  71  71 		gray28   ncl
+ 71  71  71 		grey28   ncl
+ 72 118 255		RoyalBlue1   ncl
+ 72 209 204		medium turquoise   ncl
+ 72 209 204		MediumTurquoise   ncl
+ 72  61 139		dark slate blue   ncl
+ 72  61 139		DarkSlateBlue   ncl
+ 74 112 139		SkyBlue4   ncl
+ 74  74  74 		gray29   ncl
+ 74  74  74 		grey29   ncl
+ 77  77  77 		gray30   ncl
+ 77  77  77 		grey30   ncl
+ 78 238 148		SeaGreen2   ncl
+ 79 148 205		SteelBlue3   ncl
+ 79  79  79 		gray31   ncl
+ 79  79  79 		grey31   ncl
+ 82 139 139		DarkSlateGray4   ncl
+ 82  82  82 		gray32   ncl
+ 82  82  82 		grey32   ncl
+ 83 134 139		CadetBlue4   ncl
+ 84 139	 84		PaleGreen4   ncl
+ 84 255 159		SeaGreen1   ncl
+ 84  84  84 		gray33   ncl
+ 84  84  84 		grey33   ncl
+ 85 107  47		dark olive green   ncl
+ 85 107  47		DarkOliveGreen   ncl
+ 85  26 139		purple4   ncl
+ 87  87  87 		gray34   ncl
+ 87  87  87 		grey34   ncl
+  8   8   8		gray3   ncl
+  8   8   8		grey3   ncl
+ 89  89  89 		gray35   ncl
+ 89  89  89 		grey35   ncl
+ 92 172 238		SteelBlue2   ncl
+ 92  92  92 		gray36   ncl
+ 92  92  92 		grey36   ncl
+ 93  71 139		MediumPurple4   ncl
+ 94  94  94 		gray37   ncl
+ 94  94  94 		grey37   ncl
+ 95 158 160		cadet blue   ncl
+ 95 158 160		CadetBlue   ncl
+ 96 123 139		LightSkyBlue4   ncl
+ 97  97  97 		gray38   ncl
+ 97  97  97 		grey38   ncl
+ 99 184 255		SteelBlue1   ncl
+ 99  99  99 		gray39   ncl
+ 99  99  99 		grey39   ncl
+ R   G   B   ncl

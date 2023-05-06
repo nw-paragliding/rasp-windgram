@@ -1,0 +1,73 @@
+############################################################################
+###############  THIS FILE READ AFTER NORMAL PARAMETERS SET  ############### 
+###############         SO CAN BE USED TO ALTER THEM         ############### 
+###############            (utilizes perl coding)            ############### 
+############################################################################
+############  SITE-SPECIFIC PARAMETERS FOLLOW  ################## 
+#
+### EMAIL ADDRESS where fatal error messages are sent (when std.err file not empty)
+### also used for anonymous ftp login password so CANNOT BE BLANK!
+
+$ADMIN_EMAIL_ADDRESS = 'tj@localhost';
+
+### ERROR MESSAGES TO BE REPORTED TO ADMIN VIA EMAIL
+### activate any errors you wish to be advised of via email
+### * REPORT FAILIURE OF WRF FORECAST PROGRAM wrf.exe 
+###   $ADMIN_EMAIL{'WRF_EXECUTION'} = 1 ;
+### * REPORT TIMEOUT FAILIURE OF NCL PLOTTING PROGRAM
+##   $ADMIN_EMAIL{'NCL_TIMEOUT'} = 1 ;
+### * REPORT FAILIURE TO FIND EXPECTED FINAL IMAGE FILE AT JOB END
+##   $ADMIN_EMAIL{'JOBEND_IMAGE'} = 1 ;
+##
+
+### ALTER NUMBER OF CPUS from default=2 (which is also ok for 1 cpu)
+$NCPUS = 4;
+
+## IMPORTANT - remove trailing \n from the date command
+$LOCALTIME_ID{$JOBARG} = `date +%Z | tr -d "\n"` ;   
+$LOCALTIME_ADJ{$JOBARG} = `date +%z |sed -e 's/00//g' -e 's/-0/-/g' | tr -d "\n"` ; 
+  
+$ncltimeoutsec = int( 25 *60 );
+
+#################################  FLAGS  #####################################################
+### LPRINT:     >0 output to std.out,  <0 output to file $program.printout
+###             |$LPRINT|=4 for most output,  2=normal, 1=minimal,  0=none
+### LGETGRIB:   0= skip grib get & prep
+###             1= run grib_prep.pl for existing grib files
+###             2= get new grib files at scheduled times
+###             3= get new grib files via ls query
+###            -1= grib file name specified
+### LSEND:      0= images produced only in local "RASP/RUN/OUT" subdirectory
+###             1= copy images to web directory using filenames pre-pended with "test"
+###             2= copy images to web directory using normal filenames
+###             -1,-2 => ftp images to remote server (NOT OPERATIONALLY TESTED)
+###             3= also do firstofday processing (NOT IMPLEMENTED)
+### LSAVE:      0= nosave 1= save plot data files 2= also save plot images 3=also save init files
+### LMODELINIT: 1= do wrfsi initialization 0=none
+### LMODELRUN:  2= run all  1= skip wrf.exe  0= no_run
+####################
+
+#################################################################
+######  PUT LOCAL SITE PARAMETERS CHANGES BELOW THIS LINE  ######
+#################################################################
+
+## SET BASIC PARAMETER LIST
+@{$PARAMETER_DOLIST{'$JOBARG'}} = ('hbl','boxwmax','dbl','hwcrit','dwcrit','wstar',
+	'bsratio','sfcsunpct','sfcsun','sfcshf','experimental2','experimental1',
+	'hglider','blwind','sfcwind','sfcwind0','sfcwind2', 'tenmwind','zsfclcl',
+	'zsfclcldif','zsfclclmask','zblcl','zblcldif','zblclmask','blcloudpct','blcwbase',
+	'press990','press980','press970','press960','press950','press900','press940',
+	'press930','press920','press910','press860','press870','press880','press890',
+	'press850','press825','press800','press775','press750','press725','press700',
+	'press670','press500','press1000','bltopvariab','bltopwind','wblmaxmin',
+	'blwindshear','zwblmaxmin',  'sfcdewpt', 'rhblmax', 'cape', 'wstar_bsratio',
+	'mslpress','rain1','sfctemp','wrf=CFRACH','wrf=CFRACM','wrf=CFRACL','wrf=RAINNC'  );
+
+
+push@{$PARAMETER_DOLIST{'$JOBARG'}},('xbl_-122.43_48.61_45');
+push@{$PARAMETER_DOLIST{'$JOBARG'}},('xbl_-122.43_48.61_windk_4','xbl_-122.06_48.86_windk_4');
+
+#################################################################
+######        ADDITIONS MUST BE MADE ABOVE THIS LINE       ######
+#################################################################
+1.;

@@ -1,0 +1,60 @@
+@REGION_DOLIST = ( 'PNW' );
+$GRIBFILE_MODEL = 'ETA';
+
+$LSEND = 2;
+if( not defined $LSEND ) { $LSEND =  0; }
+if( not defined $LSAVE ) { $LSAVE =  0; }
+
+$LRUN_WINDOW{'PNW'} = 0 ;
+
+@{$PARAMETER_DOLIST{'PNW'}} = ('hbl','boxwmax','dbl','hwcrit','dwcrit','wstar',
+	'bsratio','sfcsunpct','sfcsun','sfcshf','experimental2','experimental1',
+	'hglider','blwind','sfcwind','sfcwind0','sfcwind2', 'tenmwind','zsfclcl',
+	'zsfclcldif','zsfclclmask','zblcl','zblcldif','zblclmask','blcloudpct',
+	'blcwbase','press990','press980','press970','press960','press950','press900',
+	'press940','press930','press920','press910','press860','press870','press880',
+	'press890','press850','press825','press800','press775','press750','press725',
+	'press700','press670','press500','press1000','bltopvariab','bltopwind',
+	'wblmaxmin','blwindshear','zwblmaxmin',  'sfcdewpt', 'rhblmax', 'cape',
+	'wstar_bsratio','mslpress','rain1','sfctemp','wrf=CFRACH','wrf=CFRACM','wrf=CFRACL','wrf=RAINNC');
+	
+push@{$PARAMETER_DOLIST{'PNW'}},('xbl_-122.43_48.61_45');
+push@{$PARAMETER_DOLIST{'PNW'}},('xbl_-122.43_48.61_windk_4','xbl_-122.06_48.86_windk_4');
+
+$LOCALTIME_ID{'PNW'} = PDT;
+$LOCALTIME_ADJ{'PNW'} = -7; ; 
+
+$GRIBFILES_PER_FORECAST_PERIOD{'PNW'} = 6 ;
+%GRIBFILE_DOLIST = ( 'PNW'   => [ '12Z+0','12Z+3','12Z+6','12Z+9','12Z+12','12Z+15' ], );
+
+$FORECAST_PERIODHRS{'PNW'}[0] = 15;
+$DOMAIN1_STARTHH{'PNW'}[0] = '12';
+$DOMAIN1_ENDHH{'PNW'}[0] = '03';
+$DOMAIN2_START_DELTAMINS{'PNW'}[0] = 0;
+$DOMAIN2_END_DELTAMINS{'PNW'}[0] = 0;
+$DOMAIN3_START_DELTAMINS{'PNW'}[0] = 0;
+$DOMAIN3_END_DELTAMINS{'PNW'}[0] = 0;
+$DOMAIN1_TIMESTEP{'PNW'}[0] = 72;
+$BOUNDARY_UPDATE_PERIODHRS{'PNW'}[0] = 3; 
+$NDOWN_BOUNDARY_UPDATE_PERIODHRS{'PNW'}[0] = 0;
+@{$PLOT_IMAGE_SIZE{'PNW'}[0]} = ( '', '1200x1200' );
+@{$PLOT_HHMMLIST{'PNW'}[0]} =  ('1500','1600','1700','1800','1900','2000','2100','2200','2300','0000','0100','0200','0300');
+
+$FORECAST_PERIODHRS{'PNW'}[1] = 12;
+$DOMAIN1_STARTHH{'PNW'}[1] = '15';
+$DOMAIN1_ENDHH{'PNW'}[1] = '03';          
+$DOMAIN2_START_DELTAMINS{'PNW'}[1] = 0;
+$DOMAIN2_END_DELTAMINS{'PNW'}[1] = 0;
+$DOMAIN3_START_DELTAMINS{'PNW'}[1] = 0;
+$DOMAIN3_END_DELTAMINS{'PNW'}[1] = 0;
+$DOMAIN1_TIMESTEP{'PNW'}[1] = 24 ;
+$BOUNDARY_UPDATE_PERIODHRS{'PNW'}[1] = 1;     
+$NDOWN_BOUNDARY_UPDATE_PERIODHRS{'PNW'}[1] = 1 ;  
+@{$PLOT_IMAGE_SIZE{'PNW'}[1]} = ( '', '1200x1200' );
+@{$PLOT_HHMMLIST{'PNW'}[1]} =  ('1500','1600','1700','1800','1900','2000','2100','2200','2300','0000','0100','0200','0300');
+
+##############  END OF REGION DEPENDENT PARAMETERS  ##############
+##################################################################
+##########    ADDITIONS MUST BE MADE ABOVE THIS LINE    ##########
+##################################################################
+1.;

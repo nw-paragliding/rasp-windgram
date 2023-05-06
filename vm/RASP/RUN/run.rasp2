@@ -1,0 +1,191 @@
+#!/bin/bash 
+
+### run.rasp  wrap this around rasp.pl which wraps around a whole bunch of wrf related things and then the ncl plotting routines.
+##   this tjo revision of run.rasp adds some things to check for multiple nests and bail if the conditions are not met
+##   if it is a standard ordinary run, it should run same as ever except a new header in the printout file.
+##   Normally control returns to this script when rasp.pl exits. 
+
+cd $BASEDIR/RASP/RUN 
+
+callingcommand=$0
+
+## check to whether number of parameters is zero or is -?
+
+if [ $# -eq 0 -o "$1" = "-?" ]
+then
+#-----------------adescription1------------------------------------
+echo 'Run normal daily rasp2.pl job for domainarg <-z> $SITE <$*>'
+echo 'optional -z includes 1hr sleep IF DaylightTime'
+echo 'optional $* defaults to "-M 0" if not specified'
+echo '(expect to run from cron - so sans normal profile & print only errors)'
+echo '(if NOT run from cron, use nohup and &)'
+echo '(*NB* MUST BE CALLED EITHER WITH NO PATH FROM RUN DIRECTORY OR WITH FULL PATH NAME !!!)'
+exit
+fi
+##################################################################
+#4no_undefined: treat unset variable as an error when substituting: set -u
+#4no_file_glob: disable filename generation: set -f
+#4exit_on_error: exit if command has non-zero exit status: set -e
+#4test: set -vx
+##################################################################
+
+###### *NB* MUST BE CALLED WITH FULL PATH NAME SO THAT $PWD CAN BE DETERMINED !!!
+
+#################################################################################
+##########  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  ###########
+##########  *NB* EDITING MAY CAUSE PROBLEMS IN EXISTING RUNNING JOBS  ###########
+##########  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  ###########
+#################################################################################
+
+### SET FLAG TO SEND EMAIL IF STDERR NOT EMPTY
+LSENDSTDERREMAIL=0
+
+########################################
+
+### SET RUN DIRECTORY TO THAT OF THIS FILE
+if [ `echo $0 | cut -c1` = "/" ]
+then 
+  SCRIPTDIR=`echo "${0}" | sed 's|/[^/]*$||'` 
+else
+  SCRIPTDIR=`echo "${PWD}/${0}" | sed 's|[\./]*/[^/]*$||'`  # eliminate possible /./
+fi
+#bad SCRIPTDIR=`echo "${PWD}/${0}" | sed 's|[\./]*/[^/]*$||'`  # eliminate possible /./
+#4test: echo "SCRIPTDIR= $SCRIPTDIR"
+
+
+
+cd $SCRIPTDIR
+
+### USER-SPECIFIC PARAMETER 
+### SET LOCAL EMAIL ADDRESS for error messages (blank sends no messages)
+### now extract admin email address from rasp.site.parameters - allow both ' and " delimiter in rasp.site.parameters assignment
+ADMIN_EMAIL_ADDRESS=`sed -n "/^ *\$ADMIN_EMAIL_ADDRESS/s/^.*= *['\"]\([^'\"]*\)['\"].*$/\1/p" rasp.site.parameters`
+#hard-wired: ADMIN_EMAIL_ADDRESS='admindejour@drjack.info'
+
+### IF -z ARGUMENT SPECIFIED, DELAY 1HR IF DAYLIGHT SAVINGS TIME so crontab time can always be local time
+if [ "$1" = "-z" ]
+then
+  shift
+  DAYLIGHTSAVING=`perl -e '@TIME=localtime(time); print "$TIME[8]";'`
+  if [ $DAYLIGHTSAVING -gt 0 ]
+  then sleep 3600
+  fi
+fi
+
+### SET MODEL ARGUMENTS
+SITEARG=`echo $1 | tr '[a-z]' '[A-Z]'`
+sitearg=`echo $1 | tr '[A-Z]' '[a-z]'`
+
+export sitearg;
+export SITEARG;
+
+echo "SCRIPTDIR is $SCRIPTDIR"  >>rasp2.$sitearg.printout
+echo "START: Running $0  $@  at $(date)"  >>rasp2.$sitearg.printout
+
+# Don't even look for rasp.pl if -w and no real parent or site.parameters
+
+RUN_COMMON_SUBNEST=0
+
+if [[  $2 = "-w" ]]
+then
+	RUN_COMMON_SUBNEST=1
+	if [[ ! -z $3 ]]
+	then 
+		if [[ -s $BASEDIR/WRF/WRFV2/RASP/$3-WINDOW/wrf.out  ]]
+		then
+			echo "Running $1  a subnest  of the previously run domain $3" >>rasp2.$sitearg.printout
+			EXISTING_PARENT=$3
+		else   
+			echo " "
+			echo "Did not find the specified existing parent $3."  >>rasp2.$sitearg.printout
+			echo "You must supply an existing pre-run common parent at the command line: run.rasp THISREGION -w PARENTREGION " >>rasp2.$sitearg.printout
+			exit 1
+		fi
+	fi 
+fi
+
+if [[ -s rasp.run.parameters.$1 ]]
+then
+echo " "
+echo "Run will use parameter file rasp.run.parameters.$1"  >>rasp2.$sitearg.printout
+echo " " 
+else
+echo "rasp.run.parameters.$1 not found.  Be sure it exists and you have started this in the $BASEDIR/RASP/RUN directory." >>rasp2.$sitearg.printout
+exit 1
+fi
+
+### simple killers are OK so carry on.
+
+
+shift
+echo "Running   $sitearg  $SITEARG with parent $EXISTING_PARENT"  >>rasp2.$sitearg.printout
+## exit
+
+
+if [ $# -eq 0 ]
+then
+	arglist='-M 0'
+else
+	arglist=$*
+fi
+
+### TEST FOR RUN SCRIPT
+if [ ! -s rasp2.pl ]
+then
+	echo "***ERROR EXIT: rasp2.pl not found"
+	exit 1
+fi
+
+
+### SAVE OLD FILES, CREATE SITE-SPECIFIC EXECUTABLE 
+### save files from previous job
+mv -f rasp2.${sitearg}.pl       previous.rasp2.${sitearg}.pl        2>/dev/null
+mv -f rasp2.${sitearg}.printout previous.rasp2.${sitearg}.printout  2>/dev/null
+mv -f rasp2.${sitearg}.printout   previous.rasp2.${sitearg}.printout    2>/dev/null
+mv -f rasp2.${sitearg}.stderr   previous.rasp2.${sitearg}.stderr    2>/dev/null
+cp -p rasp2.pl rasp2.${sitearg}.pl
+### if rasp2.pl has changed, save old version results to help debug any errors added to new version
+if [ -f previous.rasp2.${sitearg}.pl ]
+then
+	cmp -s rasp2.${sitearg}.pl previous.rasp2.${sitearg}.pl
+	if [ $? -gt 0 ]
+	then
+		cp -pf previous.rasp2.${sitearg}.pl old.rasp2.${sitearg}.pl               2>/dev/null
+		cp -pf previous.rasp2.${sitearg}.printout old.rasp2.${sitearg}.printout   2>/dev/null
+		cp -pf previous.rasp2.${sitearg}.printout old.rasp2.${sitearg}.printout       2>/dev/null
+		cp -pf previous.rasp2.${sitearg}.stderr old.rasp2.${sitearg}.stderr       2>/dev/null
+	fi
+fi
+touch rasp2.$sitearg.printout
+echo " " >>rasp2.$sitearg.printout
+
+### SET OPTIONAL ENVIRONMENTAL PARAMETERS
+if [ -f ./rasp.site.runenvironment ]
+then
+	echo "Loading environmental parameters from rasp.site.runenvironment"
+	source ./rasp.site.runenvironment
+fi 
+
+echo "START:  Starting Run $0 $@  for $SITEARG  -- $(date)" >> rasp2.$sitearg.printout  
+if [[ $RUN_COMMON_SUBNEST -eq 1 ]]
+then
+	echo " with parent $EXISTING_PARENT  " >> rasp2.$sitearg.printout
+fi
+
+echo " \"$callingcommand  $SITEARG $* \" was the command " >>rasp2.$sitearg.printout
+echo " " >>rasp2.$sitearg.printout
+echo " " >>rasp2.$sitearg.printout
+
+## remove the done files for this region tjo
+## done_rasp2.pl.$SITEARG*
+## create a flag that this particular run has started.
+## touch done_start.$SITEARG
+
+### RUN JOB
+#nice: nice ./rasp2.${sitearg}.pl $SITEARG $arglist >| rasp2.${sitearg}.printout 2>| rasp2.${sitearg}.stderr
+#not-nice: 
+
+echo "START: RASP command  ./rasp2.${sitearg}.pl $SITEARG $arglist >| rasp2.${sitearg}.printout 2>| rasp2.${sitearg}.stderr" >>rasp2.$sitearg.printout
+
+./rasp2.${sitearg}.pl $SITEARG $arglist >| rasp2.${sitearg}.printout 2>| rasp2.${sitearg}.stderr
+

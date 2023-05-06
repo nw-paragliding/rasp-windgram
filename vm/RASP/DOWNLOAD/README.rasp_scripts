@@ -1,0 +1,134 @@
+
+============
+INSTALLATION
+============
+
+The installation of this tar file, and all RASP installation tar
+files, is described at
+   http://www.drjack.info/twiki/bin/view/RASPop/ProgramInstall
+Additional relevant information is at
+   http://www.drjack.info/twiki/bin/view/RASPop/
+
+
+========
+LICENSES
+========
+
+This tarfile includes the rasp.pl program written by Dr. John W.
+Glendening which is subject to the license described in that program.
+By using this programs you implicitly accept that license.
+
+This tarfile includes NCAR Graphics programs which are subject to the 
+license described at
+   http://ngwww.ucar.edu/ncl/license.html
+By using these programs you implicitly accept that license
+
+
+=============
+RELEASE NOTES
+=============
+-------------
+Nov 15 2005 - Changes following successful SW_SOUTHAFRICA installation
+-------------
+Nov 2005: Initial release for SW_SOUTHAFRICA installation (Ian Forbes)
+-------------
+Dec 2005: added create_directory.wrfsi_linked.pl,create_directory.wrf_linked.pl
+-------------
+1 Jan 2006: $LSEND,$LSAVE now set in rasp.run.parameters... (jobarg bypasses for -T,-t,-q,...)
+             now use rasp.site.parameters.TEMPLATE
+-------------
+12 Jan 2006: corrected WRF/UTIL/create_directory.wrfsi_window.pl
+-------------
+14 Jan 2006: corrected window plot failure due to multi-day change
+-------------
+05 Feb 2006: added ftp2u option to rasp.pl - added script RASP/RUN/UTIL/ftpgetdat_ftp2u.pl
+-------------
+07 Feb 2006: rasp.pl v2.23
+-------------
+24 Feb 2006: updated UTIL/ftpgetdat_ftp2u.pl with looping
+-------------
+ 3 Apr 2006: new RUN/UTIL/ftpgetdat_ftp2u.pl
+-------------
+ 3 May 2006: UTIL/gribftpget.pl now continue if unknown curl error occurs
+-------------
+ 7 May 2006: rasp.pl & rasp.ncl data file changes - no skewt wind clipping
+-------------
+21 May 2006: UTIL/gribftpget.pl error consolidation, rasp.ncl sounding data read correction
+-------------
+22 May 2006: rasp.pl and rasp.ncl - alter datafile creation and treatment
+-------------
+ 17 Aug 2006: updated rasp scripts for composite plots
+-------------
+ 4 Nov 2006: rasp.pl - correct image loop creation per Don Taber
+-------------
+ 6 Nov 2006: moved ncl scripts to separate tarball
+-------------
+ 13 Nov 2006: corrected WRF/UTIL/create_directory.wrfsi_linked.pl per Paul Scorer
+-------------
+ 16 Nov 2006: test for premature termination of ncl plotting script 
+-------------
+  4 Dec 2006: run.rasp uses generalized daylight-savings time test
+-------------
+  7 Dec 2006: WRF/UTIL/create_directory.wrfsi_linked.pl & WRF/UTIL/create_directory.wrf_linked.pl corrected 
+-------------
+ 19 Dec 2006: corrected non-3:1 calc.print of create_directory.wrfsi_window.pl & create_directory.wrf_window.pl
+-------------
+ 25 Dec 2006: rasp.pl changes needed for WRF v2.2
+-------------
+  2 Jan 2007: now chmod edited files
+------------
+ 12 Jan 2007: added optional title to image looping
+------------
+ 12 Jan 2007: added auto detection of nesting ratio to create_directory.wrfsi_window.pl & create_directory.wrf_window.pl and corrected 3:1 hard-wire in former
+------------
+ 15 Jan 2007: altered create_directory.wrfsi_window.pl 
+------------
+ 19 Jan 2007: added RASP/UTIL files ij2latlon.pl & latlon2ij.pl
+------------
+ 20 Jan 2007: corrected RASP/UTIL files ij2latlon.pl & latlon2ij.pl for non-3:1-gridratio
+------------
+ 22 Jan 2007: UTIL/gribftpget.pl - add 127 error message & alter FSL login
+------------
+ 29 Jan 2007: rasp.pl - minor improvements to printout wordings
+------------
+ 30 Jan 2007: rasp.pl - add SAVEDIR yyyy subdirectory
+------------
+ 31 Jan 2007: rasp.pl - add DOMAIN1_TIMESTEP as input parameter
+------------
+ 13 Jan 2007: correction ala Paul Scorer: in create_directory.wrfsi_linked.pl, remove exit
+------------
+ 20 Feb 2007: rasp.pl - added fine-scale control of file/image saves via %LSAVE hash
+------------
+ 23 Feb 2007: rasp.pl - added curr+3 run option
+------------
+ 21 Mar 2007: alter UTIL/ij2latlon.pl & UTIL/latlon2ij.pl
+------------
+ 22 Mar 2007: rasp.pl - improved error reporting for external wrf program calls
+------------
+ 23 Mar 2007: UTIL/gribftpget.pl - added rc=36 error treatment
+------------
+ 24 Mar 2007: rasp.pl - modified $LGETGRIB=0 (and thuse -q, etc. args) to also skip grib_prep.pl
+------------
+ 27 Mar 2007: rasp.pl - add hash to control which errors reported by email to admin
+------------
+ 28 May 2007: updated RUN/UTIL/ftpgetdat_ftp2u.pl for new server
+------------
+ 07 Jul 2007: updated ftpgetdat_ftp2u.pl
+------------
+ 25 Jul 2007: rasp.pl - remove old temporary ncgm and data files prior to plotting
+------------
+  5 Aug 2007: add blipspot scripts to UTIL
+------------
+  7 AUG 2007: ADDED UNTAINTING TO UTIL/ GET_RASP_BLIPSPOT.CGI & SUB.RASP_SITE_PARAMETERS.PL
+------------
+ 25 NOV 2007: rasp.pl - add -p/P argument option
+------------
+  6 JAN 2008: rasp.pl - change AVN $gribavailhrzoffset from 1.6 to 0.6 per paul hope
+------------
+ 28 JAN 2008: run.rasp - eliminate error message if no "previous" run files found
+------------
+  6 FEB 2008: ftpgetdat_ftp2u.pl altered to use nomad5 data after grib1 removal
+------------
+ 10 FEB 2008: rasp.pl - add kludge to allow grib2 ETA file using cnvgrib conversion
+------------
+ 7 Mar 2008: alter RUN/UTIL/ftpgetdat_ftp2u.pl 

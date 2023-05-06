@@ -1,0 +1,70 @@
+#! /bin/sh
+if [ $# = 0 -o "$1" = "-?" -o $# -lt 2 ]
+then
+#-----------------adescription1------------------------------------
+echo 'Convert NCGM gmeta file $1 to GIF $2 ($2 MUST have .gif tail)'
+echo '  <$1>=-widthxheight BUT AFFECTS ENTIRE IMAGE'
+echo '  Example: ncgm2gif -800x800 wfpm.ncgm wfpm.gif'
+exit
+fi
+##################################################################
+#4no_undefined: treat unset variable as an error when substituting: 
+set -u
+#4no_file_glob: disable filename generation: 
+set -f
+#4exit_on_error: exit if command has non-zero exit status: 
+set -e
+#4test: set -vx
+##################################################################
+
+### problem with trying to use "color.ps" device instead of "sun" (raster) 
+###   is that postscript adds extra white space (often quite a lot) and so differs from raster image
+###   and use of "-trim" option in ImageMagick "convert" removes too much (i.e. all) white space 
+
+### INITIALIZATION
+#raster
+ tmpfile="tmp.ncgm2gif.sun"
+#postscript tmpfile="tmp.ncgm2gif.ps"
+rm -f $tmpfile
+
+### PARSE INPUT LOOKING FOR ARG1=RESOLUTION
+if [ `echo $1 | cut -c1` != '-' ]
+then
+  resolution='512x512'
+else
+  ### CREATE non-512x512_size RASTER IMAGE FROM METAFILE
+  resolution=`echo $1 | cut -c2-`
+  shift
+fi
+
+### SANITY CHECK
+if [ $# -lt 1 ]
+then
+  echo "***ERROR - missing ncgm file argument"
+  exit
+fi
+if [ $# -lt 2 ]
+then
+  echo "***ERROR - missing gif file argument"
+  exit
+fi
+
+  ### CREATE RASTER IMAGE FROM METAFILE THEN CONVERT TO GIF
+  #raster
+  out=`$NCARG_ROOT/bin/ctrans -res $resolution -d sun $1 | convert - $2`
+
+  #old ### CREATE RASTER IMAGE FROM METAFILE
+  #old #raster
+  #old ctransout=`$NCARG_ROOT/bin/ctrans -res $resolution -d sun $1 -outfile $tmpfile`
+  #old #postscript   ctransout=`$NCARG_ROOT/bin/ctrans -res $resolution -d ps.color $1 -outfile $tmpfile`
+  #old #4testprint: echo "CTRANSOUT= $ctransout"
+  #old ### CREATE GIF FROM RASTER IMAGE
+  #old #raster
+  #old convert $tmpfile $2
+  #old #postscript1 (too_much_white_space) convert $tmpfile $2
+  #old #postscript2 (too_little_white_space) convert -trim $tmpfile $2
+  #old   ### CLEANUP
+  #old   rm -f $tmpfile
+
+  echo "created GIF image with widthxheight= $resolution"
+

@@ -1,0 +1,1968 @@
+rec 1:0:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=1000 levels=(3,232) grid=3 1000 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -418.4 439.2  num bits 14  BDS_Ref -4184  DecScale 1 BinScale 0
+
+rec 2:114114:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=975 levels=(3,207) grid=3 975 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -213.8 628.5  num bits 14  BDS_Ref -2138  DecScale 1 BinScale 0
+
+rec 3:228228:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=950 levels=(3,182) grid=3 950 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -3.8 822.5  num bits 14  BDS_Ref -38  DecScale 1 BinScale 0
+
+rec 4:342342:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=925 levels=(3,157) grid=3 925 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 211.4 1021.4  num bits 13  BDS_Ref 2114  DecScale 1 BinScale 0
+
+rec 5:448310:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=900 levels=(3,132) grid=3 900 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 431.7 1224.7  num bits 13  BDS_Ref 4317  DecScale 1 BinScale 0
+
+rec 6:554278:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=850 levels=(3,82) grid=3 850 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 888.2 1649  num bits 13  BDS_Ref 8882  DecScale 1 BinScale 0
+
+rec 7:660246:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=800 levels=(3,32) grid=3 800 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 1366.2 2111  num bits 13  BDS_Ref 13662  DecScale 1 BinScale 0
+
+rec 8:766214:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=750 levels=(2,238) grid=3 750 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 1866.9 2629.6  num bits 13  BDS_Ref 18669  DecScale 1 BinScale 0
+
+rec 9:872182:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=700 levels=(2,188) grid=3 700 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 2392.6 3199.3  num bits 13  BDS_Ref 23926  DecScale 1 BinScale 0
+
+rec 10:978150:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=650 levels=(2,138) grid=3 650 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 2946.4 3807.9  num bits 14  BDS_Ref 29464  DecScale 1 BinScale 0
+
+rec 11:1092264:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=600 levels=(2,88) grid=3 600 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 3533.2 4454  num bits 14  BDS_Ref 35332  DecScale 1 BinScale 0
+
+rec 12:1206378:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=550 levels=(2,38) grid=3 550 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 4158.8 5148.8  num bits 14  BDS_Ref 41588  DecScale 1 BinScale 0
+
+rec 13:1320492:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=500 levels=(1,244) grid=3 500 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 4820.4 5900.7  num bits 14  BDS_Ref 48204  DecScale 1 BinScale 0
+
+rec 14:1434606:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=450 levels=(1,194) grid=3 450 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 5515.2 6723.1  num bits 14  BDS_Ref 55152  DecScale 1 BinScale 0
+
+rec 15:1548720:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=400 levels=(1,144) grid=3 400 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 6272.2 7621  num bits 14  BDS_Ref 62722  DecScale 1 BinScale 0
+
+rec 16:1662834:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=350 levels=(1,94) grid=3 350 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 7118.1 8622.8  num bits 14  BDS_Ref 71181  DecScale 1 BinScale 0
+
+rec 17:1776948:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=300 levels=(1,44) grid=3 300 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 8083.1 9743.7  num bits 15  BDS_Ref 80831  DecScale 1 BinScale 0
+
+rec 18:1899206:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=250 levels=(0,250) grid=3 250 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 9190.2 11017.9  num bits 15  BDS_Ref 91902  DecScale 1 BinScale 0
+
+rec 19:2021464:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=200 levels=(0,200) grid=3 200 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 10565.9 12506.7  num bits 15  BDS_Ref 105659  DecScale 1 BinScale 0
+
+rec 20:2143722:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=150 levels=(0,150) grid=3 150 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 12310.6 14314.4  num bits 15  BDS_Ref 123106  DecScale 1 BinScale 0
+
+rec 21:2265980:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=100 levels=(0,100) grid=3 100 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 14715 16666.3  num bits 15  BDS_Ref 147150  DecScale 1 BinScale 0
+
+rec 22:2388238:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=70 levels=(0,70) grid=3 70 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 16810.9 18716  num bits 15  BDS_Ref 168109  DecScale 1 BinScale 0
+
+rec 23:2510496:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=50 levels=(0,50) grid=3 50 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 18742.3 20795.7  num bits 15  BDS_Ref 187423  DecScale 1 BinScale 0
+
+rec 24:2632754:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=30 levels=(0,30) grid=3 30 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 21614.4 24091.1  num bits 15  BDS_Ref 216144  DecScale 1 BinScale 0
+
+rec 25:2755012:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=20 levels=(0,20) grid=3 20 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 23896.9 26858.3  num bits 15  BDS_Ref 238969  DecScale 1 BinScale 0
+
+rec 26:2877270:date 2000012412 HGT kpds5=7 kpds6=100 kpds7=10 levels=(0,10) grid=3 10 mb anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 27995.8 31753.9  num bits 16  BDS_Ref 279958  DecScale 1 BinScale 0
+
+rec 27:3007674:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=1000 levels=(3,232) grid=3 1000 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 228.4 314.8  num bits 10  BDS_Ref 2284  DecScale 1 BinScale 0
+
+rec 28:3089208:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=975 levels=(3,207) grid=3 975 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 230.3 313.4  num bits 10  BDS_Ref 2303  DecScale 1 BinScale 0
+
+rec 29:3170742:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=950 levels=(3,182) grid=3 950 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 231 311.8  num bits 10  BDS_Ref 2310  DecScale 1 BinScale 0
+
+rec 30:3252276:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=925 levels=(3,157) grid=3 925 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 231.5 310.1  num bits 10  BDS_Ref 2315  DecScale 1 BinScale 0
+
+rec 31:3333810:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=900 levels=(3,132) grid=3 900 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 232.7 308  num bits 10  BDS_Ref 2327  DecScale 1 BinScale 0
+
+rec 32:3415344:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=850 levels=(3,82) grid=3 850 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 236.6 303.7  num bits 10  BDS_Ref 2366  DecScale 1 BinScale 0
+
+rec 33:3496878:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=800 levels=(3,32) grid=3 800 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 238.2 298.9  num bits 10  BDS_Ref 2382  DecScale 1 BinScale 0
+
+rec 34:3578412:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=750 levels=(2,238) grid=3 750 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 237.4 293.6  num bits 10  BDS_Ref 2374  DecScale 1 BinScale 0
+
+rec 35:3659946:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=700 levels=(2,188) grid=3 700 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 235.7 287.4  num bits 10  BDS_Ref 2357  DecScale 1 BinScale 0
+
+rec 36:3741480:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=650 levels=(2,138) grid=3 650 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 232.4 284.8  num bits 10  BDS_Ref 2324  DecScale 1 BinScale 0
+
+rec 37:3823014:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=600 levels=(2,88) grid=3 600 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 227.7 282.3  num bits 10  BDS_Ref 2277  DecScale 1 BinScale 0
+
+rec 38:3904548:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=550 levels=(2,38) grid=3 550 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 224.9 279.3  num bits 10  BDS_Ref 2249  DecScale 1 BinScale 0
+
+rec 39:3986082:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=500 levels=(1,244) grid=3 500 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 220.4 273.7  num bits 10  BDS_Ref 2204  DecScale 1 BinScale 0
+
+rec 40:4067616:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=450 levels=(1,194) grid=3 450 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 216.6 268.4  num bits 10  BDS_Ref 2166  DecScale 1 BinScale 0
+
+rec 41:4149150:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=400 levels=(1,144) grid=3 400 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 215.1 262.5  num bits 9  BDS_Ref 2151  DecScale 1 BinScale 0
+
+rec 42:4222538:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=350 levels=(1,94) grid=3 350 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 210.8 255.2  num bits 9  BDS_Ref 2108  DecScale 1 BinScale 0
+
+rec 43:4295926:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=300 levels=(1,44) grid=3 300 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 206.2 246.6  num bits 9  BDS_Ref 2062  DecScale 1 BinScale 0
+
+rec 44:4369314:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=250 levels=(0,250) grid=3 250 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 203.5 236.9  num bits 9  BDS_Ref 2035  DecScale 1 BinScale 0
+
+rec 45:4442702:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=200 levels=(0,200) grid=3 200 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 199.1 233.9  num bits 9  BDS_Ref 1991  DecScale 1 BinScale 0
+
+rec 46:4516090:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=150 levels=(0,150) grid=3 150 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 197.3 232  num bits 9  BDS_Ref 1973  DecScale 1 BinScale 0
+
+rec 47:4589478:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=100 levels=(0,100) grid=3 100 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 186.7 232.5  num bits 9  BDS_Ref 1867  DecScale 1 BinScale 0
+
+rec 48:4662866:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=70 levels=(0,70) grid=3 70 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 192.5 235.9  num bits 9  BDS_Ref 1925  DecScale 1 BinScale 0
+
+rec 49:4736254:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=50 levels=(0,50) grid=3 50 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 186.2 236.8  num bits 9  BDS_Ref 1862  DecScale 1 BinScale 0
+
+rec 50:4809642:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=30 levels=(0,30) grid=3 30 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 177.9 239.2  num bits 10  BDS_Ref 1779  DecScale 1 BinScale 0
+
+rec 51:4891176:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=20 levels=(0,20) grid=3 20 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 179.5 240  num bits 10  BDS_Ref 1795  DecScale 1 BinScale 0
+
+rec 52:4972710:date 2000012412 TMP kpds5=11 kpds6=100 kpds7=10 levels=(0,10) grid=3 10 mb anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 195.4 249.9  num bits 10  BDS_Ref 1954  DecScale 1 BinScale 0
+
+rec 53:5054244:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=1000 levels=(3,232) grid=3 1000 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -1.352 1.58  num bits 12  BDS_Ref -1352  DecScale 3 BinScale 0
+
+rec 54:5152068:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=975 levels=(3,207) grid=3 975 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -1.363 1.577  num bits 12  BDS_Ref -1363  DecScale 3 BinScale 0
+
+rec 55:5249892:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=950 levels=(3,182) grid=3 950 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -1.382 1.572  num bits 12  BDS_Ref -1382  DecScale 3 BinScale 0
+
+rec 56:5347716:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=925 levels=(3,157) grid=3 925 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -1.576 1.59  num bits 12  BDS_Ref -1576  DecScale 3 BinScale 0
+
+rec 57:5445540:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=900 levels=(3,132) grid=3 900 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -1.968 1.655  num bits 12  BDS_Ref -1968  DecScale 3 BinScale 0
+
+rec 58:5543364:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=850 levels=(3,82) grid=3 850 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -2.544 1.803  num bits 13  BDS_Ref -2544  DecScale 3 BinScale 0
+
+rec 59:5649332:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=800 levels=(3,32) grid=3 800 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -2.803 1.957  num bits 13  BDS_Ref -2803  DecScale 3 BinScale 0
+
+rec 60:5755300:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=750 levels=(2,238) grid=3 750 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -2.81 2.004  num bits 13  BDS_Ref -2810  DecScale 3 BinScale 0
+
+rec 61:5861268:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=700 levels=(2,188) grid=3 700 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -2.658 2.01  num bits 13  BDS_Ref -2658  DecScale 3 BinScale 0
+
+rec 62:5967236:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=650 levels=(2,138) grid=3 650 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -2.632 1.773  num bits 13  BDS_Ref -2632  DecScale 3 BinScale 0
+
+rec 63:6073204:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=600 levels=(2,88) grid=3 600 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -2.372 1.768  num bits 13  BDS_Ref -2372  DecScale 3 BinScale 0
+
+rec 64:6179172:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=550 levels=(2,38) grid=3 550 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -2.266 1.785  num bits 12  BDS_Ref -2266  DecScale 3 BinScale 0
+
+rec 65:6276996:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=500 levels=(1,244) grid=3 500 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -2.184 1.797  num bits 12  BDS_Ref -2184  DecScale 3 BinScale 0
+
+rec 66:6374820:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=450 levels=(1,194) grid=3 450 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -2.298 1.78  num bits 12  BDS_Ref -2298  DecScale 3 BinScale 0
+
+rec 67:6472644:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=400 levels=(1,144) grid=3 400 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -2.161 1.66  num bits 12  BDS_Ref -2161  DecScale 3 BinScale 0
+
+rec 68:6570468:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=350 levels=(1,94) grid=3 350 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -1.91 1.52  num bits 12  BDS_Ref -1910  DecScale 3 BinScale 0
+
+rec 69:6668292:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=300 levels=(1,44) grid=3 300 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -1.545 1.269  num bits 12  BDS_Ref -1545  DecScale 3 BinScale 0
+
+rec 70:6766116:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=250 levels=(0,250) grid=3 250 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -1.147 0.885  num bits 11  BDS_Ref -1147  DecScale 3 BinScale 0
+
+rec 71:6855794:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=200 levels=(0,200) grid=3 200 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.965 0.529  num bits 11  BDS_Ref -965  DecScale 3 BinScale 0
+
+rec 72:6945472:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=150 levels=(0,150) grid=3 150 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.529 0.467  num bits 10  BDS_Ref -529  DecScale 3 BinScale 0
+
+rec 73:7027006:date 2000012412 VVEL kpds5=39 kpds6=100 kpds7=100 levels=(0,100) grid=3 100 mb anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.31 0.346  num bits 10  BDS_Ref -310  DecScale 3 BinScale 0
+
+rec 74:7108540:date 2000012412 RH kpds5=52 kpds6=100 kpds7=1000 levels=(3,232) grid=3 1000 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 75:7165638:date 2000012412 RH kpds5=52 kpds6=100 kpds7=975 levels=(3,207) grid=3 975 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 76:7222736:date 2000012412 RH kpds5=52 kpds6=100 kpds7=950 levels=(3,182) grid=3 950 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 77:7279834:date 2000012412 RH kpds5=52 kpds6=100 kpds7=925 levels=(3,157) grid=3 925 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 78:7336932:date 2000012412 RH kpds5=52 kpds6=100 kpds7=900 levels=(3,132) grid=3 900 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 79:7394030:date 2000012412 RH kpds5=52 kpds6=100 kpds7=850 levels=(3,82) grid=3 850 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 80:7451128:date 2000012412 RH kpds5=52 kpds6=100 kpds7=800 levels=(3,32) grid=3 800 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 81:7508226:date 2000012412 RH kpds5=52 kpds6=100 kpds7=750 levels=(2,238) grid=3 750 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 82:7565324:date 2000012412 RH kpds5=52 kpds6=100 kpds7=700 levels=(2,188) grid=3 700 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 83:7622422:date 2000012412 RH kpds5=52 kpds6=100 kpds7=650 levels=(2,138) grid=3 650 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 84:7679520:date 2000012412 RH kpds5=52 kpds6=100 kpds7=600 levels=(2,88) grid=3 600 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 85:7736618:date 2000012412 RH kpds5=52 kpds6=100 kpds7=550 levels=(2,38) grid=3 550 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 86:7793716:date 2000012412 RH kpds5=52 kpds6=100 kpds7=500 levels=(1,244) grid=3 500 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 87:7850814:date 2000012412 RH kpds5=52 kpds6=100 kpds7=450 levels=(1,194) grid=3 450 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 88:7907912:date 2000012412 RH kpds5=52 kpds6=100 kpds7=400 levels=(1,144) grid=3 400 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 89:7965010:date 2000012412 RH kpds5=52 kpds6=100 kpds7=350 levels=(1,94) grid=3 350 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 90:8022108:date 2000012412 RH kpds5=52 kpds6=100 kpds7=300 levels=(1,44) grid=3 300 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 91:8079206:date 2000012412 RH kpds5=52 kpds6=100 kpds7=250 levels=(0,250) grid=3 250 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 92:8136304:date 2000012412 RH kpds5=52 kpds6=100 kpds7=200 levels=(0,200) grid=3 200 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 93:8193402:date 2000012412 RH kpds5=52 kpds6=100 kpds7=150 levels=(0,150) grid=3 150 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 94:8250500:date 2000012412 RH kpds5=52 kpds6=100 kpds7=100 levels=(0,100) grid=3 100 mb anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 1 100  num bits 7  BDS_Ref 1  DecScale 0 BinScale 0
+
+rec 95:8307598:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=1000 levels=(3,232) grid=3 1000 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000313 0.000387  num bits 10  BDS_Ref -313  DecScale 6 BinScale 0
+
+rec 96:8389132:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=975 levels=(3,207) grid=3 975 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000343 0.000416  num bits 10  BDS_Ref -343  DecScale 6 BinScale 0
+
+rec 97:8470666:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=950 levels=(3,182) grid=3 950 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.00036 0.000412  num bits 10  BDS_Ref -360  DecScale 6 BinScale 0
+
+rec 98:8552200:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=925 levels=(3,157) grid=3 925 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000366 0.000399  num bits 10  BDS_Ref -366  DecScale 6 BinScale 0
+
+rec 99:8633734:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=900 levels=(3,132) grid=3 900 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000369 0.000392  num bits 10  BDS_Ref -369  DecScale 6 BinScale 0
+
+rec 100:8715268:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=850 levels=(3,82) grid=3 850 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000341 0.000392  num bits 10  BDS_Ref -341  DecScale 6 BinScale 0
+
+rec 101:8796802:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=800 levels=(3,32) grid=3 800 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.00032 0.000407  num bits 10  BDS_Ref -320  DecScale 6 BinScale 0
+
+rec 102:8878336:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=750 levels=(2,238) grid=3 750 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000328 0.000413  num bits 10  BDS_Ref -328  DecScale 6 BinScale 0
+
+rec 103:8959870:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=700 levels=(2,188) grid=3 700 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000333 0.000403  num bits 10  BDS_Ref -333  DecScale 6 BinScale 0
+
+rec 104:9041404:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=650 levels=(2,138) grid=3 650 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000333 0.000375  num bits 10  BDS_Ref -333  DecScale 6 BinScale 0
+
+rec 105:9122938:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=600 levels=(2,88) grid=3 600 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000316 0.000343  num bits 10  BDS_Ref -316  DecScale 6 BinScale 0
+
+rec 106:9204472:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=550 levels=(2,38) grid=3 550 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000311 0.000392  num bits 10  BDS_Ref -311  DecScale 6 BinScale 0
+
+rec 107:9286006:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=500 levels=(1,244) grid=3 500 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.00034 0.00047  num bits 10  BDS_Ref -340  DecScale 6 BinScale 0
+
+rec 108:9367540:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=450 levels=(1,194) grid=3 450 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000373 0.000513  num bits 10  BDS_Ref -373  DecScale 6 BinScale 0
+
+rec 109:9449074:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=400 levels=(1,144) grid=3 400 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000386 0.000486  num bits 10  BDS_Ref -386  DecScale 6 BinScale 0
+
+rec 110:9530608:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=350 levels=(1,94) grid=3 350 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.00044 0.000512  num bits 10  BDS_Ref -440  DecScale 6 BinScale 0
+
+rec 111:9612142:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=300 levels=(1,44) grid=3 300 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000402 0.000474  num bits 10  BDS_Ref -402  DecScale 6 BinScale 0
+
+rec 112:9693676:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=250 levels=(0,250) grid=3 250 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000296 0.000345  num bits 10  BDS_Ref -296  DecScale 6 BinScale 0
+
+rec 113:9775210:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=200 levels=(0,200) grid=3 200 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000244 0.000259  num bits 9  BDS_Ref -244  DecScale 6 BinScale 0
+
+rec 114:9848598:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=150 levels=(0,150) grid=3 150 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000206 0.000207  num bits 9  BDS_Ref -206  DecScale 6 BinScale 0
+
+rec 115:9921986:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=100 levels=(0,100) grid=3 100 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000196 0.000201  num bits 9  BDS_Ref -196  DecScale 6 BinScale 0
+
+rec 116:9995374:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=70 levels=(0,70) grid=3 70 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000188 0.000206  num bits 9  BDS_Ref -188  DecScale 6 BinScale 0
+
+rec 117:10068762:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=50 levels=(0,50) grid=3 50 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000171 0.00026  num bits 9  BDS_Ref -171  DecScale 6 BinScale 0
+
+rec 118:10142150:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=30 levels=(0,30) grid=3 30 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000165 0.000286  num bits 9  BDS_Ref -165  DecScale 6 BinScale 0
+
+rec 119:10215538:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=20 levels=(0,20) grid=3 20 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000181 0.000298  num bits 9  BDS_Ref -181  DecScale 6 BinScale 0
+
+rec 120:10288926:date 2000012412 ABSV kpds5=41 kpds6=100 kpds7=10 levels=(0,10) grid=3 10 mb anl:
+  ABSV=Absolute vorticity [/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.000222 0.000327  num bits 10  BDS_Ref -222  DecScale 6 BinScale 0
+
+rec 121:10370460:date 2000012412 O3MR kpds5=154 kpds6=100 kpds7=100 levels=(0,100) grid=3 100 mb anl:
+  O3MR=Ozone mixing ratio [kg/kg]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 7e-08 3.803e-06  num bits 12  BDS_Ref 70  DecScale 9 BinScale 0
+
+rec 122:10468284:date 2000012412 O3MR kpds5=154 kpds6=100 kpds7=70 levels=(0,70) grid=3 70 mb anl:
+  O3MR=Ozone mixing ratio [kg/kg]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 2.87e-07 5.498e-06  num bits 13  BDS_Ref 287  DecScale 9 BinScale 0
+
+rec 123:10574252:date 2000012412 O3MR kpds5=154 kpds6=100 kpds7=50 levels=(0,50) grid=3 50 mb anl:
+  O3MR=Ozone mixing ratio [kg/kg]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 9.97e-07 7.436e-06  num bits 13  BDS_Ref 997  DecScale 9 BinScale 0
+
+rec 124:10680220:date 2000012412 O3MR kpds5=154 kpds6=100 kpds7=30 levels=(0,30) grid=3 30 mb anl:
+  O3MR=Ozone mixing ratio [kg/kg]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 4.421e-06 1.1145e-05  num bits 13  BDS_Ref 4421  DecScale 9 BinScale 0
+
+rec 125:10786188:date 2000012412 O3MR kpds5=154 kpds6=100 kpds7=20 levels=(0,20) grid=3 20 mb anl:
+  O3MR=Ozone mixing ratio [kg/kg]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 4.352e-06 1.2762e-05  num bits 14  BDS_Ref 4352  DecScale 9 BinScale 0
+
+rec 126:10900302:date 2000012412 O3MR kpds5=154 kpds6=100 kpds7=10 levels=(0,10) grid=3 10 mb anl:
+  O3MR=Ozone mixing ratio [kg/kg]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 6.778e-06 1.7807e-05  num bits 14  BDS_Ref 6778  DecScale 9 BinScale 0
+
+rec 127:11014416:date 2000012412 5WAVH kpds5=222 kpds6=100 kpds7=500 levels=(1,244) grid=3 500 mb anl:
+  5WAVH=5-wave geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 4822.9 5893.8  num bits 14  BDS_Ref 48229  DecScale 1 BinScale 0
+
+rec 128:11128530:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=1000 levels=(3,232) grid=3 1000 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -20.8 20.8  num bits 9  BDS_Ref -208  DecScale 1 BinScale 0
+
+rec 129:11201918:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=975 levels=(3,207) grid=3 975 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -20.9 23.8  num bits 9  BDS_Ref -209  DecScale 1 BinScale 0
+
+rec 130:11275306:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=950 levels=(3,182) grid=3 950 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -22.6 26.6  num bits 9  BDS_Ref -226  DecScale 1 BinScale 0
+
+rec 131:11348694:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=925 levels=(3,157) grid=3 925 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -24.8 28.3  num bits 10  BDS_Ref -248  DecScale 1 BinScale 0
+
+rec 132:11430228:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=900 levels=(3,132) grid=3 900 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -26 29.4  num bits 10  BDS_Ref -260  DecScale 1 BinScale 0
+
+rec 133:11511762:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=850 levels=(3,82) grid=3 850 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -21.7 33.2  num bits 10  BDS_Ref -217  DecScale 1 BinScale 0
+
+rec 134:11593296:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=800 levels=(3,32) grid=3 800 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -21.4 36.8  num bits 10  BDS_Ref -214  DecScale 1 BinScale 0
+
+rec 135:11674830:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=750 levels=(2,238) grid=3 750 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -20.9 39.7  num bits 10  BDS_Ref -209  DecScale 1 BinScale 0
+
+rec 136:11756364:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=700 levels=(2,188) grid=3 700 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -19.6 43  num bits 10  BDS_Ref -196  DecScale 1 BinScale 0
+
+rec 137:11837898:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=650 levels=(2,138) grid=3 650 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -20.5 46.1  num bits 10  BDS_Ref -205  DecScale 1 BinScale 0
+
+rec 138:11919432:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=600 levels=(2,88) grid=3 600 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -20.5 49.9  num bits 10  BDS_Ref -205  DecScale 1 BinScale 0
+
+rec 139:12000966:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=550 levels=(2,38) grid=3 550 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -24.2 55.2  num bits 10  BDS_Ref -242  DecScale 1 BinScale 0
+
+rec 140:12082500:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=500 levels=(1,244) grid=3 500 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -28.7 64.1  num bits 10  BDS_Ref -287  DecScale 1 BinScale 0
+
+rec 141:12164034:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=450 levels=(1,194) grid=3 450 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -35.9 71.4  num bits 11  BDS_Ref -359  DecScale 1 BinScale 0
+
+rec 142:12253712:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=400 levels=(1,144) grid=3 400 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -39.2 76.9  num bits 11  BDS_Ref -392  DecScale 1 BinScale 0
+
+rec 143:12343390:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=350 levels=(1,94) grid=3 350 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -41.5 79.7  num bits 11  BDS_Ref -415  DecScale 1 BinScale 0
+
+rec 144:12433068:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=300 levels=(1,44) grid=3 300 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -43.7 77.1  num bits 11  BDS_Ref -437  DecScale 1 BinScale 0
+
+rec 145:12522746:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=250 levels=(0,250) grid=3 250 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -47.6 87.4  num bits 11  BDS_Ref -476  DecScale 1 BinScale 0
+
+rec 146:12612424:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=200 levels=(0,200) grid=3 200 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -33.8 84.7  num bits 11  BDS_Ref -338  DecScale 1 BinScale 0
+
+rec 147:12702102:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=150 levels=(0,150) grid=3 150 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -24.3 78.3  num bits 11  BDS_Ref -243  DecScale 1 BinScale 0
+
+rec 148:12791780:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=100 levels=(0,100) grid=3 100 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -30.3 49.9  num bits 10  BDS_Ref -303  DecScale 1 BinScale 0
+
+rec 149:12873314:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=70 levels=(0,70) grid=3 70 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -17.6 52  num bits 10  BDS_Ref -176  DecScale 1 BinScale 0
+
+rec 150:12954848:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=50 levels=(0,50) grid=3 50 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -18.5 58.4  num bits 10  BDS_Ref -185  DecScale 1 BinScale 0
+
+rec 151:13036382:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=30 levels=(0,30) grid=3 30 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -25.3 77.1  num bits 11  BDS_Ref -253  DecScale 1 BinScale 0
+
+rec 152:13126060:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=20 levels=(0,20) grid=3 20 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -30.4 88.9  num bits 11  BDS_Ref -304  DecScale 1 BinScale 0
+
+rec 153:13215738:date 2000012412 UGRD kpds5=33 kpds6=100 kpds7=10 levels=(0,10) grid=3 10 mb anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -47 106  num bits 11  BDS_Ref -470  DecScale 1 BinScale 0
+
+rec 154:13305416:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=1000 levels=(3,232) grid=3 1000 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -20.9 25.3  num bits 9  BDS_Ref -209  DecScale 1 BinScale 0
+
+rec 155:13378804:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=975 levels=(3,207) grid=3 975 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -23 25.3  num bits 9  BDS_Ref -230  DecScale 1 BinScale 0
+
+rec 156:13452192:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=950 levels=(3,182) grid=3 950 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -24.2 26.1  num bits 9  BDS_Ref -242  DecScale 1 BinScale 0
+
+rec 157:13525580:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=925 levels=(3,157) grid=3 925 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -24.3 26.3  num bits 9  BDS_Ref -243  DecScale 1 BinScale 0
+
+rec 158:13598968:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=900 levels=(3,132) grid=3 900 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -24.5 26  num bits 9  BDS_Ref -245  DecScale 1 BinScale 0
+
+rec 159:13672356:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=850 levels=(3,82) grid=3 850 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -28.6 27.6  num bits 10  BDS_Ref -286  DecScale 1 BinScale 0
+
+rec 160:13753890:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=800 levels=(3,32) grid=3 800 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -30.6 32.1  num bits 10  BDS_Ref -306  DecScale 1 BinScale 0
+
+rec 161:13835424:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=750 levels=(2,238) grid=3 750 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -31.1 35  num bits 10  BDS_Ref -311  DecScale 1 BinScale 0
+
+rec 162:13916958:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=700 levels=(2,188) grid=3 700 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -29.1 37.5  num bits 10  BDS_Ref -291  DecScale 1 BinScale 0
+
+rec 163:13998492:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=650 levels=(2,138) grid=3 650 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -30.8 39.2  num bits 10  BDS_Ref -308  DecScale 1 BinScale 0
+
+rec 164:14080026:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=600 levels=(2,88) grid=3 600 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -31.2 40.6  num bits 10  BDS_Ref -312  DecScale 1 BinScale 0
+
+rec 165:14161560:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=550 levels=(2,38) grid=3 550 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -35.8 44.4  num bits 10  BDS_Ref -358  DecScale 1 BinScale 0
+
+rec 166:14243094:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=500 levels=(1,244) grid=3 500 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -38.8 49.5  num bits 10  BDS_Ref -388  DecScale 1 BinScale 0
+
+rec 167:14324628:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=450 levels=(1,194) grid=3 450 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -43.2 54.1  num bits 10  BDS_Ref -432  DecScale 1 BinScale 0
+
+rec 168:14406162:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=400 levels=(1,144) grid=3 400 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -49 60.8  num bits 11  BDS_Ref -490  DecScale 1 BinScale 0
+
+rec 169:14495840:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=350 levels=(1,94) grid=3 350 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -55.7 67.2  num bits 11  BDS_Ref -557  DecScale 1 BinScale 0
+
+rec 170:14585518:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=300 levels=(1,44) grid=3 300 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -63.2 73.5  num bits 11  BDS_Ref -632  DecScale 1 BinScale 0
+
+rec 171:14675196:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=250 levels=(0,250) grid=3 250 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -67.2 74.6  num bits 11  BDS_Ref -672  DecScale 1 BinScale 0
+
+rec 172:14764874:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=200 levels=(0,200) grid=3 200 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -62 63.8  num bits 11  BDS_Ref -620  DecScale 1 BinScale 0
+
+rec 173:14854552:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=150 levels=(0,150) grid=3 150 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -44 46.2  num bits 10  BDS_Ref -440  DecScale 1 BinScale 0
+
+rec 174:14936086:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=100 levels=(0,100) grid=3 100 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -46.6 44.7  num bits 10  BDS_Ref -466  DecScale 1 BinScale 0
+
+rec 175:15017620:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=70 levels=(0,70) grid=3 70 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -45.9 41.4  num bits 10  BDS_Ref -459  DecScale 1 BinScale 0
+
+rec 176:15099154:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=50 levels=(0,50) grid=3 50 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -45.8 40.2  num bits 10  BDS_Ref -458  DecScale 1 BinScale 0
+
+rec 177:15180688:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=30 levels=(0,30) grid=3 30 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -50.7 50.5  num bits 10  BDS_Ref -507  DecScale 1 BinScale 0
+
+rec 178:15262222:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=20 levels=(0,20) grid=3 20 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -48.2 58.4  num bits 11  BDS_Ref -482  DecScale 1 BinScale 0
+
+rec 179:15351900:date 2000012412 VGRD kpds5=34 kpds6=100 kpds7=10 levels=(0,10) grid=3 10 mb anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -63.1 77.2  num bits 11  BDS_Ref -631  DecScale 1 BinScale 0
+
+rec 180:15441578:date 2000012412 TMP kpds5=11 kpds6=116 kpds7=7680 levels=(30,0) grid=3 30-0 mb above gnd anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 228.2 311.5  num bits 10  BDS_Ref 2282  DecScale 1 BinScale 0
+
+rec 181:15523112:date 2000012412 RH kpds5=52 kpds6=116 kpds7=7680 levels=(30,0) grid=3 30-0 mb above gnd anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 182:15580210:date 2000012412 SPFH kpds5=51 kpds6=116 kpds7=7680 levels=(30,0) grid=3 30-0 mb above gnd anl:
+  SPFH=Specific humidity [kg/kg]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 0.02054  num bits 12  BDS_Ref 0  DecScale 5 BinScale 0
+
+rec 183:15678034:date 2000012412 UGRD kpds5=33 kpds6=116 kpds7=7680 levels=(30,0) grid=3 30-0 mb above gnd anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -23.6 22.9  num bits 9  BDS_Ref -236  DecScale 1 BinScale 0
+
+rec 184:15751422:date 2000012412 VGRD kpds5=34 kpds6=116 kpds7=7680 levels=(30,0) grid=3 30-0 mb above gnd anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -21.9 30.7  num bits 10  BDS_Ref -219  DecScale 1 BinScale 0
+
+rec 185:15832956:date 2000012412 TMP kpds5=11 kpds6=103 kpds7=1829 levels=(7,37) grid=3 1829 m above MSL anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 237.8 299.7  num bits 10  BDS_Ref 2378  DecScale 1 BinScale 0
+
+rec 186:15914490:date 2000012412 TMP kpds5=11 kpds6=103 kpds7=2743 levels=(10,183) grid=3 2743 m above MSL anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 234.4 291.8  num bits 10  BDS_Ref 2344  DecScale 1 BinScale 0
+
+rec 187:15996024:date 2000012412 TMP kpds5=11 kpds6=103 kpds7=3658 levels=(14,74) grid=3 3658 m above MSL anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 227.3 284.9  num bits 10  BDS_Ref 2273  DecScale 1 BinScale 0
+
+rec 188:16077558:date 2000012412 UGRD kpds5=33 kpds6=103 kpds7=1829 levels=(7,37) grid=3 1829 m above MSL anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -21.3 37.1  num bits 10  BDS_Ref -213  DecScale 1 BinScale 0
+
+rec 189:16159092:date 2000012412 UGRD kpds5=33 kpds6=103 kpds7=2743 levels=(10,183) grid=3 2743 m above MSL anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -20 42.7  num bits 10  BDS_Ref -200  DecScale 1 BinScale 0
+
+rec 190:16240626:date 2000012412 UGRD kpds5=33 kpds6=103 kpds7=3658 levels=(14,74) grid=3 3658 m above MSL anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -20.3 47.7  num bits 10  BDS_Ref -203  DecScale 1 BinScale 0
+
+rec 191:16322160:date 2000012412 VGRD kpds5=34 kpds6=103 kpds7=1829 levels=(7,37) grid=3 1829 m above MSL anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -31.7 35.6  num bits 10  BDS_Ref -317  DecScale 1 BinScale 0
+
+rec 192:16403694:date 2000012412 VGRD kpds5=34 kpds6=103 kpds7=2743 levels=(10,183) grid=3 2743 m above MSL anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -27.9 38.8  num bits 10  BDS_Ref -279  DecScale 1 BinScale 0
+
+rec 193:16485228:date 2000012412 VGRD kpds5=34 kpds6=103 kpds7=3658 levels=(14,74) grid=3 3658 m above MSL anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -31.2 38.4  num bits 10  BDS_Ref -312  DecScale 1 BinScale 0
+
+rec 194:16566762:date 2000012412 PRES kpds5=1 kpds6=1 kpds7=0 levels=(0,0) grid=3 sfc anl:
+  PRES=Pressure [Pa]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 49560 106427  num bits 16  BDS_Ref 49560  DecScale 0 BinScale 0
+
+rec 195:16697166:date 2000012412 PWAT kpds5=54 kpds6=200 kpds7=0 levels=(0,0) grid=3 atmos col anl:
+  PWAT=Precipitable water [kg/m^2]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0.2 69.5  num bits 10  BDS_Ref 2  DecScale 1 BinScale 0
+
+rec 196:16778700:date 2000012412 RH kpds5=52 kpds6=200 kpds7=0 levels=(0,0) grid=3 atmos col anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 96  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 197:16835798:date 2000012412 HGT kpds5=7 kpds6=7 kpds7=0 levels=(0,0) grid=3 tropopause anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 5168.4 18274.8  num bits 16  BDS_Ref 51684  DecScale 1 BinScale 1
+
+rec 198:16966202:date 2000012412 TMP kpds5=11 kpds6=7 kpds7=0 levels=(0,0) grid=3 tropopause anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 186.8 256.2  num bits 10  BDS_Ref 1868  DecScale 1 BinScale 0
+
+rec 199:17047736:date 2000012412 PRES kpds5=1 kpds6=7 kpds7=0 levels=(0,0) grid=3 tropopause anl:
+  PRES=Pressure [Pa]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 6034 48629  num bits 16  BDS_Ref 6034  DecScale 0 BinScale 0
+
+rec 200:17178140:date 2000012412 VWSH kpds5=136 kpds6=7 kpds7=0 levels=(0,0) grid=3 tropopause anl:
+  VWSH=Vertical speed shear [1/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -0.0214 0.0155  num bits 9  BDS_Ref -214  DecScale 4 BinScale 0
+
+rec 201:17251528:date 2000012412 LFTX kpds5=131 kpds6=1 kpds7=0 levels=(0,0) grid=3 sfc anl:
+  LFTX=Surface lifted index [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -7.9 45.1  num bits 10  BDS_Ref -79  DecScale 1 BinScale 0
+
+rec 202:17333062:date 2000012412 CAPE kpds5=157 kpds6=1 kpds7=0 levels=(0,0) grid=3 sfc anl:
+  CAPE=Convective Avail. Pot. Energy [J/kg]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 3504  num bits 12  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 203:17430886:date 2000012412 CIN kpds5=156 kpds6=1 kpds7=0 levels=(0,0) grid=3 sfc anl:
+  CIN=Convective inhibition [J/kg]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -833 0  num bits 10  BDS_Ref -833  DecScale 0 BinScale 0
+
+rec 204:17512420:date 2000012412 4LFTX kpds5=132 kpds6=1 kpds7=0 levels=(0,0) grid=3 sfc anl:
+  4LFTX=Best (4-layer) lifted index [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -10.4 28.6  num bits 9  BDS_Ref -104  DecScale 1 BinScale 0
+
+rec 205:17585808:date 2000012412 CAPE kpds5=157 kpds6=116 kpds7=46080 levels=(180,0) grid=3 180-0 mb above gnd anl:
+  CAPE=Convective Avail. Pot. Energy [J/kg]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 3504  num bits 12  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 206:17683632:date 2000012412 CIN kpds5=156 kpds6=116 kpds7=46080 levels=(180,0) grid=3 180-0 mb above gnd anl:
+  CIN=Convective inhibition [J/kg]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -804 0  num bits 10  BDS_Ref -804  DecScale 0 BinScale 0
+
+rec 207:17765166:date 2000012412 HGT kpds5=7 kpds6=6 kpds7=0 levels=(0,0) grid=3 max wind lev anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 4859.6 18639.2  num bits 16  BDS_Ref 48596  DecScale 1 BinScale 2
+
+rec 208:17895570:date 2000012412 TMP kpds5=11 kpds6=6 kpds7=0 levels=(0,0) grid=3 max wind lev anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 185 272.2  num bits 10  BDS_Ref 1850  DecScale 1 BinScale 0
+
+rec 209:17977104:date 2000012412 PRES kpds5=1 kpds6=6 kpds7=0 levels=(0,0) grid=3 max wind lev anl:
+  PRES=Pressure [Pa]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 7002 49999  num bits 16  BDS_Ref 7002  DecScale 0 BinScale 0
+
+rec 210:18107508:date 2000012412 HGT kpds5=7 kpds6=1 kpds7=0 levels=(0,0) grid=3 sfc anl:
+  HGT=Geopotential height [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -331.4 5697.5  num bits 16  BDS_Ref -3314  DecScale 1 BinScale 0
+
+rec 211:18237912:date 2000012412 PRMSL kpds5=2 kpds6=102 kpds7=0 levels=(0,0) grid=3 MSL anl:
+  PRMSL=Pressure reduced to MSL [Pa]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 94966 105873  num bits 14  BDS_Ref 94966  DecScale 0 BinScale 0
+
+rec 212:18352026:date 2000012412 RH kpds5=52 kpds6=108 kpds7=11364 levels=(44,100) grid=3 sigma 0.44-1.00 anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 3 100  num bits 7  BDS_Ref 3  DecScale 0 BinScale 0
+
+rec 213:18409124:date 2000012412 RH kpds5=52 kpds6=108 kpds7=18526 levels=(72,94) grid=3 sigma 0.72-0.94 anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 214:18466222:date 2000012412 RH kpds5=52 kpds6=108 kpds7=11336 levels=(44,72) grid=3 sigma 0.44-0.72 anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 215:18523320:date 2000012412 RH kpds5=52 kpds6=108 kpds7=8548 levels=(33,100) grid=3 sigma 0.33-1.00 anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 4 100  num bits 7  BDS_Ref 4  DecScale 0 BinScale 0
+
+rec 216:18580418:date 2000012412 POT kpds5=13 kpds6=107 kpds7=9950 levels=(38,222) grid=3 sigma=0.9950 anl:
+  POT=Potential temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 226.8 322.5  num bits 10  BDS_Ref 2268  DecScale 1 BinScale 0
+
+rec 217:18661952:date 2000012412 TMP kpds5=11 kpds6=107 kpds7=9950 levels=(38,222) grid=3 sigma=0.9950 anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 227.8 311.8  num bits 10  BDS_Ref 2278  DecScale 1 BinScale 0
+
+rec 218:18743486:date 2000012412 VVEL kpds5=39 kpds6=107 kpds7=9950 levels=(38,222) grid=3 sigma=0.9950 anl:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -1.754 2.191  num bits 12  BDS_Ref -1754  DecScale 3 BinScale 0
+
+rec 219:18841310:date 2000012412 RH kpds5=52 kpds6=107 kpds7=9950 levels=(38,222) grid=3 sigma=0.9950 anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 220:18898408:date 2000012412 TOZNE kpds5=10 kpds6=200 kpds7=0 levels=(0,0) grid=3 atmos col anl:
+  TOZNE=Total ozone [Dobson]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 200.9 502.4  num bits 12  BDS_Ref 2009  DecScale 1 BinScale 0
+
+rec 221:18996232:date 2000012412 UGRD kpds5=33 kpds6=7 kpds7=0 levels=(0,0) grid=3 tropopause anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -35.8 77.1  num bits 11  BDS_Ref -358  DecScale 1 BinScale 0
+
+rec 222:19085910:date 2000012412 UGRD kpds5=33 kpds6=6 kpds7=0 levels=(0,0) grid=3 max wind lev anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -48.5 89.1  num bits 11  BDS_Ref -485  DecScale 1 BinScale 0
+
+rec 223:19175588:date 2000012412 UGRD kpds5=33 kpds6=107 kpds7=9950 levels=(38,222) grid=3 sigma=0.9950 anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -21.2 21.1  num bits 9  BDS_Ref -212  DecScale 1 BinScale 0
+
+rec 224:19248976:date 2000012412 VGRD kpds5=34 kpds6=7 kpds7=0 levels=(0,0) grid=3 tropopause anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -56.7 69.2  num bits 11  BDS_Ref -567  DecScale 1 BinScale 0
+
+rec 225:19338654:date 2000012412 VGRD kpds5=34 kpds6=6 kpds7=0 levels=(0,0) grid=3 max wind lev anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -68.2 74.9  num bits 11  BDS_Ref -682  DecScale 1 BinScale 0
+
+rec 226:19428332:date 2000012412 VGRD kpds5=34 kpds6=107 kpds7=9950 levels=(38,222) grid=3 sigma=0.9950 anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -20.8 26.1  num bits 9  BDS_Ref -208  DecScale 1 BinScale 0
+
+rec 227:19501720:date 2000012412 TMP kpds5=11 kpds6=1 kpds7=0 levels=(0,0) grid=3 sfc anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 219 319.1  num bits 10  BDS_Ref 2190  DecScale 1 BinScale 0
+
+rec 228:19583254:date 2000012412 SOILW kpds5=144 kpds6=112 kpds7=10 levels=(0,10) grid=3 0-10 cm down anl: bitmap: 43649 undef
+  SOILW=Volumetric soil moisture [fraction]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0.057 0.468  num bits 9  BDS_Ref 57  DecScale 3 BinScale 0
+
+rec 229:19615690:date 2000012412 SOILW kpds5=144 kpds6=112 kpds7=2760 levels=(10,200) grid=3 10-200 cm down anl: bitmap: 43649 undef
+  SOILW=Volumetric soil moisture [fraction]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0.099 0.464  num bits 9  BDS_Ref 99  DecScale 3 BinScale 0
+
+rec 230:19648126:date 2000012412 TMP kpds5=11 kpds6=112 kpds7=10 levels=(0,10) grid=3 0-10 cm down anl: bitmap: 43649 undef
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 202.8 314.9  num bits 11  BDS_Ref 2028  DecScale 1 BinScale 0
+
+rec 231:19685940:date 2000012412 TMP kpds5=11 kpds6=112 kpds7=2760 levels=(10,200) grid=3 10-200 cm down anl: bitmap: 43649 undef
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 200 303.8  num bits 11  BDS_Ref 2000  DecScale 1 BinScale 0
+
+rec 232:19723754:date 2000012412 WEASD kpds5=65 kpds6=1 kpds7=0 levels=(0,0) grid=3 sfc anl:
+  WEASD=Accum. snow [kg/m^2]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 199  num bits 8  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 233:19788998:date 2000012412 LAND kpds5=81 kpds6=1 kpds7=0 levels=(0,0) grid=3 sfc anl:
+  LAND=Land cover (land=1;sea=0) [fraction]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 1  num bits 1  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 234:19797226:date 2000012412 ICEC kpds5=91 kpds6=1 kpds7=0 levels=(0,0) grid=3 sfc anl:
+  ICEC=Ice concentration (ice=1;no ice=0) [fraction]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 1  num bits 1  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 235:19805454:date 2000012412 TMP kpds5=11 kpds6=105 kpds7=2 levels=(0,2) grid=3 2 m above gnd anl:
+  TMP=Temp. [K]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 222.1 314.1  num bits 10  BDS_Ref 2221  DecScale 1 BinScale 0
+
+rec 236:19886988:date 2000012412 SPFH kpds5=51 kpds6=105 kpds7=2 levels=(0,2) grid=3 2 m above gnd anl:
+  SPFH=Specific humidity [kg/kg]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 0.03391  num bits 12  BDS_Ref 0  DecScale 5 BinScale 0
+
+rec 237:19984812:date 2000012412 HPBL kpds5=221 kpds6=1 kpds7=0 levels=(0,0) grid=3 sfc anl:
+  HPBL=Planetary boundary layer height [m]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 27 4117  num bits 16  BDS_Ref 270  DecScale 1 BinScale 0
+
+rec 238:20115216:date 2000012412 TCDC kpds5=71 kpds6=244 kpds7=0 levels=(0,0) grid=3 convect-cld layer anl:
+  TCDC=Total cloud cover [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 80  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 239:20172314:date 2000012412 PRES kpds5=1 kpds6=243 kpds7=0 levels=(0,0) grid=3 convect-cld top anl: bitmap: 59916 undef
+  PRES=Pressure [Pa]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 10039 80851  num bits 16  BDS_Ref 10039  DecScale 0 BinScale 1
+
+rec 240:20191038:date 2000012412 PRES kpds5=1 kpds6=242 kpds7=0 levels=(0,0) grid=3 convect-cld bot anl: bitmap: 59916 undef
+  PRES=Pressure [Pa]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 60190 100650  num bits 16  BDS_Ref 60190  DecScale 0 BinScale 0
+
+rec 241:20209762:date 2000012412 RH kpds5=52 kpds6=105 kpds7=2 levels=(0,2) grid=3 2 m above gnd anl:
+  RH=Relative humidity [%]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 242:20266860:date 2000012412 UGRD kpds5=33 kpds6=105 kpds7=10 levels=(0,10) grid=3 10 m above gnd anl:
+  UGRD=u wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -18.9 18.7  num bits 9  BDS_Ref -189  DecScale 1 BinScale 0
+
+rec 243:20340248:date 2000012412 VGRD kpds5=34 kpds6=105 kpds7=10 levels=(0,10) grid=3 10 m above gnd anl:
+  VGRD=v wind [m/s]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -19.4 22.5  num bits 9  BDS_Ref -194  DecScale 1 BinScale 0
+
+rec 244:20413636:date 2000012412 GPA kpds5=27 kpds6=100 kpds7=1000 levels=(3,232) grid=3 1000 mb anl:
+  GPA=Geopotential height anomaly [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -360.9 220.4  num bits 13  BDS_Ref -3609  DecScale 1 BinScale 0
+
+rec 245:20519604:date 2000012412 GPA kpds5=27 kpds6=100 kpds7=500 levels=(1,244) grid=3 500 mb anl:
+  GPA=Geopotential height anomaly [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -378.1 418.9  num bits 13  BDS_Ref -3781  DecScale 1 BinScale 0
+
+rec 246:20625572:date 2000012412 5WAVA kpds5=230 kpds6=100 kpds7=500 levels=(1,244) grid=3 500 mb anl:
+  5WAVA=5-wave geopot. height anomaly [gpm]
+  timerange 10 P1 0 P2 0 TimeU 1  nx 360 ny 181 GDS grid 0 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 82 Table 2
+  latlon: lat  90.000000 to -90.000000 by 1.000000  nxny 65160
+          long 0.000000 to -1.000000 by 1.000000, (360 x 181) scan 0 mode 128 bdsgrid 1
+  min/max data -334.3 379.7  num bits 13  BDS_Ref -3343  DecScale 1 BinScale 0
+

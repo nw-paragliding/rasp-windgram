@@ -1,0 +1,5 @@
+0.828922864396655
+0.171077135603345
+a03
+a04
+climatological albedo for Mon Mar 21 01:16:53 2011

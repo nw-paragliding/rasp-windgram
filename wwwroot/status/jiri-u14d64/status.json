@@ -1,0 +1,207 @@
+[
+ {
+  "time":"2017/02/18 19:54:42",
+  "type":"OK",
+  "message":"[WXTOFLY] Starting evening run"
+ },
+ {
+  "time":"2017/02/18 19:54:44",
+  "type":"OK",
+  "message":"[PNW.00z.d2]: Starting RASP run"
+ },
+ {
+  "time":"2017/02/18 20:24:35",
+  "type":"OK",
+  "message":"[PNW.00z.d2]: Finished nested run in 00:29:51"
+ },
+ {
+  "time":"2017/02/18 20:24:36",
+  "type":"OK",
+  "message":"[PNW.d2] Post stage 1 tasks started"
+ },
+ {
+  "time":"2017/02/18 20:24:36",
+  "type":"OK",
+  "message":"[PNW.d2] Started plot cropping"
+ },
+ {
+  "time":"2017/02/18 20:24:36",
+  "type":"OK",
+  "message":"[PNW.00z.w2]: Starting RASP run"
+ },
+ {
+  "time":"2017/02/18 20:27:09",
+  "type":"OK",
+  "message":"[PNW.d2] Finished plot cropping"
+ },
+ {
+  "time":"2017/02/18 20:27:09",
+  "type":"OK",
+  "message":"[PNW.d2] Started generating BLIPSPOTs"
+ },
+ {
+  "time":"2017/02/18 20:31:08",
+  "type":"OK",
+  "message":"[PNW.d2] Finished generating BLIPSPOTs"
+ },
+ {
+  "time":"2017/02/18 20:31:09",
+  "type":"OK",
+  "message":"[PNW.d2] Started generating WINDGRAMs"
+ },
+ {
+  "time":"2017/02/18 20:33:31",
+  "type":"OK",
+  "message":"[PNW.d2] Finished generating WINDGRAMs"
+ },
+ {
+  "time":"2017/02/18 20:33:32",
+  "type":"OK",
+  "message":"[PNW.d2] All tasks finished in00:08:56"
+ },
+ {
+  "time":"2017/02/18 20:56:18",
+  "type":"WARNING",
+  "message":"Detected errors during RASP run"
+ },
+ {
+  "time":"2017/02/18 20:56:18",
+  "type":"OK",
+  "message":"[PNW.00z.w2]: Finished nested run in 00:31:42"
+ },
+ {
+  "time":"2017/02/18 20:56:18",
+  "type":"OK",
+  "message":"[PNW.w2] Started post stage 2 tasks"
+ },
+ {
+  "time":"2017/02/18 20:56:19",
+  "type":"OK",
+  "message":"[PNW.w2] Started generating BLIPSPOTs"
+ },
+ {
+  "time":"2017/02/18 20:56:18",
+  "type":"OK",
+  "message":"[PNW.TIGER.00z]: Starting nested run"
+ },
+ {
+  "time":"2017/02/18 20:59:12",
+  "type":"OK",
+  "message":"[PNW.w2] Finished generating BLIPSPOTs"
+ },
+ {
+  "time":"2017/02/18 20:59:13",
+  "type":"OK",
+  "message":"[PNW.w2] Started generating WINDGRAMs"
+ },
+ {
+  "time":"2017/02/18 21:01:26",
+  "type":"OK",
+  "message":"[PNW.w2] Finished generating WINDGRAMs"
+ },
+ {
+  "time":"2017/02/18 21:01:27",
+  "type":"OK",
+  "message":"[PNW.w2] Started plotting sea level pressure"
+ },
+ {
+  "time":"2017/02/18 21:01:29",
+  "type":"OK",
+  "message":"[PNW.w2] Finished plotting sea level pressure"
+ },
+ {
+  "time":"2017/02/18 21:01:30",
+  "type":"OK",
+  "message":"[PNW.w2] Started plotting surface temperature"
+ },
+ {
+  "time":"2017/02/18 21:01:32",
+  "type":"OK",
+  "message":"[PNW.w2] Finished plotting surface temperature"
+ },
+ {
+  "time":"2017/02/18 21:01:33",
+  "type":"OK",
+  "message":"[PNW.w2] Started cropping plots"
+ },
+ {
+  "time":"2017/02/18 21:03:53",
+  "type":"OK",
+  "message":"[PNW.w2] Finished cropping plots"
+ },
+ {
+  "time":"2017/02/18 21:03:55",
+  "type":"OK",
+  "message":"[PNW.w2] All tasks finished in 00:07:37"
+ },
+ {
+  "time":"2017/02/18 21:17:01",
+  "type":"OK",
+  "message":"[PNW.TIGER.00z]: Finished nested run in 00:20:43"
+ },
+ {
+  "time":"2017/02/18 21:17:02",
+  "type":"OK",
+  "message":"[TIGER.w2] Started post stage 2 tasks"
+ },
+ {
+  "time":"2017/02/18 21:17:02",
+  "type":"OK",
+  "message":"[TIGER.w2] Started generating BLIPSPOTs"
+ },
+ {
+  "time":"2017/02/18 21:17:02",
+  "type":"OK",
+  "message":"[PNW.FRASER.00z]: Starting nested run"
+ },
+ {
+  "time":"2017/02/18 21:17:04",
+  "type":"OK",
+  "message":"[TIGER.w2] Finished generating BLIPSPOTs"
+ },
+ {
+  "time":"2017/02/18 21:17:17",
+  "type":"OK",
+  "message":"[TIGER.w2] Started generating WINDGRAMs"
+ },
+ {
+  "time":"2017/02/18 21:17:28",
+  "type":"OK",
+  "message":"[TIGER.w2] Finished generating WINDGRAMs"
+ },
+ {
+  "time":"2017/02/18 21:17:29",
+  "type":"OK",
+  "message":"[TIGER.w2] Started plotting sea level pressure"
+ },
+ {
+  "time":"2017/02/18 21:17:32",
+  "type":"OK",
+  "message":"[TIGER.w2] Finished plotting sea level pressure"
+ },
+ {
+  "time":"2017/02/18 21:17:33",
+  "type":"OK",
+  "message":"[TIGER.w2] Started plotting surface temperature"
+ },
+ {
+  "time":"2017/02/18 21:17:36",
+  "type":"OK",
+  "message":"[TIGER.w2] Finished plotting surface temperature"
+ },
+ {
+  "time":"2017/02/18 21:17:38",
+  "type":"OK",
+  "message":"[TIGER.w2] Started cropping plots"
+ },
+ {
+  "time":"2017/02/18 21:18:21",
+  "type":"OK",
+  "message":"[TIGER.w2] Finished cropping plots"
+ },
+ {
+  "time":"2017/02/18 21:18:23",
+  "type":"OK",
+  "message":"[TIGER.w2] All tasks finished in 00:01:21"
+ }
+]

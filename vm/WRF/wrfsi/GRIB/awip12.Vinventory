@@ -1,0 +1,1503 @@
+rec 1:0:date 2004123000 MSLET kpds5=130 kpds6=102 kpds7=0 levels=(0,0) grid=218 MSL 66hr fcst:
+  MSLET=Mean sea level pressure (ETA model) [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 99228.6 104432  num bits 14  BDS_Ref 99228.6  DecScale 0 BinScale -1
+
+rec 2:459980:date 2004123000 PRMSL kpds5=2 kpds6=102 kpds7=0 levels=(0,0) grid=218 MSL 66hr fcst:
+  PRMSL=Pressure reduced to MSL [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 99228.6 104872  num bits 14  BDS_Ref 99228.6  DecScale 0 BinScale -1
+
+rec 3:919960:date 2004123000 VIS kpds5=20 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  VIS=Visibility [m]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 26.3763 20026.4  num bits 7  BDS_Ref 0.263763  DecScale -2 BinScale 1
+
+rec 4:1149996:date 2004123000 ABSV kpds5=41 kpds6=100 kpds7=250 levels=(0,250) grid=218 250 mb 66hr fcst:
+  ABSV=Absolute vorticity [/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -0.000172059 0.000260441  num bits 8  BDS_Ref -17.2059  DecScale 5 BinScale -2
+
+rec 5:1412882:date 2004123000 ABSV kpds5=41 kpds6=100 kpds7=500 levels=(1,244) grid=218 500 mb 66hr fcst:
+  ABSV=Absolute vorticity [/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -0.000128485 0.000366515  num bits 8  BDS_Ref -12.8485  DecScale 5 BinScale -2
+
+rec 6:1675768:date 2004123000 ABSV kpds5=41 kpds6=100 kpds7=700 levels=(2,188) grid=218 700 mb 66hr fcst:
+  ABSV=Absolute vorticity [/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -0.000486801 0.000538199  num bits 6  BDS_Ref -4.86801  DecScale 4 BinScale -2
+
+rec 7:1872956:date 2004123000 ABSV kpds5=41 kpds6=100 kpds7=850 levels=(3,82) grid=218 850 mb 66hr fcst:
+  ABSV=Absolute vorticity [/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -0.00103747 0.000837535  num bits 7  BDS_Ref -10.3747  DecScale 4 BinScale -2
+
+rec 8:2102992:date 2004123000 ABSV kpds5=41 kpds6=100 kpds7=1000 levels=(3,232) grid=218 1000 mb 66hr fcst:
+  ABSV=Absolute vorticity [/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -0.000659715 0.000852785  num bits 7  BDS_Ref -6.59715  DecScale 4 BinScale -3
+
+rec 9:2333028:date 2004123000 PRES kpds5=1 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  PRES=Pressure [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 64461.2 103944  num bits 16  BDS_Ref 64461.2  DecScale 0 BinScale 0
+
+rec 10:2858706:date 2004123000 HGT kpds5=7 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  HGT=Geopotential height [gpm]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 3681.75  num bits 14  BDS_Ref 0  DecScale 0 BinScale -2
+
+rec 11:3318686:date 2004123000 TMP kpds5=11 kpds6=105 kpds7=2 levels=(0,2) grid=218 2 m above gnd 66hr fcst:
+  TMP=Temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 227.552 303.427  num bits 11  BDS_Ref 227.552  DecScale 0 BinScale -4
+
+rec 12:3680118:date 2004123000 SPFH kpds5=51 kpds6=105 kpds7=2 levels=(0,2) grid=218 2 m above gnd 66hr fcst:
+  SPFH=Specific humidity [kg/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 2.7773e-08 0.019  num bits 7  BDS_Ref 2.7773e-05  DecScale 3 BinScale -2
+
+rec 13:3910154:date 2004123000 RH kpds5=52 kpds6=105 kpds7=2 levels=(0,2) grid=218 2 m above gnd 66hr fcst:
+  RH=Relative humidity [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 9.80272 99.8027  num bits 7  BDS_Ref 9.80272  DecScale 0 BinScale 0
+
+rec 14:4140190:date 2004123000 POT kpds5=13 kpds6=105 kpds7=10 levels=(0,10) grid=218 10 m above gnd 66hr fcst:
+  POT=Potential temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 227.697 314.822  num bits 10  BDS_Ref 227.697  DecScale 0 BinScale -3
+
+rec 15:4468774:date 2004123000 SPFH kpds5=51 kpds6=105 kpds7=10 levels=(0,10) grid=218 10 m above gnd 66hr fcst:
+  SPFH=Specific humidity [kg/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 2.7773e-08 0.01875  num bits 7  BDS_Ref 2.7773e-05  DecScale 3 BinScale -2
+
+rec 16:4698810:date 2004123000 UGRD kpds5=33 kpds6=105 kpds7=10 levels=(0,10) grid=218 10 m above gnd 66hr fcst:
+  UGRD=u wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -20.389 16.986  num bits 10  BDS_Ref -20.389  DecScale 0 BinScale -4
+
+rec 17:5027394:date 2004123000 VGRD kpds5=34 kpds6=105 kpds7=10 levels=(0,10) grid=218 10 m above gnd 66hr fcst:
+  VGRD=v wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -12.6795 15.5705  num bits 9  BDS_Ref -12.6795  DecScale 0 BinScale -4
+
+rec 18:5323128:date 2004123000 APCP kpds5=61 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 60-66hr acc:
+  APCP=Total precipitation [kg/m^2]
+  timerange 4 P1 60 P2 66 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 18.75  num bits 8  BDS_Ref 0  DecScale 0 BinScale -3
+
+rec 19:5586014:date 2004123000 ACPCP kpds5=63 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 60-66hr acc:
+  ACPCP=Convective precipitation [kg/m^2]
+  timerange 4 P1 60 P2 66 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 9.625  num bits 7  BDS_Ref 0  DecScale 0 BinScale -3
+
+rec 20:5816050:date 2004123000 WEASD kpds5=65 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 60-66hr acc:
+  WEASD=Accum. snow [kg/m^2]
+  timerange 4 P1 60 P2 66 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 16.75  num bits 7  BDS_Ref 0  DecScale 0 BinScale -2
+
+rec 21:6046086:date 2004123000 CSNOW kpds5=143 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  CSNOW=Categorical snow [yes=1;no=0]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 1  num bits 1  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 22:6079028:date 2004123000 CICEP kpds5=142 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  CICEP=Categorical ice pellets [yes=1;no=0]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 1  num bits 1  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 23:6111970:date 2004123000 CFRZR kpds5=141 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  CFRZR=Categorical freezing rain [yes=1;no=0]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 1  num bits 1  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 24:6144912:date 2004123000 CRAIN kpds5=140 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  CRAIN=Categorical rain [yes=1;no=0]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 1  num bits 1  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 25:6177854:date 2004123000 CAPE kpds5=157 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  CAPE=Convective Avail. Pot. Energy [J/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 2940  num bits 8  BDS_Ref 0  DecScale -1 BinScale 1
+
+rec 26:6440740:date 2004123000 CIN kpds5=156 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  CIN=Convective inhibition [J/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -496.604 -0.603516  num bits 8  BDS_Ref -496.604  DecScale 0 BinScale 1
+
+rec 27:6703626:date 2004123000 PWAT kpds5=54 kpds6=200 kpds7=0 levels=(0,0) grid=218 atmos col 66hr fcst:
+  PWAT=Precipitable water [kg/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0.484623 48.4846  num bits 8  BDS_Ref 0.484623  DecScale 0 BinScale -2
+
+rec 28:6966512:date 2004123000 TCDC kpds5=71 kpds6=200 kpds7=0 levels=(0,0) grid=218 atmos col 66hr fcst:
+  TCDC=Total cloud cover [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 100  num bits 6  BDS_Ref 0  DecScale 0 BinScale 1
+
+rec 29:7163700:date 2004123000 DSWRF kpds5=204 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 60-66hr ave:
+  DSWRF=Downward short wave flux [W/m^2]
+  timerange 3 P1 60 P2 66 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 668  num bits 13  BDS_Ref 0  DecScale 0 BinScale -3
+
+rec 30:7590830:date 2004123000 HLCY kpds5=190 kpds6=106 kpds7=7680 levels=(30,0) grid=218 3000-0 m above gnd 66hr fcst:
+  HLCY=Storm relative helicity [m^2/s^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -116.038 827.962  num bits 9  BDS_Ref -116.038  DecScale 0 BinScale 1
+
+rec 31:7886564:date 2004123000 USTM kpds5=196 kpds6=106 kpds7=15360 levels=(60,0) grid=218 6000-0 m above gnd 66hr fcst:
+  USTM=u-component of storm motion [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -27.4858 30.8892  num bits 9  BDS_Ref -27.4858  DecScale 0 BinScale -3
+
+rec 32:8182298:date 2004123000 VSTM kpds5=197 kpds6=106 kpds7=15360 levels=(60,0) grid=218 6000-0 m above gnd 66hr fcst:
+  VSTM=v-component of storm motion [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -19.8748 18.8752  num bits 8  BDS_Ref -19.8748  DecScale 0 BinScale -2
+
+rec 33:8445184:date 2004123000 TMP kpds5=11 kpds6=116 kpds7=7680 levels=(30,0) grid=218 30-0 mb above gnd 66hr fcst:
+  TMP=Temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 229.562 301.312  num bits 11  BDS_Ref 229.562  DecScale 0 BinScale -4
+
+rec 34:8806616:date 2004123000 RH kpds5=52 kpds6=116 kpds7=7680 levels=(30,0) grid=218 30-0 mb above gnd 66hr fcst:
+  RH=Relative humidity [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 11.9991 98.9991  num bits 7  BDS_Ref 11.9991  DecScale 0 BinScale 0
+
+rec 35:9036652:date 2004123000 UGRD kpds5=33 kpds6=116 kpds7=7680 levels=(30,0) grid=218 30-0 mb above gnd 66hr fcst:
+  UGRD=u wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -22.73 21.4575  num bits 10  BDS_Ref -22.73  DecScale 0 BinScale -4
+
+rec 36:9365236:date 2004123000 VGRD kpds5=34 kpds6=116 kpds7=7680 levels=(30,0) grid=218 30-0 mb above gnd 66hr fcst:
+  VGRD=v wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -14.5025 21.7475  num bits 10  BDS_Ref -14.5025  DecScale 0 BinScale -4
+
+rec 37:9693820:date 2004123000 PLI kpds5=24 kpds6=116 kpds7=7680 levels=(30,0) grid=218 30-0 mb above gnd 66hr fcst:
+  PLI=Parcel lifted index (to 500 hPa) [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -5.92239 45.3276  num bits 9  BDS_Ref -5.92239  DecScale 0 BinScale -3
+
+rec 38:9989554:date 2004123000 TMP kpds5=11 kpds6=116 kpds7=15390 levels=(60,30) grid=218 60-30 mb above gnd 66hr fcst:
+  TMP=Temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 233.7 299.388  num bits 11  BDS_Ref 233.7  DecScale 0 BinScale -4
+
+rec 39:10350986:date 2004123000 UGRD kpds5=33 kpds6=116 kpds7=15390 levels=(60,30) grid=218 60-30 mb above gnd 66hr fcst:
+  UGRD=u wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -28.7589 23.6786  num bits 10  BDS_Ref -28.7589  DecScale 0 BinScale -4
+
+rec 40:10679570:date 2004123000 VGRD kpds5=34 kpds6=116 kpds7=15390 levels=(60,30) grid=218 60-30 mb above gnd 66hr fcst:
+  VGRD=v wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -15.4615 28.1635  num bits 10  BDS_Ref -15.4615  DecScale 0 BinScale -4
+
+rec 41:11008154:date 2004123000 TMP kpds5=11 kpds6=116 kpds7=23100 levels=(90,60) grid=218 90-60 mb above gnd 66hr fcst:
+  TMP=Temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 236.109 297.922  num bits 10  BDS_Ref 236.109  DecScale 0 BinScale -4
+
+rec 42:11336738:date 2004123000 RH kpds5=52 kpds6=116 kpds7=23100 levels=(90,60) grid=218 90-60 mb above gnd 66hr fcst:
+  RH=Relative humidity [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 4.11263 100.113  num bits 7  BDS_Ref 4.11263  DecScale 0 BinScale 0
+
+rec 43:11566774:date 2004123000 UGRD kpds5=33 kpds6=116 kpds7=23100 levels=(90,60) grid=218 90-60 mb above gnd 66hr fcst:
+  UGRD=u wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -30.4805 23.207  num bits 10  BDS_Ref -30.4805  DecScale 0 BinScale -4
+
+rec 44:11895358:date 2004123000 VGRD kpds5=34 kpds6=116 kpds7=23100 levels=(90,60) grid=218 90-60 mb above gnd 66hr fcst:
+  VGRD=v wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -17.4149 29.0226  num bits 10  BDS_Ref -17.4149  DecScale 0 BinScale -4
+
+rec 45:12223942:date 2004123000 TMP kpds5=11 kpds6=116 kpds7=30810 levels=(120,90) grid=218 120-90 mb above gnd 66hr fcst:
+  TMP=Temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 240.725 295.288  num bits 10  BDS_Ref 240.725  DecScale 0 BinScale -4
+
+rec 46:12552526:date 2004123000 UGRD kpds5=33 kpds6=116 kpds7=30810 levels=(120,90) grid=218 120-90 mb above gnd 66hr fcst:
+  UGRD=u wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -30.8022 26.5103  num bits 10  BDS_Ref -30.8022  DecScale 0 BinScale -4
+
+rec 47:12881110:date 2004123000 VGRD kpds5=34 kpds6=116 kpds7=30810 levels=(120,90) grid=218 120-90 mb above gnd 66hr fcst:
+  VGRD=v wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -17.1028 28.1472  num bits 10  BDS_Ref -17.1028  DecScale 0 BinScale -4
+
+rec 48:13209694:date 2004123000 TMP kpds5=11 kpds6=116 kpds7=38520 levels=(150,120) grid=218 150-120 mb above gnd 66hr fcst:
+  TMP=Temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 244.536 292.224  num bits 10  BDS_Ref 244.536  DecScale 0 BinScale -4
+
+rec 49:13538278:date 2004123000 RH kpds5=52 kpds6=116 kpds7=38520 levels=(150,120) grid=218 150-120 mb above gnd 66hr fcst:
+  RH=Relative humidity [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 1.57677 99.5768  num bits 7  BDS_Ref 1.57677  DecScale 0 BinScale 0
+
+rec 50:13768314:date 2004123000 UGRD kpds5=33 kpds6=116 kpds7=38520 levels=(150,120) grid=218 150-120 mb above gnd 66hr fcst:
+  UGRD=u wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -32.1941 29.3684  num bits 10  BDS_Ref -32.1941  DecScale 0 BinScale -4
+
+rec 51:14096898:date 2004123000 VGRD kpds5=34 kpds6=116 kpds7=38520 levels=(150,120) grid=218 150-120 mb above gnd 66hr fcst:
+  VGRD=v wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -16.0798 24.4202  num bits 10  BDS_Ref -16.0798  DecScale 0 BinScale -4
+
+rec 52:14425482:date 2004123000 4LFTX kpds5=132 kpds6=116 kpds7=46080 levels=(180,0) grid=218 180-0 mb above gnd 66hr fcst:
+  4LFTX=Best (4-layer) lifted index [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -5.91911 26.3309  num bits 8  BDS_Ref -5.91911  DecScale 0 BinScale -2
+
+rec 53:14688368:date 2004123000 CAPE kpds5=157 kpds6=116 kpds7=46080 levels=(180,0) grid=218 180-0 mb above gnd 66hr fcst:
+  CAPE=Convective Avail. Pot. Energy [J/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 2640  num bits 8  BDS_Ref 0  DecScale -1 BinScale 1
+
+rec 54:14951254:date 2004123000 CIN kpds5=156 kpds6=116 kpds7=46080 levels=(180,0) grid=218 180-0 mb above gnd 66hr fcst:
+  CIN=Convective inhibition [J/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -490.932 1.06812  num bits 8  BDS_Ref -490.932  DecScale 0 BinScale 1
+
+rec 55:15214140:date 2004123000 LFTX kpds5=131 kpds6=101 kpds7=12900 levels=(50,100) grid=218 500-1000 mb 66hr fcst:
+  LFTX=Surface lifted index [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 266.54 323.665  num bits 9  BDS_Ref 266.54  DecScale 0 BinScale -3
+
+rec 56:15509874:date 2004123000 RH kpds5=52 kpds6=116 kpds7=15390 levels=(60,30) grid=218 60-30 mb above gnd 66hr fcst:
+  RH=Relative humidity [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 5.29663 100.297  num bits 7  BDS_Ref 5.29663  DecScale 0 BinScale 0
+
+rec 57:15739910:date 2004123000 RH kpds5=52 kpds6=116 kpds7=30810 levels=(120,90) grid=218 120-90 mb above gnd 66hr fcst:
+  RH=Relative humidity [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 2.02149 100.021  num bits 7  BDS_Ref 2.02149  DecScale 0 BinScale 0
+
+rec 58:15969946:date 2004123000 SHTFL kpds5=122 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  SHTFL=Sensible heat flux [W/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -634.627 148.623  num bits 13  BDS_Ref -634.627  DecScale 0 BinScale -3
+
+rec 59:16397076:date 2004123000 LHTFL kpds5=121 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  LHTFL=Latent heat flux [W/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -632.377 264.373  num bits 13  BDS_Ref -632.377  DecScale 0 BinScale -3
+
+rec 60:16824206:date 2004123000 DSWRF kpds5=204 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  DSWRF=Downward short wave flux [W/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 876.25  num bits 13  BDS_Ref 0  DecScale 0 BinScale -3
+
+rec 61:17251336:date 2004123000 DLWRF kpds5=205 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  DLWRF=Downward long wave flux [W/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 102.145 459.27  num bits 12  BDS_Ref 102.145  DecScale 0 BinScale -3
+
+rec 62:17645618:date 2004123000 USWRF kpds5=211 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  USWRF=Upward short wave flux [W/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 383.5  num bits 12  BDS_Ref 0  DecScale 0 BinScale -3
+
+rec 63:18039900:date 2004123000 ULWRF kpds5=212 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  ULWRF=Upward long wave flux [W/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 150.738 584.363  num bits 12  BDS_Ref 150.738  DecScale 0 BinScale -3
+
+rec 64:18434182:date 2004123000 LAND kpds5=81 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  LAND=Land cover (land=1;sea=0) [fraction]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 1  num bits 1  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 65:18467124:date 2004123000 SFCR kpds5=83 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  SFCR=Surface roughness [m]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 1.59e-05 0.460016  num bits 8  BDS_Ref 0.00159  DecScale 2 BinScale -2
+
+rec 66:18730010:date 2004123000 FRICV kpds5=253 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  FRICV=Friction velocity [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0.07 2.245  num bits 7  BDS_Ref 0.7  DecScale 1 BinScale -2
+
+rec 67:18960046:date 2004123000 CAPE kpds5=157 kpds6=116 kpds7=23040 levels=(90,0) grid=218 90-0 mb above gnd 66hr fcst:
+  CAPE=Convective Avail. Pot. Energy [J/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 1860  num bits 7  BDS_Ref 0  DecScale -1 BinScale 1
+
+rec 68:19190082:date 2004123000 CIN kpds5=156 kpds6=116 kpds7=23040 levels=(90,0) grid=218 90-0 mb above gnd 66hr fcst:
+  CIN=Convective inhibition [J/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -442.03 -0.0302734  num bits 8  BDS_Ref -442.03  DecScale 0 BinScale 1
+
+rec 69:19452968:date 2004123000 HLCY kpds5=190 kpds6=106 kpds7=2560 levels=(10,0) grid=218 1000-0 m above gnd 66hr fcst:
+  HLCY=Storm relative helicity [m^2/s^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -166.474 673.526  num bits 9  BDS_Ref -166.474  DecScale 0 BinScale 1
+
+rec 70:19748702:date 2004123000 CAPE kpds5=157 kpds6=116 kpds7=65280 levels=(255,0) grid=218 255-0 mb above gnd 66hr fcst:
+  CAPE=Convective Avail. Pot. Energy [J/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 2940  num bits 8  BDS_Ref 0  DecScale -1 BinScale 1
+
+rec 71:20011588:date 2004123000 CIN kpds5=156 kpds6=116 kpds7=65280 levels=(255,0) grid=218 255-0 mb above gnd 66hr fcst:
+  CIN=Convective inhibition [J/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -449.898 0.102295  num bits 8  BDS_Ref -449.898  DecScale 0 BinScale 1
+
+rec 72:20274474:date 2004123000 CFRZR kpds5=141 kpds6=116 kpds7=65280 levels=(255,0) grid=218 255-0 mb above gnd 66hr fcst:
+  CFRZR=Categorical freezing rain [yes=1;no=0]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 129
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 34380.2 99980.2  num bits 9  BDS_Ref 343.802  DecScale -2 BinScale 1
+
+rec 73:20570208:date 2004123000 VVEL kpds5=39 kpds6=100 kpds7=500 levels=(1,244) grid=218 500 mb 66hr fcst:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -2.36917 1.91208  num bits 8  BDS_Ref -2.36917  DecScale 0 BinScale -5
+
+rec 74:20833094:date 2004123000 VVEL kpds5=39 kpds6=100 kpds7=700 levels=(2,188) grid=218 700 mb 66hr fcst:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -3.91342 4.46158  num bits 9  BDS_Ref -3.91342  DecScale 0 BinScale -5
+
+rec 75:21128828:date 2004123000 TMP kpds5=11 kpds6=100 kpds7=750 levels=(2,238) grid=218 750 mb 66hr fcst:
+  TMP=Temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 245.542 287.917  num bits 9  BDS_Ref 245.542  DecScale 0 BinScale -3
+
+rec 76:21424562:date 2004123000 TMP kpds5=11 kpds6=100 kpds7=800 levels=(3,32) grid=218 800 mb 66hr fcst:
+  TMP=Temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 241.815 290.565  num bits 9  BDS_Ref 241.815  DecScale 0 BinScale -3
+
+rec 77:21720296:date 2004123000 TMP kpds5=11 kpds6=100 kpds7=850 levels=(3,82) grid=218 850 mb 66hr fcst:
+  TMP=Temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 240.094 293.594  num bits 9  BDS_Ref 240.094  DecScale 0 BinScale -3
+
+rec 78:22016030:date 2004123000 TMP kpds5=11 kpds6=100 kpds7=900 levels=(3,132) grid=218 900 mb 66hr fcst:
+  TMP=Temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 240.923 296.673  num bits 9  BDS_Ref 240.923  DecScale 0 BinScale -3
+
+rec 79:22311764:date 2004123000 TMP kpds5=11 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  TMP=Temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 227.072 318.572  num bits 10  BDS_Ref 227.072  DecScale 0 BinScale -3
+
+rec 80:22640348:date 2004123000 WEASD kpds5=65 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  WEASD=Accum. snow [kg/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 400  num bits 8  BDS_Ref 0  DecScale 0 BinScale 1
+
+rec 81:22903234:date 2004123000 PRES kpds5=1 kpds6=109 kpds7=1 levels=(0,1) grid=218 hybrid lev 1 66hr fcst:
+  PRES=Pressure [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 63237.1 103837  num bits 8  BDS_Ref 632.371  DecScale -2 BinScale 1
+
+rec 82:23166120:date 2004123000 HGT kpds5=7 kpds6=109 kpds7=1 levels=(0,1) grid=218 hybrid lev 1 66hr fcst:
+  HGT=Geopotential height [gpm]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 8.09548 3820.97  num bits 15  BDS_Ref 8.09548  DecScale 0 BinScale -3
+
+rec 83:23658948:date 2004123000 TMP kpds5=11 kpds6=109 kpds7=1 levels=(0,1) grid=218 hybrid lev 1 66hr fcst:
+  TMP=Temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 227.89 302.515  num bits 10  BDS_Ref 227.89  DecScale 0 BinScale -3
+
+rec 84:23987532:date 2004123000 POT kpds5=13 kpds6=109 kpds7=1 levels=(0,1) grid=218 hybrid lev 1 66hr fcst:
+  POT=Potential temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 227.738 313.613  num bits 10  BDS_Ref 227.738  DecScale 0 BinScale -3
+
+rec 85:24316116:date 2004123000 DPT kpds5=17 kpds6=109 kpds7=1 levels=(0,1) grid=218 hybrid lev 1 66hr fcst:
+  DPT=Dew point temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 202.208 297.458  num bits 10  BDS_Ref 202.208  DecScale 0 BinScale -3
+
+rec 86:24644700:date 2004123000 RH kpds5=52 kpds6=109 kpds7=1 levels=(0,1) grid=218 hybrid lev 1 66hr fcst:
+  RH=Relative humidity [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 9.25425 100.254  num bits 7  BDS_Ref 9.25425  DecScale 0 BinScale 0
+
+rec 87:24874736:date 2004123000 SPFH kpds5=51 kpds6=109 kpds7=1 levels=(0,1) grid=218 hybrid lev 1 66hr fcst:
+  SPFH=Specific humidity [kg/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 1e-12 0.01875  num bits 7  BDS_Ref 1e-09  DecScale 3 BinScale -2
+
+rec 88:25104772:date 2004123000 UGRD kpds5=33 kpds6=109 kpds7=1 levels=(0,1) grid=218 hybrid lev 1 66hr fcst:
+  UGRD=u wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -22.5325 18.0925  num bits 9  BDS_Ref -22.5325  DecScale 0 BinScale -3
+
+rec 89:25400506:date 2004123000 VGRD kpds5=34 kpds6=109 kpds7=1 levels=(0,1) grid=218 hybrid lev 1 66hr fcst:
+  VGRD=v wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -12.6641 15.9609  num bits 8  BDS_Ref -12.6641  DecScale 0 BinScale -3
+
+rec 90:25663392:date 2004123000 VVEL kpds5=39 kpds6=109 kpds7=1 levels=(0,1) grid=218 hybrid lev 1 66hr fcst:
+  VVEL=Pressure vertical velocity [Pa/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -0.614835 0.853915  num bits 6  BDS_Ref -0.614835  DecScale 0 BinScale -5
+
+rec 91:25860580:date 2004123000 TKE kpds5=158 kpds6=109 kpds7=1 levels=(0,1) grid=218 hybrid lev 1 66hr fcst:
+  TKE=Turbulent kinetic energy [J/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0.2 21.7  num bits 7  BDS_Ref 0.2  DecScale 0 BinScale -2
+
+rec 92:26090616:date 2004123000 KX kpds5=133 kpds6=109 kpds7=1 levels=(0,1) grid=218 hybrid lev 1 66hr fcst:
+  KX=K index [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 129
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 45.3  num bits 9  BDS_Ref 0  DecScale 1 BinScale 0
+
+rec 93:26386350:date 2004123000 TSOIL kpds5=85 kpds6=112 kpds7=10 levels=(0,10) grid=218 0-10 cm down 66hr fcst:
+  TSOIL=Soil temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 234.539 303.039  num bits 9  BDS_Ref 234.539  DecScale 0 BinScale -2
+
+rec 94:26682084:date 2004123000 SOILW kpds5=144 kpds6=112 kpds7=10 levels=(0,10) grid=218 0-10 cm down 66hr fcst:
+  SOILW=Volumetric soil moisture [fraction]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0.0494713 0.999471  num bits 9  BDS_Ref 4.94713  DecScale 2 BinScale -2
+
+rec 95:26977818:date 2004123000 TSOIL kpds5=85 kpds6=112 kpds7=2600 levels=(10,40) grid=218 10-40 cm down 66hr fcst:
+  TSOIL=Soil temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 238.105 300.23  num bits 9  BDS_Ref 238.105  DecScale 0 BinScale -3
+
+rec 96:27273552:date 2004123000 SOILW kpds5=144 kpds6=112 kpds7=2600 levels=(10,40) grid=218 10-40 cm down 66hr fcst:
+  SOILW=Volumetric soil moisture [fraction]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0.0286419 0.998642  num bits 9  BDS_Ref 2.86419  DecScale 2 BinScale -2
+
+rec 97:27569286:date 2004123000 TSOIL kpds5=85 kpds6=112 kpds7=10340 levels=(40,100) grid=218 40-100 cm down 66hr fcst:
+  TSOIL=Soil temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 245.182 299.932  num bits 9  BDS_Ref 245.182  DecScale 0 BinScale -3
+
+rec 98:27865020:date 2004123000 SOILW kpds5=144 kpds6=112 kpds7=10340 levels=(40,100) grid=218 40-100 cm down 66hr fcst:
+  SOILW=Volumetric soil moisture [fraction]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0.0285077 0.998508  num bits 9  BDS_Ref 2.85077  DecScale 2 BinScale -2
+
+rec 99:28160754:date 2004123000 TSOIL kpds5=85 kpds6=112 kpds7=25800 levels=(100,200) grid=218 100-200 cm down 66hr fcst:
+  TSOIL=Soil temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 254.144 299.644  num bits 8  BDS_Ref 254.144  DecScale 0 BinScale -2
+
+rec 100:28423640:date 2004123000 SOILW kpds5=144 kpds6=112 kpds7=25800 levels=(100,200) grid=218 100-200 cm down 66hr fcst:
+  SOILW=Volumetric soil moisture [fraction]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0.0285143 0.998514  num bits 9  BDS_Ref 2.85143  DecScale 2 BinScale -2
+
+rec 101:28719374:date 2004123000 TSOIL kpds5=85 kpds6=111 kpds7=300 levels=(1,44) grid=218 300 cm down 66hr fcst:
+  TSOIL=Soil temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 262 299  num bits 8  BDS_Ref 262  DecScale 0 BinScale -2
+
+rec 102:28982260:date 2004123000 MSTAV kpds5=207 kpds6=112 kpds7=100 levels=(0,100) grid=218 0-100 cm down 66hr fcst:
+  MSTAV=Moisture availability [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -10.3571 247.643  num bits 8  BDS_Ref -10.3571  DecScale 0 BinScale 1
+
+rec 103:29245146:date 2004123000 SOILM kpds5=86 kpds6=112 kpds7=200 levels=(0,200) grid=218 0-200 cm down 66hr fcst:
+  SOILM=Soil moisture content [kg/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 60.1542 3000.15  num bits 8  BDS_Ref 6.01542  DecScale -1 BinScale 1
+
+rec 104:29508032:date 2004123000 CNWAT kpds5=223 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  CNWAT=Plant canopy surface water [kg/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 0.5  num bits 8  BDS_Ref 0  DecScale 2 BinScale -2
+
+rec 105:29770918:date 2004123000 SNOM kpds5=99 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 60-66hr acc:
+  SNOM=Snow melt [kg/m^2]
+  timerange 4 P1 60 P2 66 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 21  num bits 7  BDS_Ref 0  DecScale 0 BinScale -2
+
+rec 106:30000954:date 2004123000 SSRUN kpds5=235 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 60-66hr acc:
+  SSRUN=Storm surface runoff [kg/m^2]
+  timerange 4 P1 60 P2 66 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 7.825  num bits 9  BDS_Ref 0  DecScale 1 BinScale -2
+
+rec 107:30296688:date 2004123000 BGRUN kpds5=234 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 60-66hr acc:
+  BGRUN=Baseflow-groundwater runoff [kg/m^2]
+  timerange 4 P1 60 P2 66 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 2.875  num bits 8  BDS_Ref 0  DecScale 1 BinScale -3
+
+rec 108:30559574:date 2004123000 SFEXC kpds5=208 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  SFEXC=Exchange coefficient [(kg/m^3)(m/s)]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 0.04525  num bits 8  BDS_Ref 0  DecScale 3 BinScale -2
+
+rec 109:30822460:date 2004123000 VEG kpds5=87 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  VEG=Vegetation [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 91.25  num bits 9  BDS_Ref 0  DecScale 0 BinScale -2
+
+rec 110:31118194:date 2004123000 LCDC kpds5=73 kpds6=214 kpds7=0 levels=(0,0) grid=218 low cld lay 66hr fcst:
+  LCDC=Low level cloud cover [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 100  num bits 6  BDS_Ref 0  DecScale 0 BinScale 1
+
+rec 111:31315382:date 2004123000 MCDC kpds5=74 kpds6=224 kpds7=0 levels=(0,0) grid=218 mid cld lay 66hr fcst:
+  MCDC=Mid level cloud cover [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 100  num bits 6  BDS_Ref 0  DecScale 0 BinScale 1
+
+rec 112:31512570:date 2004123000 HCDC kpds5=75 kpds6=234 kpds7=0 levels=(0,0) grid=218 high cld lay 66hr fcst:
+  HCDC=High level cloud cover [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 100  num bits 6  BDS_Ref 0  DecScale 0 BinScale 1
+
+rec 113:31709758:date 2004123000 TMP kpds5=11 kpds6=116 kpds7=46230 levels=(180,150) grid=218 180-150 mb above gnd 66hr fcst:
+  TMP=Temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 243.078 290.703  num bits 9  BDS_Ref 243.078  DecScale 0 BinScale -3
+
+rec 114:32005492:date 2004123000 UGRD kpds5=33 kpds6=116 kpds7=46230 levels=(180,150) grid=218 180-150 mb above gnd 66hr fcst:
+  UGRD=u wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -28.7804 30.5946  num bits 9  BDS_Ref -28.7804  DecScale 0 BinScale -3
+
+rec 115:32301226:date 2004123000 VGRD kpds5=34 kpds6=116 kpds7=46230 levels=(180,150) grid=218 180-150 mb above gnd 66hr fcst:
+  VGRD=v wind [m/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -14.4135 24.9615  num bits 9  BDS_Ref -14.4135  DecScale 0 BinScale -3
+
+rec 116:32596960:date 2004123000 RH kpds5=52 kpds6=108 kpds7=12132 levels=(47,100) grid=218 sigma 0.47-1.00 66hr fcst:
+  RH=Relative humidity [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 8.13566 97.1357  num bits 7  BDS_Ref 8.13566  DecScale 0 BinScale 0
+
+rec 117:32826996:date 2004123000 ALBDO kpds5=84 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  ALBDO=Albedo [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 6 79.25  num bits 9  BDS_Ref 6  DecScale 0 BinScale -2
+
+rec 118:33122730:date 2004123000 WTMP kpds5=80 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  WTMP=Water temp. [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 271.34 301.59  num bits 8  BDS_Ref 271.34  DecScale 0 BinScale -3
+
+rec 119:33385616:date 2004123000 BMIXL kpds5=226 kpds6=109 kpds7=1 levels=(0,1) grid=218 hybrid lev 1 66hr fcst:
+  BMIXL=Blackadar's mixing length scale [m]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 63.125  num bits 9  BDS_Ref 0  DecScale 0 BinScale -3
+
+rec 120:33681350:date 2004123000 ICEC kpds5=91 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  ICEC=Ice concentration (ice=1;no ice=0) [fraction]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 1  num bits 6  BDS_Ref 0  DecScale 1 BinScale -2
+
+rec 121:33878538:date 2004123000 CPOFP kpds5=194 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  CPOFP=Prob. of frozen precipitation [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -50 100  num bits 8  BDS_Ref -50  DecScale 0 BinScale 0
+
+rec 122:34141424:date 2004123000 PRATE kpds5=59 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  PRATE=Precipitation rate [kg/m^2/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 0.0017  num bits 7  BDS_Ref 0  DecScale 4 BinScale -2
+
+rec 123:34371460:date 2004123000 VWSH kpds5=136 kpds6=200 kpds7=0 levels=(0,0) grid=218 atmos col 66hr fcst:
+  VWSH=Vertical speed shear [1/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 129
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 2.12  num bits 12  BDS_Ref 0  DecScale 3 BinScale 0
+
+rec 124:34765742:date 2004123000 TSLSA kpds5=137 kpds6=200 kpds7=0 levels=(0,0) grid=218 atmos col 66hr fcst:
+  TSLSA=3-hr pressure tendency (Std Atmos Red) [Pa/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 129
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 0.06883  num bits 13  BDS_Ref 0  DecScale 5 BinScale 0
+
+rec 125:35192872:date 2004123000 BVF2 kpds5=138 kpds6=200 kpds7=0 levels=(0,0) grid=218 atmos col 66hr fcst:
+  BVF2=Brunt-Vaisala frequency^2 [1/s^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 129
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 0.7929  num bits 13  BDS_Ref 0  DecScale 4 BinScale 0
+
+rec 126:35620002:date 2004123000 PVMW kpds5=139 kpds6=200 kpds7=0 levels=(0,0) grid=218 atmos col 66hr fcst:
+  PVMW=Potential vorticity (mass-weighted) [1/s/m]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 129
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 4.132  num bits 13  BDS_Ref 0  DecScale 3 BinScale 0
+
+rec 127:36047132:date 2004123000 CRAIN kpds5=140 kpds6=200 kpds7=0 levels=(0,0) grid=218 atmos col 66hr fcst:
+  CRAIN=Categorical rain [yes=1;no=0]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 129
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 4.395  num bits 13  BDS_Ref 0  DecScale 3 BinScale 0
+
+rec 128:36474262:date 2004123000 PRES kpds5=1 kpds6=2 kpds7=0 levels=(0,0) grid=218 cld base 66hr fcst:
+  PRES=Pressure [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -50000 104000  num bits 7  BDS_Ref -50  DecScale -3 BinScale 1
+
+rec 129:36704298:date 2004123000 PRES kpds5=1 kpds6=3 kpds7=0 levels=(0,0) grid=218 cld top 66hr fcst:
+  PRES=Pressure [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -50000 104000  num bits 7  BDS_Ref -50  DecScale -3 BinScale 1
+
+rec 130:36934334:date 2004123000 PRES kpds5=1 kpds6=242 kpds7=0 levels=(0,0) grid=218 convect-cld bot 66hr fcst:
+  PRES=Pressure [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -50000 100000  num bits 7  BDS_Ref -50  DecScale -3 BinScale 1
+
+rec 131:37164370:date 2004123000 PRES kpds5=1 kpds6=243 kpds7=0 levels=(0,0) grid=218 convect-cld top 66hr fcst:
+  PRES=Pressure [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -50000 100000  num bits 7  BDS_Ref -50  DecScale -3 BinScale 1
+
+rec 132:37394406:date 2004123000 PRES kpds5=1 kpds6=248 kpds7=0 levels=(0,0) grid=218  66hr fcst:
+  PRES=Pressure [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -50000 100000  num bits 7  BDS_Ref -50  DecScale -3 BinScale 1
+
+rec 133:37624442:date 2004123000 PRES kpds5=1 kpds6=249 kpds7=0 levels=(0,0) grid=218  66hr fcst:
+  PRES=Pressure [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -50000 100000  num bits 7  BDS_Ref -50  DecScale -3 BinScale 1
+
+rec 134:37854478:date 2004123000 PRES kpds5=1 kpds6=251 kpds7=0 levels=(0,0) grid=218  66hr fcst:
+  PRES=Pressure [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -50000 100000  num bits 7  BDS_Ref -50  DecScale -3 BinScale 1
+
+rec 135:38084514:date 2004123000 PRES kpds5=1 kpds6=252 kpds7=0 levels=(0,0) grid=218  66hr fcst:
+  PRES=Pressure [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -50000 78000  num bits 7  BDS_Ref -50  DecScale -3 BinScale 1
+
+rec 136:38314550:date 2004123000 PRES kpds5=1 kpds6=206 kpds7=0 levels=(0,0) grid=218  66hr fcst:
+  PRES=Pressure [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -50000 104000  num bits 7  BDS_Ref -50  DecScale -3 BinScale 1
+
+rec 137:38544586:date 2004123000 PRES kpds5=1 kpds6=207 kpds7=0 levels=(0,0) grid=218  66hr fcst:
+  PRES=Pressure [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -50000 104000  num bits 7  BDS_Ref -50  DecScale -3 BinScale 1
+
+rec 138:38774622:date 2004123000 CDCON kpds5=72 kpds6=200 kpds7=0 levels=(0,0) grid=218 atmos col 66hr fcst:
+  CDCON=Convective cloud cover [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 96  num bits 9  BDS_Ref 0  DecScale 0 BinScale -2
+
+rec 139:39070356:date 2004123000 SX kpds5=134 kpds6=200 kpds7=0 levels=(0,0) grid=218 atmos col 66hr fcst:
+  SX=Sweat index [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 129
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0.2 1  num bits 9  BDS_Ref 20  DecScale 2 BinScale -2
+
+rec 140:39366090:date 2004123000 SNOD kpds5=66 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  SNOD=Snow depth [m]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 2.14544  num bits 16  BDS_Ref 0  DecScale 5 BinScale 2
+
+rec 141:39891768:date 2004123000 CONDP kpds5=159 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  CONDP=Lifted parcel condensation pressure [Pa]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 6 80  num bits 9  BDS_Ref 6  DecScale 0 BinScale -2
+
+rec 142:40187502:date 2004123000 CSUSF kpds5=160 kpds6=112 kpds7=10 levels=(0,10) grid=218 0-10 cm down 66hr fcst:
+  CSUSF=Clear sky upward solar flux [W/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0.0347677 0.999768  num bits 9  BDS_Ref 3.47677  DecScale 2 BinScale -2
+
+rec 143:40483236:date 2004123000 CSUSF kpds5=160 kpds6=112 kpds7=2600 levels=(10,40) grid=218 10-40 cm down 66hr fcst:
+  CSUSF=Clear sky upward solar flux [W/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0.0286419 0.998642  num bits 9  BDS_Ref 2.86419  DecScale 2 BinScale -2
+
+rec 144:40778970:date 2004123000 CSUSF kpds5=160 kpds6=112 kpds7=10340 levels=(40,100) grid=218 40-100 cm down 66hr fcst:
+  CSUSF=Clear sky upward solar flux [W/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0.0285077 0.998508  num bits 9  BDS_Ref 2.85077  DecScale 2 BinScale -2
+
+rec 145:41074704:date 2004123000 CSUSF kpds5=160 kpds6=112 kpds7=25800 levels=(100,200) grid=218 100-200 cm down 66hr fcst:
+  CSUSF=Clear sky upward solar flux [W/m^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0.0285143 0.998514  num bits 9  BDS_Ref 2.85143  DecScale 2 BinScale -2
+
+rec 146:41370438:date 2004123000 RWMR kpds5=170 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  RWMR=Rain water mixing ratio [kg/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 6 75  num bits 9  BDS_Ref 6  DecScale 0 BinScale -2
+
+rec 147:41666172:date 2004123000 SNMR kpds5=171 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  SNMR=Snow mixing ratio [kg/kg]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 4  num bits 3  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 148:41764812:date 2004123000 LPSX kpds5=181 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  LPSX=x-gradient of log pressure [1/m]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 0.056  num bits 9  BDS_Ref 0  DecScale 3 BinScale -3
+
+rec 149:42060546:date 2004123000 var203 kpds5=203 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  var203=undefined
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 400  num bits 8  BDS_Ref 0  DecScale 0 BinScale 1
+
+rec 150:42323432:date 2004123000 TSD1D kpds5=219 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  TSD1D=Std. dev. of IR T over 1x1 deg area [K]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 0.13875  num bits 7  BDS_Ref 0  DecScale 2 BinScale -3
+
+rec 151:42553468:date 2004123000 HPBL kpds5=221 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  HPBL=Planetary boundary layer height [m]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 35.0585 3911.81  num bits 14  BDS_Ref 35.0585  DecScale 0 BinScale -2
+
+rec 152:43013448:date 2004123000 5WAVH kpds5=222 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  5WAVH=5-wave geopotential height [gpm]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 13  num bits 7  BDS_Ref 0  DecScale 0 BinScale -3
+
+rec 153:43243484:date 2004123000 SOTYP kpds5=224 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  SOTYP=Soil type (Zobler) [0..9]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 9  num bits 9  BDS_Ref 0  DecScale 1 BinScale -2
+
+rec 154:43539218:date 2004123000 VGTYP kpds5=225 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  VGTYP=Vegetation type (as in SiB) [0..13]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 13  num bits 7  BDS_Ref 0  DecScale 0 BinScale -3
+
+rec 155:43769254:date 2004123000 5WAVA kpds5=230 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  5WAVA=5-wave geopot. height anomaly [gpm]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 0.4125  num bits 8  BDS_Ref 0  DecScale 2 BinScale -2
+
+rec 156:44032140:date 2004123000 MFLUX kpds5=231 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  MFLUX=Convective cloud mass flux [Pa/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 0.13875  num bits 7  BDS_Ref 0  DecScale 2 BinScale -3
+
+rec 157:44262176:date 2004123000 SNOWC kpds5=238 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  SNOWC=Snow cover [%]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 100  num bits 7  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 158:44492212:date 2004123000 var240 kpds5=240 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  var240=undefined
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 0.4675  num bits 8  BDS_Ref 0  DecScale 2 BinScale -2
+
+rec 159:44755098:date 2004123000 VDFHR kpds5=246 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  VDFHR=Vertical diffusion heating [K/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 0.893  num bits 10  BDS_Ref 0  DecScale 3 BinScale 0
+
+rec 160:45083682:date 2004123000 VDFUA kpds5=247 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  VDFUA=Vertical diffusion zonal accel [m/s^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 1  num bits 7  BDS_Ref 0  DecScale 2 BinScale 0
+
+rec 161:45313718:date 2004123000 VDFVA kpds5=248 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  VDFVA=Vertical diffusion meridional accel [m/s^2]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 1  num bits 7  BDS_Ref 0  DecScale 2 BinScale 0
+
+rec 162:45543754:date 2004123000 VDFMR kpds5=249 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  VDFMR=Vertical diffusion moistening [kg/kg/s]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 130
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 1  num bits 7  BDS_Ref 0  DecScale 2 BinScale 0
+
+rec 163:45773790:date 2004123000 HGT kpds5=7 kpds6=5 kpds7=0 levels=(0,0) grid=218 cond lev 66hr fcst:
+  HGT=Geopotential height [gpm]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 268.001 4188  num bits 8  BDS_Ref 26.8001  DecScale -1 BinScale 1
+
+rec 164:46036676:date 2004123000 var180 kpds5=180 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 66hr fcst:
+  var180=undefined
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0.0520655 26.1146  num bits 9  BDS_Ref 0.0520655  DecScale 0 BinScale -4
+
+rec 165:46332410:date 2004123000 HGT kpds5=7 kpds6=245 kpds7=0 levels=(0,0) grid=218  66hr fcst:
+  HGT=Geopotential height [gpm]
+  timerange 0 P1 66 P2 0 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data -7002.65 3907.35  num bits 16  BDS_Ref -7002.65  DecScale 0 BinScale -2
+
+rec 166:46858088:date 2004123000 APCP kpds5=61 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 63-66hr acc:
+  APCP=Total precipitation [kg/m^2]
+  timerange 4 P1 63 P2 66 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 14  num bits 4  BDS_Ref 0  DecScale 0 BinScale 0
+
+rec 167:46989578:date 2004123000 ACPCP kpds5=63 kpds6=1 kpds7=0 levels=(0,0) grid=218 sfc 63-66hr acc:
+  ACPCP=Convective precipitation [kg/m^2]
+  timerange 4 P1 63 P2 66 TimeU 1  nx 614 ny 428 GDS grid 3 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 84 Table 2
+  Lambert Conf: Lat1 12.190000 Lon1 -133.459000 Lov -95.000000
+      Latin1 25.000000 Latin2 25.000000 LatSP 0.000000 LonSP 0.000000
+      North Pole (614 x 428) Dx 12.191000 Dy 12.191000 scan 64 mode 8
+  min/max data 0 7  num bits 3  BDS_Ref 0  DecScale 0 BinScale 0
+

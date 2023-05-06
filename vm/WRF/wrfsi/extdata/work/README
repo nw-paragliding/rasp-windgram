@@ -1,0 +1,3 @@
+This is a work area for grib_prep.  When it runs, it creates a subdirectory
+here named for the source being processed and runs in that directory.  When
+complete, it moves the final output to ../extprd

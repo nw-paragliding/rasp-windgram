@@ -1,0 +1,5 @@
+This directory contains the configuration data for a given domain.  It also
+contains the static.wrfsi file, which is created during localization by
+the gridgen_model.exe program.  The static.wrfsi file is a netCDF file 
+containing the terrain height, land use, map factors, lats, lons, etc. for your
+grid.  It only has to be created when you initially define your grid.

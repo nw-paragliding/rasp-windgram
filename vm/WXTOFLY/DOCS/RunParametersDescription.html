@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0069)http://www.drjack.info/twiki/bin/view/RASPop/RunParametersDescription -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>  RunParametersDescription &lt; RASPop &lt; TWiki</title>
+
+
+</head>
+<body class="twikiViewPage">
+<div class="twikiTopic">
+<small>Originally created by: <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/Main/DrJack">DrJack</a> - 11 Dec 2005</small>
+<!--- <strong>****</strong> EDIT/REMOVE TEXT BELOW THIS LINE TO CREATE A NEW WIKI PAGE <strong>****</strong> -->
+<p>
+</p><h1><a name="RUN_PARAMETER_DESCRIPTION"> </a><a name="RUN_PARAMETER_DESCRIPTION_"> </a> RUN PARAMETER DESCRIPTION <br>     </h1>
+Parameters in file $BASEDIR/RASP/RUN/rasp.run.parameters.REGIONXYZ control the behavior of runs initiated by the command "run.rasp REGIONXYZ", where REGIONXYZ is the identifier (directory name) of regional grid setup data.  This file is in Perl coding format, so parameter names beginning with "$" are for a single value whereas parameters beginning with "@" or "%" can contain multiple (array/hash) values.  Note that all specified "hour" times below are UTC (GMT) not local time!
+<p>
+An overview of parameter specification is found at <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/RASPop/ParameterOverview">ParameterOverview</a>.
+</p><p>
+</p><h2><a name="Region_independent_Parameters"> </a> Region-independent Parameters     </h2>
+<ul>
+<li> @REGION_DOLIST <br>
+     Regions processed by a single run, normally set to "REGIONXYZ".  It is possible to run two regional forecasts from the same NCEP "grib" data, so that it need be downloaded only once, by putting two region names here and then creating region-specific run parameters for both regions.  (The corresponding regional run directories should have already been created.)
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $GRIBFILE_MODEL <br>
+     NCEP driving model data ("grib files") to be used for RASP initialization and boundary conditions. For non-US runs this is either the "GFSA" or "GFSN" global model output (see <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/RASPop/GFSAvsGFSN">GFSAvsGFSN</a>) while for US runs it is normally the "ETA" regional model output.  Note: the same argument must be used for parameters INIT_ROOT &amp; LBC_ROOT in file <em>$BASEDIR/WRF/wrfsi/domains/REGIONXYZ/static/wrfsi.nl</em> and if a windowed run also in file <em>$BASEDIR/WRF/wrfsi/domains/REGIONXYZ-WINDOW/static/wrfsi.nl</em>.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $GRIB_LEFT_LON, $GRIB_RIGHT_LON,$GRIB_BOTTOM_LAT, $GRIB_TOP_LAT (GFSA only) <br>
+     These parameters are only utilized when $GRIBFILE_MODEL='GFSA'.  They set the boundaries (longitude/latitude, in integer degrees) of the region extracted to a limited-area GFS file, which is then downloaded. Since this results in considerable saving of download time/cost, they should normally be set whenever GFS model downloads are requested.  The boundaries must encompass the entire domain of the coarsest model domain.  For further information see <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/RASPop/GFSAvsGFSN">GFSAvsGFSN</a>.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $LSEND <br>
+     Whether files will be created in optional website directory 
+</li>
+<li> 
+<ul>
+<li> 0 = images and data files produced only in local "RASP/RUN/OUT" subdirectory
+</li>
+<li> 1 = copy images and data files to web directory using filenames pre-pended with "test"
+</li>
+<li> 2 = copy images and data files to web directory using normal filenames
+</li>
+<li> -1,-2 = send images and data files to remote server (NOT COMPLETED: calls script <em>$BASEDIR/RASP/RUN/UTIL/rasp.multiftp,</em> which is currently a test version using parameters which would need to  be modified for other users (e.g. the remote server name) - if you get this script to work please let me know and I will adopt your version and generalize the script for others to use more easily.  Alternatively you could write your own script to replace the existing one and I would adapt rasp.pl to utilize it.)
+</li>
+<li> 3 = also do firstofday processing (NOT IMPLEMENTED)
+</li>
+</ul>
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $LSAVE (global) <br>    Whether files will be saved in archive directory
+<ul>
+<li> 0 = inhibits all archive saves to preserve disk space
+</li>
+<li> 1 = saves data files at times specified by @{$SAVE_PLOT_HHMMLIST} - uses least disk space
+</li>
+<li> 2 = saves images and data files at times specified by @{$SAVE_PLOT_HHMMLIST} - uses much more disk space than $LSAVE=1
+</li>
+<li> 3 = saves images and data files at times specified by @{$SAVE_PLOT_HHMMLIST} and saves initial condition files to a storage directory
+</li>
+</ul>
+</li>
+</ul>
+<p>
+</p><ul>
+<li> %LSAVE (hash array) - OPTIONAL <br>
+  Gives fine-scale control over saving of files to archive directory if needed.  It is not normally set as the global $LSAVE flag meets most user needs.  A <em>more restrictive</em> (smaller) LSAVE than the global value can be set for an individual hour and parameter by setting $LSAVE{REGIONXYZ}{parametername}{time}[IWINDOW].  For example, $LSAVE{PANOCHE}{blwindshear}{1500}[0]=0; will result in images and datafiles of the blwindshear parameter at 1500 lst <em>not</em> being saved for a non-windowed run when global $LSAVE=1. Setting values for numerous parameters and hours can be lengthy, but using simple perl programming can help.  For example, the following is used by <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/RASPop/DrJack">DrJack</a> to save his archive files: setting global $LSAVE=2, the following reduces LSAVE to 1 for all <em>except</em> the "slice" plot, all pressure level plots, and all soundings at all requested output times for the non-windowed run (a similar loop is used for the windowed run): 
+</li>
+</ul>
+<pre>  foreach $param ( @{$PARAMETER_DOLIST{'PANOCHE'}} )
+  {
+  foreach $hhmm ( @{$SAVE_PLOT_HHMMLIST{'PANOCHE'}[0]} )
+  {
+  if( $param eq 'boxwmax' or $param =~ /press/ or $param =~ /sounding/  )
+    { $LSAVE{'PANOCHE'}{$param}{$hhmm}[0] = 1 ; }
+  }
+  }
+</pre>
+<p>
+</p><h2><a name="Overall_Region_specific_Paramete"> </a> Overall Region-specific Parameters     </h2>
+<ul>
+<li> $LRUN_WINDOW{'REGIONXYZ'} <br>
+     Controls "1-stage" vs "2-stage" behavior. Use 0 for a "1-stage" run and 2 for a "2-stage" run producing both "stage-1" and "stage-2" (window) forecasts. Setting this parameter to 1 will do a stage-2-only run using data from an existing previously-run 1-stage run - this is primarily for test runs but might have some operational utility.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> @{$PARAMETER_DOLIST{'REGIONXYZ'}} <br>
+     Parameters to be plotted.  The parameter list used in the supplied example region file <em>$BASEDIR/RASP/RUN/rasp.run.parameters.PANOCHE</em> (or SW_SOUTHAFRICA) contains all possible parameters.  If desired, some can be eliminated for your region.  The parameter names give the plots described at <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/RASPop/PlotParameterNames">PlotParameterNames</a>. Also, any desired sounding plot must be added to this list as described at <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/RASPop/ProgramUserChanges">ProgramUserChanges</a>.  Any variable available in the WRF output files can also be plotted, perhaps just for diagnostic purpose rather than for public presentation, as described at <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/RASPop/ProgramUserChanges">ProgramUserChanges</a>.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $LOCALTIME_ID{'REGIONXYZ'} <br>
+     3 letter identification for identification of local time zone, e.g. "PST" for "Pacific Standard Time".  Used only for printing information. Note that "daylight savings time" output is <em>not</em> produced by the model.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $LOCALTIME_ADJ{'REGIONXYZ'}  <br>
+     Time zone adjustment.  The difference in hours between local time zone and the UTC time zone.  (Negative for US.)
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $GRIBFILES_PER_FORECAST_PERIOD{'REGIONXYZ'} <br>
+     Number of GRIB files to be downloaded for a single forecast run. Normally this is 5 for a 12 hour forecast which will use GRIB data for the initialization and for later boundary conditions at 3 hour time intervals.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> %GRIBFILE_DOLIST <br>
+       Individual GRIB files to be downloaded for the forecast runs, using format "iZ+f" where i is the <em>GRIB</em> model initialization time (in UTC) and f it's forecast period (in hours).  For example, for a single 12 hour forecast which will use GRIB data from a 6Z ETA GRIB initialization for a RASP initialization at 15Z and for later RASP boundary conditions at 3 hour time intervals out to 3Z the next day, this parameter would be <br>   %GRIBFILE_DOLIST = ( 'REGIONXYZ' =&gt; [ '6Z+9','6Z+12','6Z+15','6Z+18','6Z+21', ],  ); <br> i.e $GRIBFILES_PER_FORECAST_PERIOD=5 values all having the same <em>GRIB</em> initialization time but with forecast periods equally spaced by ($FORECAST_PERIODHRS/($GRIBFILES_PER_FORECAST_PERIOD-1))=3 hours. The forecast period must be larger for each successive file.  Possible initialization times are 0Z, 6Z, 12Z, and 18Z. Additional forecast runs during a single day can be created by adding a sequence of GRIBFILES with a different GRIB initialization time see <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/RASPop/ProgramComplexRuns">ProgramComplexRuns</a>. 
+</li>
+</ul>
+<p>
+</p><h2><a name="Time_Parameters_for_Stage_1_Fore"> </a> Time Parameters for Stage-1 Forecast Run     </h2>
+      A RASP forecast "run" begins at its "initialization" time (which can only be 0Z, 3Z, 6Z, etc.) and runs for its specified forecast period (which must be a multiple of 3, and typically is 12 hours).  The model's "equations of motion" must re-adjust to initialization imbalances, leading to forecast inaccuracies over the first 2-6 hours (the smaller/larger time corresponding to a smaller/larger grid spacing) - so forecast output should not be displayed for that "spinup" period.  GRIB files at 3 hour intervals covering the specified forecast period are downloaded to provide initial and boundary conditions for the RASP run. The RASP initialization time equals the <em>validation</em> time of the first (earliest) GRIB file (where the GRIB validation time is the sum of the GRIB initialization time and GRIB forecast time). Note that in the following consistency between several different parameters is often required - for example, the difference between $DOMAIN1_STARTHH and $DOMAIN1_ENDHH must equal $FORECAST_PERIODHRS, the $DOMAIN1_STARTHH must equal the validation time of the first (earliest) GRIB file in a forecast period, etc.  Please note that the script does not make many consistency checks!
+<p>
+</p><ul>
+<li> $FORECAST_PERIODHRS{'REGIONXYZ'}[0] <br>
+     Forecast period covered by a single run, normally 12 hours.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $DOMAIN1_STARTHH{'REGIONXYZ'}[0] <br>
+     Two-digit start (model initialization) UTC hour for the coarse domain forecast,  which must be an hour for which a downloaded NCEP "grib" file is available i.e. normally a GMT hour which is a multiple of 3.  This time should be in the early morning, before or just after sunrise. ("Two-digit" means that a leading zero must be used if needed.) 
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $DOMAIN1_ENDHH{'REGIONXYZ'}[0] <br>
+     Two-digit end UTC hour (initialization hour + forecast period) for the coarse domain forecast.   ("Two-digit" means that a leading zero must be used if needed. The end hour can be greater than 24, use the algebraic sum of initialization hour + forecast period, not the time of day.)
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $DOMAIN2_START_DELTAMINS{'REGIONXYZ'}[0]  <br>
+     Time between start of fine and coarse domain forecasts, in minutes  - at present should be 0
+</li>
+</ul>
+<p>
+</p><ul>
+<li>  $DOMAIN2_END_DELTAMINS{'REGIONXYZ'}[0] <br>       Time between end of fine and coarse domain forecasts, in minutes  - at present should be 0
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $DOMAIN3_START_DELTAMINS{'REGIONXYZ'}[0]  <br>       Not used at present
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $DOMAIN3_END_DELTAMINS{'REGIONXYZ'}[0] <br>
+     Not used at present
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $DOMAIN1_TIMESTEP{'REGIONXYZ'}[0]  <br>
+     Time step in seconds of the stage-1 coarse grid.  See <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/RASPop/GridTimeStep">GridTimeStep</a> for more information.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $BOUNDARY_UPDATE_PERIODHRS{'REGIONXYZ'}[0]  <br>
+     Increment between boundary updates from GRID data, normally 3 hours.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $NDOWN_BOUNDARY_UPDATE_PERIODHRS{'REGIONXYZ'}[0] <br>
+     Always zero
+</li>
+</ul>
+<p>
+</p><ul>
+<li> @{$PLOT_IMAGE_SIZE{'REGIONXYZ'}[0]} <br>
+     Width and height of plot image, ala "600x600".  First array value is for first (outer) domain images, second value for second (inner) domain images.  To not plot a domain, use a blank value.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> @{$PLOT_HHMMLIST{'REGIONXYZ'}[0]} <br>
+     Array containing times for which parameter plots will be created, in format "HHMM" where HH and MM are the UTC hour and minute in two-digit format. ("Two-digit" means that a leading zero must be used if needed.) This means that if you want to plot every hour from 10pm to 1am UTC the next day you will have to put in 2200, 2300, 0000, 0100 (these are not limited to the GRIBFILE_DOLIST times).  Plots require creation of a WRF output file for that time, which by default is done for each hour; output for other times requires modification of parameter <code>HISTORY_INTERVAL</code> in file <code>$BASEDIR/WRF/WRFV2/RASP/REGIONXYZ/namelist.template</code>.  Note that such plots require a model iteration be made for <em>exactly</em> that time, based on $DOMAIN1_TIMESTEP{'REGIONXYZ'}[0] - see <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/RASPop/GridTimeStep">GridTimeStep</a> for more information, particularly if an expected plot does not appear! 
+</li>
+</ul>
+<p>
+</p><ul>
+<li> @{$PLOT_LOOP_HHMMLIST{'REGIONXYZ'}[0]} <br>
+     Array containing times for which a loop of parameter plots will be created at the end of the stage-1 run, in format "HHMM" where HH and MM are the UTC hour and minute in two-digit format. ("Two-digit" means that a leading zero must be used if needed.)  All times specified here must also be included in  @{$PLOT_HHMMLIST{'REGIONXYZ'}[0]}.  An entry of 'title' will add a title frame at the beginning of the loop.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> @{$SAVE_PLOT_HHMMLIST{'REGIONXYZ'}[0]} <br>
+     Array containing times for which parameter plot images are stored, in format "HHMM" where HH and MM are the UTC hour and minute in two-digit format.  When $LSAVE in file rasp.site.parameters.REGIONYZ is greater than 0, copies of the forecast plots will be saved for the specified times in directory $BASEDIR/RASP/SAVE/REGIONXYZ/yyyymmdd where yyyy is the year, mm the numeric month, and dd the day. To be saved, any such time must also be in $PLOT_HHMMLIST so that the plot gets created and $PLOT_IMAGE_SIZE must be non-blank for the desired domain.  ("Two-digit" means that a leading zero must be used if needed.).
+</li>
+</ul>
+<p>
+</p><h2><a name="Time_Parameters_for_Stage_2_Wind"> </a> Time Parameters for Stage-2 ("Window") Forecast Run      </h2>
+      These parameters are required only for a stage-2 "window" run, i.e. only when $LRUN_WINDOW{'REGIONXYZ'} &gt; 0.  Note that  the parameters are identical to those of the preceeding section except "[1]" replaces "[0]" in the parameter names.  When choosing times to display, note that "spinup" adjustments to the unbalanced initial state will occur during the first 1-3 hours (a smaller/larger time corresponding to a smaller/larger grid spacing) , producing forecast inaccuraries - so creating plots of times earlier than 1-2 hours after initialization is not recommended.
+<p>
+</p><ul>
+<li> $FORECAST_PERIODHRS{'REGIONXYZ'}[1] <br>
+     Forecast period covered by a single run, normally 6 hours.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $DOMAIN1_STARTHH{'REGIONXYZ'}[1] <br>
+     Two-digit start (model initialization) UTC hour for the "windowd" coarse domain forecast, which must be an hour for which a downloaded NCEP "grib" file is available i.e. normally a GMT hour which is a multiple of 3.   ("Two-digit" means that a leading zero must be used if needed.)  While a start time equal to the stage-1 start hour [$DOMAIN1_STARTHH{'REGIONXYZ'}[0]]  is allowed, the stage-2 start hour should be later than the stage-1 start hour since the coarser resolution grid has a longer spinup time.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $DOMAIN1_ENDHH{'REGIONXYZ'}[1]   <br>
+     Two-digit end UTC hour (initialization hour + forecast period) for the coarse domain forecast.   ("Two-digit" means that a leading zero must be used if needed. The end hour can be greater than 24, use the algebraic sum of initialization hour + forecast period, not the time of day.)
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $DOMAIN2_START_DELTAMINS{'REGIONXYZ'}[1]  <br>
+     Time between start of fine and coarse domain forecasts, in minutes  - at present should be 0
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $DOMAIN2_END_DELTAMINS{'REGIONXYZ'}[1] <br>
+     Time between end of fine and coarse domain forecasts, in minutes  - at present should be 0
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $DOMAIN3_START_DELTAMINS{'REGIONXYZ'}[1]  <br>
+     Not used at present
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $DOMAIN3_END_DELTAMINS{'REGIONXYZ'}[1] <br>
+     Not used at present
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $DOMAIN1_TIMESTEP{'REGIONXYZ'}[1]  <br>
+     Time step in seconds of the stage-2 coarse grid.   See <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/RASPop/GridTimeStep">GridTimeStep</a> for more information.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $BOUNDARY_UPDATE_PERIODHRS{'REGIONXYZ'}[1] <br>
+     Increment between boundary updates using previous stage-1 run - normally 1 hour.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> $NDOWN_BOUNDARY_UPDATE_PERIODHRS{'REGIONXYZ'}[1] <br>
+     Must be same as  $BOUNDARY_UPDATE_PERIODHRS{'REGIONXYZ'}[1] value above.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> @{$PLOT_IMAGE_SIZE{'REGIONXYZ'}[1]} <br>
+     Width and height of plot image, ala "600x600".  First array value is for first (outer) domain images, second value for second (inner) domain images.  To not plot a domain, use a blank value.
+</li>
+</ul>
+<p>
+</p><ul>
+<li> @{$PLOT_HHMMLIST{'REGIONXYZ'}[1]} <br>
+     Array containing times for which parameter plots will be created, in format "HHMM" where HH and MM are the UTC hour and minute in two-digit format. ("Two-digit" means that a leading zero must be used if needed.)    Note that such plots require a model iteration be made for <em>exactly</em> that time, based on $DOMAIN1_TIME{'REGIONXYZ'}[1] - see <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/RASPop/GridTimeStep">GridTimeStep</a> for more information, particularly if an expected plot does not appear! 
+</li>
+</ul>
+<p>
+</p><ul>
+<li> @{$PLOT_LOOP_HHMMLIST{'REGIONXYZ'}[1]} <br>
+     Array containing times for which a loop of parameter plots will be created at the end of the stage-2 run, in format "HHMM" where HH and MM are the UTC hour and minute in two-digit format. ("Two-digit" means that a leading zero must be used if needed.)  All times specified here must also be included in  @{$PLOT_HHMMLIST{'REGIONXYZ'}[1]}.  An entry of 'title' will add a title frame at the beginning of the loop.    Plots require creation of a WRF output file for that time, which by default is done at 30 minute intervals; output for other times requires modification of parameter <code>HISTORY_INTERVAL</code> in file <code>$BASEDIR/WRF/WRFV2/RASP/REGIONXYZ-WINDOW/namelist.template</code>.   Note that such plots require a model iteration be made for <em>exactly</em> that time, based on $DOMAIN1_TIMESTEP{'REGIONXYZ'}[0] - see <a class="twikiLink" href="http://www.drjack.info/twiki/bin/view/RASPop/GridTimeStep">GridTimeStep</a> for more information, particularly if an expected plot does not appear! 
+</li>
+</ul>
+<p>
+</p><ul>
+<li> @{$SAVE_PLOT_HHMMLIST{'REGIONXYZ'}[1]} <br>
+     Array containing times for which parameter plot images are stored, in format "HHMM" where HH and MM are the UTC hour and minute in two-digit format.  When $LSAVE in file rasp.site.parameters.REGIONYZ is greater than 0, copies of the forecast plots will be saved for the specified times in directory $BASEDIR/RASP/SAVE/REGIONXYZ/yyyymmdd where yyyy is the year, mm the numeric month, and dd the day. To be saved, any such time must also be in $PLOT_HHMMLIST so that the plot gets created and $PLOT_IMAGE_SIZE must be non-blank for the desired domain.  ("Two-digit" means that a leading zero must be used if needed.).
+</li>
+</ul>
+<p>
+</p>
+</div>
+</body></html>

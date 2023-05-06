@@ -1,0 +1,247 @@
+There are 4 steps to setting up your run:  (A) installation, 
+(B) configuring grib_prep, (C) obtaining the global geographical data, and
+(D) configuring your domains.  Each of these steps are described in order
+below.  You only need to perform (A)-(C) once.  Step (D) is performed
+every time you wish to create or edit a new domain.
+
+A.  INSTALL THE CODE.
+
+Most people can simply follow the instructions in the INSTALL file.  
+More advanced users may manage their code and data file systems
+differently.  If this is the case, here are some of the important
+variables that can be set in the environment or by using command-line
+options during the installation:
+
+SOURCE_ROOT:  The directory created when you extract the SI tar file.  
+INSTALLROOT:  The top-level directory where you want your executable
+code and scripts to reside.  This will contain "bin" and "etc" 
+subdirectories.  It is recommended that the INSTALLROOT be an 
+immediate subdirectory of your WRF model top level directory (i.e.,
+the INSTALLROOT is parallel to the "dyn_em" and "main" subdirectories
+of the WRF model.
+
+EXT_DATAROOT:  Top-level directory containing subdirectories for
+the configuration, execution, logging, and output of the grib_prep
+program used for reformatting GRIB files.  One EXT_DATAROOT can
+support multiple MOAD_DATAROOTs.
+
+DATAROOT:  Top level directory containing one or more MOAD_DATAROOTs
+as subdirectories, where one MOAD_DATAROOT has all configuration and
+output data for one particular geographical domain specified by the
+user. 
+
+TEMPLATES:  Top-level directory containing subdirectories of template
+files, where each subdirectory contains the templates for one 
+MOAD_DATAROOT.
+
+GEOG_DATAROOT:  Path to where all of the global geographical data sets
+are placed.  This path contains the following subdirectories: 
+albedo_ncep
+greenfrac
+landuse_30s
+soiltemp_1deg
+soiltype_bot_30s
+soiltype_top_30s
+topo_30s
+
+B. CONFIGURE GRIB_PREP.
+
+Now, configure grib_prep to deal with your GRIB data sources:
+
+1.  Go to EXT_DATAROOT/static.
+
+2.  Edit the grib_prep.nl to point to the paths to the specified
+    GRIB data sources.  NOTE:  WRFSI works on the assumption that
+    each GRIB source is in its own directory, NOT mixed with other GRIB
+    sources.  For each NAME, there must be an associated Vtable.NAME in
+    the EXT_DATAROOT/static directory.  The most common data sources have
+    already been set up (Eta on isobaric surfaces, AVN on isobaric, RUC on
+    hybrid or isobaric, AGRMET).  You just need to edit the paths to these
+    GRIB sources.
+
+3.  Use INSTALLROOT/etc/grib_prep.pl to run grib_prep manually or out of
+    cron if you want to run it separately from the rest of the WRFSI.  This
+    is the recommended method if running multiple domains that share
+    a model for lateral boundary conditions.  For example, at AFWA, there
+    may be a WRF domain over Europe and one over North America, but both
+    use AVN and AGRMET as initial and boundary condition data.  Running
+    grib_prep separately from WRFSI is more efficient, as it only needs to
+    run once per AVN and AGRMET cycle received, although two instances of
+    wrfsi will run (one for Europe, one for North America).  Users only running
+    a single domain or running in research mode can use the master wrfsi.pl
+    script to run everything at once, including grib_prep. To see how to
+    run grib_prep, use
+        $INSTALLROOT/etc/grib_prep.pl -h
+
+C. OBTAIN GLOBAL GEOGRAPHICAL DATA SETS
+
+Next, download and untar the global geography data sets if you have not already
+done so.  You can obtain the required data sets from:
+
+ftp://aftp.fsl.noaa.gov/divisions/frd-laps/WRFSI/Geog_Data
+
+These should be untarred within your GEOG_DATAROOT (see above), which
+if never set explicity is set by default to be EXT_DATAROOT/GEOG.
+We recommend untarring them inside of your $EXT_DATAROOT/GEOG.
+
+Note:  When you untar the corresponding tar files, they create their own subdirectory
+of the same name.  Furthermore, if you untar them within the EXT_DATAROOT/GEOG area,
+your INSTALLROOT/templates/default templates have already been edited by the 
+installation script to match these paths. 
+
+D. CONFIGURE YOUR WRF DOMAIN(S)
+
+Finally, configure one or more WRF domains.  This is analagous to the process
+of running TERRAIN for MM5 or MAKESFC for RAMS.  In this new version of WRFSI,
+one should always use the INSTALLROOT/etc/window_domain_rt.pl script to
+accomplish this task, as it edits cdl files automatically and executes
+gridgen_model to build the static.wrfsi netCDF file.
+
+NOTE: WE RECOMMEND USING THE GUI TO ACCOMPLISH THE FOLLOWING TASKS, AS IT
+PROVIDES A MUCH MORE USER-FRIENDLY INTERFACE!!!  THE GUI DOES ALL OF THE
+FOLLOWING "BEHIND THE SCENES".  
+
+1.  Determine the directory that is going to contain your data for this
+    domain (MOAD_DATAROOT).  For convenience, set the MOAD_DATAROOT.  For
+    example, if I am going to create a domain named "t2" and am going
+    to put it on a partition named "/p15/data" (which must exist), enter
+    the following (assuming csh syntax):
+
+       setenv MOAD_DATAROOT /p15/data/t2
+
+2.  Go to $INSTALLROOT/templates and make a copy of the "default" subdirectory,
+    naming the new copy to what you wish to call your domain.  For example, to
+    create template for a domain called t2:
+
+      cd $INSTALLROOT/templates
+      cp -r default t2
+      chmod -R u+w t2
+    (the "default" template is set to be read only, and you should NOT
+     edit the default contents. Rather, you should always make a copy as
+     described above and make the copy editable, which is what the chmod
+     command above accomplishes).
+
+    If you previously created a domain and simply wish to change it, go
+    to the template subdirectory previously created and edit those files
+    rather than performing the "cp" above.
+
+3.  Go into your newly created template directory (t2) and edit the settings
+    in wrfsi.nl to your liking.  NOTE:  The installation script has already
+    automatically edited many of the paths based on the EXT_DATAROOT
+    specified at installation.  You can change these if required, but for
+    many users no changes to these paths will be needed, especially if you
+    untar the global geographical data sets within EXT_DATAROOT/GEOG as
+    recommended.
+
+4.  If you plan to use the scripts provided by WRFSI to run the real.exe and
+    wrf.exe executables as well, then also edit wrf.nl to configure the WRF
+    model.
+
+5.  Run the window_domain_rt.pl script:
+
+    cd $INSTALLROOT/etc
+    ./window_domain_rt.pl -w wrfsi -t $INSTALLROOT/templates/t2 \
+    -c -s $SOURCE_ROOT 
+
+    NOTE:  If the $SOURCE_ROOT is set as an environment variable, you
+    do not need to include the "-s $SOURCE_ROOT" option.  
+
+6.  Proper execution of the above command results in the following 
+    being created:
+
+    MOAD_DATAROOT/log/localize_domain.log  -> Std output/error from gridgen_model
+    MOAD_DATAROOT/static/static.wrfsi -> netCDF file with geographical fields 
+                                         interpolated to your domain
+    MOAD_DATAROOT/static/wrfsi.nl  -> Merge of template wrfsi.nl and distribution wrfsi.nl
+    MOAD_DATAROOT/static/wrf.nl    -> Merge of template wrf.nl an wrfsi.nl
+    MOAD_DATAROOT/cdl/wrfsi.cdl    -> Properly edited cdl file
+    MOAD_DATAROOT/wrfprd           -> Empty directory for WRF model output
+    MOAD_DATAROOT/siprd            -> Empty directory for WRFSI output
+
+7.  If the localization does not properly finish, check the log file shown
+    above for error messages.  Virtually all problems are due to one of the
+    following:
+
+     1.  Path to geographical data sets not correct in your template wrfsi.nl or
+         missing some of the geographical data sets.
+
+     2.  The "ncgen" program not in your default path (although this should not 
+         happen, because window_domain_rt.pl sets this before running gridgen).  
+
+     3.  On IBMs, large domains may require "-bmaxdata:" be set to a larger value
+         in $SOURCE_ROOT/src/include/makefile.inc
+
+     4.  Incorrect specification of grid parameters in wrfsi.nl
+
+E.  RUNNING WRFSI
+
+1.  Assuming you succesfully created a domain in step D, you can
+    run the wrfsi the "old" way using the wrfsi.pl script:
+
+    cd $INSTALLROOT/etc
+    ./wrfsi.pl -d $MOAD_DATAROOT 2002102512 24 AVN
+
+    This example will run grib_prep and wrfprep for the specified
+    MOAD_DATAROOT (if MOAD_DATAROOT is an enviroment variable, you
+    can omit the "-d $MOAD_DATAROOT" option).  The start date for
+    the forecast is YYYYMMDDHH, or 12Z 25 Oct 2002.  The forecast
+    length is 24 hours, and AVN will be used for initial and 
+    lateral boundary conditions.  If grib_prep was already run for
+    your cycle of interest (either manually, out of cron, or because
+    of a prior run of wrfsi.pl) you can add a "-g" prior to the date
+    specification, and grib_prep will be skipped.  To see all
+    options for wrfsi.pl, enter:
+
+     ./wrfsi.pl -h
+
+2.  Successful running of the wrfsi.pl script results in output 
+    being placed in:
+
+    MOAD_DATAROOT/siprd
+
+3.  The files required for the WRF "real" program to run are the
+    "real_input.*" files and the "namelist.input" file that are
+    put in MOAD_DATAROOT/siprd by the run script.  
+
+4.  If you installed WRFSI as a subdirectory of your top-level
+    WRF code directory (that is, your INSTALLROOT is parallel with
+    dyn_em and main subdirectories of WRF), and WRF "real" has 
+    already been compiled, the wrfsi.pl script can also launch
+    the "real" program to produce the "wrfinput" and "wrfbdy"
+    files read in by the model.  See the output of "wrfsi.pl -h".
+
+5.  You can also run INSTALLROOT/etc/wrfprep.pl instead of wrfsi.pl.
+    For real-time users running multiple domains, this may be a better
+    option.  Execute "wrfprep.pl -h" to see how this is used.  
+
+6.  Finally, there are run scripts included with the WRFSI to 
+    run WRF as well.  See the "run_wrf.pl -h" and "rt_wrf.pl -h"
+    for details.  If executed, they copy the wrfbdy, wrfinput, and
+    namelist.input files to MOAD_DATAROOT/wrfprd and the model
+    is executed within that directory. For more information, 
+    contact Brent Shaw (shaw@fsl.noaa.gov, (303)497-6100).   
+
+F.  Running Multiple Cases
+
+If you want to run multiple cases for the same domain and save off 
+the data and configuration for each case, a simple way to do this
+is:
+
+1.  Localize your domain using the GUI or manual method.
+
+2.  Run the WRFSI for case 1.
+
+3.  After you are finished with case 1:
+
+cd $MOAD_DATAROOT
+cp -r siprd siprd.case1
+cp -r wrfprd wrfprd.case1
+
+4.  Change the things you want to change about the configuration.
+Note that as long as you are not changing anything in the horizontal
+grid definitions, you do not need to rerun the localization!
+
+5.  Re-run the SI for the new case.
+
+6.  Repeat steps 3-5 as necessary, using successive case numbers or
+some other naming convention.

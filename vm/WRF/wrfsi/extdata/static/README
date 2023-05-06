@@ -1,0 +1,92 @@
+This directory contains the configuration information for the grib_prep
+program, which is used to extract the appropriate data from GRIB files
+and write the output to ../extprd.  There is a Vtable for each data source
+used by WRFSI.  If you wish to add a source, simply copy one of the Vtables
+into another called Vtable.{NAME}, where {NAME} is your choice.  You will
+need to add an entry to grib_prep.nl that matches this name.
+
+&gpinput_defs
+ SRCNAME = 'ETA','GFS', 'AVN','RUCH', 'NNRP',    'NNRPSFC', 'SST',
+ SRCVTAB = 'ETA','GFS', 'AVN','RUCH', 'NNRPSFC', 'NNRPSFC', 'SST',
+ SRCPATH = '/public/data/grids/eta/40km_eta212_isobaric/grib',
+           '/public/data/grids/avn/global-65160/grib',
+           '/public/data/grids/avn/global-65160/grib',
+           '/rt0/rucdev/nrelwind/run/maps_fcst',
+           '/path/to/nnrp/grib',
+           '/path/to/nnrp/sfc/grib',
+           '/public/data/grids/ncep/sst/grib',
+ SRCCYCLE =  6,6,6,6,12,12,24,
+ SRCDELAY =  3,4,4,3, 0, 0,36,
+/
+
+! The grib_prep.nl namelist is used to control execution of grib_prep, the 
+! program WRFSI uses to decode GRIB files into the binary intermediate format
+! used by hinterp.  It is composed of two namelist sections, "filetimespec"
+! and "gpinputdefs".  The grib_prep.exe executable expects to find this
+! file in the working directory from which it is executed, along with
+! a series of GRIB files to process named "GRIBFILE.AA", "GRIBFILE.AB", 
+! etc.  The grib_prep.exe program only uses the filetimespec section of the
+! namelist.  The gpinputdefs section is used by the perl script "grib_prep.pl"
+! to set up the EXT_DATA_ROOT/work/SOURCE subdirectory from which to run
+! the executable.  If you are not using grib_prep.pl to run grib_prep.exe, then
+! you will need to manually set up everything that the script takes care of.
+!
+! Namelist Entries:
+!
+!  filetimespec
+!
+!   This section defines the start and stop year, month, day, hour,  
+!   minute, and second (in UTC) that the data must span.  It also
+!   defines the interval in seconds between output files.  If the output 
+!   frequency is greater than the input data, grib_prep.exe will do
+!   time interpolation automatically to fill in the gaps.  This section
+!   of the namelist is updated automatically by grib_prep.pl. (Actually,
+!   a copy of the namelist in EXT_DATA_ROOT/static is put into the work
+!   directory and edited there, in the event multiple grib_prep jobs are
+!   running for different sources simultaneously.
+
+!   gpinputdefs
+!
+!   This is the section where paths to raw data, Vtable names, etc.
+!   are defined.  This section is used by grib_prep.pl, along with
+!   filetimespec, to look for the correct files matching the desired
+!   times and soft link those grib files into the work directory along with
+!   the edited namelist prior to execution of the fortran program.
+
+!  SRCNAME:  
+!     This entry contains one or more (comma-separated) quoted strings
+!     for each of the "source" data sets you wish to process.  These names
+!     are aribitrarily selected by the user and will define the prefix
+!     of the final output files in $EXT_DATA_ROOT/extprd.  This name
+!     must also be used in the interp_control section of wrfsi.pl for
+!     hinterp to read the grib_prep output.
+!
+!  SRCVTAB:
+!     One quoted string entry per SRCNAME entry.  This is the suffix used
+!     to obtain the appropriate Vtable from the EXT_DATA_ROOT/static directory
+!     to properly extract the variables from the grib output.  In the older
+!     versions of the WRFSI, SRCVTAB was the same as source name, but it is
+!     recognized that more than one model (or configuration of the same
+!     model) may use the same GRIB table.  This allows for that.
+!
+!  SRCPATH:
+!     One quoted string per SRCNAME, these entries are the paths to each
+!     of the SRCNAME GRIB directories.
+!
+!  SRCCYCLE:
+!     The number of hours between new model runs of the SRCNAME model. There
+!     is one integer entry for each SRCNAME.
+!
+!  SRCDELAY:
+!     One integer entry per SRCNAME, this defines the number of hours after
+!     the SRCNAME's initial valid time that you expect the entire run to
+!     be available.  
+!
+!  SRCCYLE and SRCDELAY are used in this manner:  When grib_prep.pl runs,
+!     it uses the system clock to determine the latest available cycle that
+!     will fulfill your need for SRCNAME.  For example, if you run the script
+!     at 14Z for a model that is on a 6 hour cycle with a 3 hour delay, it  
+!     will assume it is too early for a 12Z run to be available (14Z-12Z is
+!     less than the 3 hour delay), so it will look for the 06Z cycle.  
+!
+

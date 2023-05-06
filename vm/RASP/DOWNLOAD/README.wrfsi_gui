@@ -1,0 +1,50 @@
+
+============
+INSTALLATION
+============
+
+The installation of this tar file, and all RASP installation tar
+files, is described at
+   http://www.drjack.info/twiki/bin/view/RASPop/ProgramInstall
+Additional relevant information is at
+   http://www.drjack.info/twiki/bin/view/RASPop/
+
+
+========
+LICENSES
+========
+
+The installation of this file, and all RASP installation files, is
+described at
+   http://www.drjack.info/twiki/bin/view/RASPop/ProgramInstall
+
+This tarfile includes WRF programs which are subject to the 
+license described at
+  http://ngwww.ucar.edu/ncl/license.html
+By using these programs you implicitly accept that license
+
+
+=============
+RELEASE NOTES
+=============
+Nov 2005: Excluding Tk-804.027.tar.gz 
+-------------
+ 6 Mar 2006: v2.1.2 wrfsi adding gui executables
+-------------
+ 5 Apr 2006: corrected fixed boundary specification in templates/default
+-------------
+ 4 Nov 2006: altered perl paths from /usr/local/bin/perl-5.8.6 and make all executable
+-------------
+20 Nov 2006: corrected RUN_HOURS in templates/default/wrf.nl file
+-------------
+25 Dec 2006: namelist changes needed for WRF v2.2
+-------------
+ 7 Jan 2007: template/default/wrfsi.nl now has 52 "jack" levels
+-------------
+22 Jan 2007: gave write permission to WRF/wrfsi/templates/default/dataroot.txt
+------------
+07 Jul 2007: corrected WRF/wrfsi/templates/default/dataroot.txt
+------------
+22 Feb 2008: set NUM_ACTIVE_SUBNESTS = 1 in WRF/wrfsi/templates/default/wrfsi.nl
+------------
+ 1 Mar 2008: alter wrf_tools to allos local/BASEDIR instead of original hard-wired directory

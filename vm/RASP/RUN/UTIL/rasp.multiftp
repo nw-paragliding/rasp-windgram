@@ -1,0 +1,248 @@
+#! /bin/sh
+if [ $# = 0 -o "$1" = "-?" ]
+then
+#-----------------adescription1------------------------------------
+echo '*** UNTESTED ***'
+echo 'FTP files PARAM.$3 in subdirectory $1 to file PARAM.$4 in remote server subdirectory $2'
+echo '   $5= -1=>add_test_to_name)'
+#NO_VALIDTIME_USED echo '   $6= filevalidtime'
+echo '   $6+ = PARAM list'
+echo '   repeats $nrepeat times if unsuccessful IF nrepeat>0'
+exit
+fi
+##################################################################
+#4no_undefined: treat unset variable as an error when substituting:
+set -u
+#4no_file_glob: disable filename generation: 
+set -f
+#4exit_on_error: exit if command has non-zero exit status: set -e
+#4test:
+ set -vx
+##################################################################
+
+######## NOTES ########
+#TXTKLUDGE - comments out ftp of txt data file
+
+####### PARAMETERS ########
+
+###!!!### USER-SPECIFIC PARAMETER:  LOGDIR is log file directory
+LOGDIR='/home/admin/DRJACK/RASP/RUN'
+
+###!!!### USER-SPECIFIC PARAMETER:  FTPADDRESS is remote server ftp address
+FTPADDRESS='drjack.info'
+
+###!!!### USER-SPECIFIC PARAMETER:  LOGIN_INFO is remote server ftp 'username password'
+LOGIN_INFO='raspftp@drjack.net password';
+
+### presently use server links in place of FTPBASEDIR
+FTPBASEDIR=''
+#alternative: FTPBASEDIR='.'
+
+#NO_VALIDTIME_USED ### VALIDTIMEDIR is run directory containing ?Z.32x16.gif files
+#NO_VALIDTIME_USED  VALIDTIMEDIR='/home/admin/DRJACK/RASP'
+
+### traceroute used if error result (''=not_done)
+TRACEROUTEEXE=''
+
+### sleep time between plot ftps
+plotsleep=1
+
+### only repeat until time of next expected blipmap = 3hrs
+### only repeat for 1 hr - gave "fork failure" problem
+nrepeat=12
+### JUL21 - no repeats in attempt to prevent "fork failure" problems
+nrepeat=3
+sleepsec=300
+#4tests: nrepeat=2
+#4tests: sleepsec=5
+
+####### END OF PARAMETERS ########
+
+### INITIALIZATION
+program='rasp.multiftp'
+FILEOUT="/tmp/tmp.${program}.out.${$}"
+#old FILEOUT="${0}.tmp.${$}"
+ftptest=-1
+iattempt=0
+qlog=' '
+
+### PARSE NON-PARAMETER ARGUMENTS
+LOCALHEAD=$1
+shift
+FTPSUBDIR=$1
+shift
+LOCALTAIL=$1
+shift
+FTPTAIL=$1
+shift
+DOFLAG=$1
+shift
+#NO_VALIDTIME_USED VALIDTIME=$1
+#NO_VALIDTIME_USED shift
+### PARSE PARAMETER ARGUMENTS
+PARAMLIST=""
+while [ $# -gt 0 ]
+do
+  PARAMLIST="$PARAMLIST $1"
+shift
+done
+
+#pretxtgzip: TXTTAIL=`echo $TAIL | sed 's/png/txt/'`
+#TXTKLUDGE FTPTXTTAIL=`echo $FTPTAIL | sed 's/png/data.zip/'`
+#TXTKLUDGE LOCALTXTTAIL=`echo $LOCALTAIL | sed 's/png/data.zip/'`
+
+### TREAT $DOFLAG=0 TEST CASE BY ALTERING FTPHEAD
+if [ $DOFLAG -eq -1 ]
+then
+  FTPHEAD='test.'
+else
+  FTPHEAD=''
+fi
+
+### KEEP LOG OF FTP ENTRY
+datime1=`date -u +%a' '%b' '%e' '%H':'%M':'%S`
+datime2='--------'
+iattemptm1='-'
+echo "> $datime1 $datime2 GMT  $nrepeat $iattemptm1 $sleepsec  $FTPSUBDIR $FTPTAIL $DOFLAG  $$" >> $LOGDIR/${program}.log
+
+### LOOP OVER FTPS
+while [ $ftptest -ne 0 -a $iattempt -le $nrepeat ]
+do
+  iattemptm1=$iattempt
+  iattempt=`expr $iattempt + 1`
+  datime1=`date -u +%a' '%b' '%e' '%H':'%M':'%S`
+  rm -f $FILEOUT
+
+  ### ftp script moves existing blipmap based upon $DOFLAG flag =1
+  if [ $DOFLAG -eq 1 ]
+  then
+    ### $DOFLAG=1 does special "first of this hour" processing:
+    ### moves existing blipmap to "previous(day)" file, deletes "last" file,
+    ### and copies file to "first" file in addition to normal "latest" file
+    #old lastfile="last.${TAIL}"
+    #old previousfile="previous.${TAIL}"
+    #4test:   ) | ftp -n -i abcdefg.com  > $FILEOUT 2>&1
+
+    #WS-2lines:
+    ( echo "user $LOGIN_INFO";
+      echo "cd $FTPBASEDIR";
+      echo "cd $FTPSUBDIR";
+# following file changes now done in blip.ftp2previousday
+#old      echo "delete $lastfile";
+#old      echo "delete $previousfile";
+#old      echo "rename $TAIL $previousfile";
+for PARAM in $PARAMLIST
+do
+  sleep $plotsleep
+      firstfile="FCST/first.${FTPHEAD}${PARAM}.${FTPTAIL}"
+      newfile="FCST/${FTPHEAD}${PARAM}.${FTPTAIL}";
+      #TXTKLUDGE       txtfile="FCST/${FTPHEAD}${PARAM}.${FTPTXTTAIL}";
+      echo "delete $firstfile";
+      echo "delete $newfile";
+      echo "put ${LOCALHEAD}.${PARAM}.${LOCALTAIL} $firstfile";
+      echo "put ${LOCALHEAD}.${PARAM}.${LOCALTAIL} $newfile";
+      #TXTKLUDGE      echo "put ${LOCALHEAD}.${PARAM}.${LOCALTXTTAIL} $txtfile";
+      #pretxtgzip:       echo "put blipmap.${PARAM} $txtfile";
+done
+      ### replace existing "valid" graphics
+      #linux: 
+      #NO_VALIDTIME_USED echo "delete ${VALIDTIME}z.valid.png";
+      #NO_VALIDTIME_USED echo "put ${VALIDTIMEDIR}/${VALIDTIME}z.32x16.png ${VALIDTIME}z.valid.png";
+      #sgi: echo "delete ${VALIDTIME}Z.valid.gif";
+      #sgi: echo "put $VALIDTIMEDIR/${VALIDTIME}Z.32x16.gif ${VALIDTIME}Z.valid.gif";
+      echo "bye";
+    ) | ftp -n -i $FTPADDRESS > $FILEOUT 2>&1
+    # use "-i" flag to turn off prompt instead of echo "prompt";
+    #old ) | ftp -n -i jane.webbnet.com > $FILEOUT 2>&1
+    #alternate ) | ftp -n -i www.drjack.net > $FILEOUT 2>&1
+    #old ) | ftp -n -i www.webbnet.com > $FILEOUT 2>&1
+    #4test:   ) | ftp -n -i abcdefg.com  > $FILEOUT 2>&1
+
+  else
+    ### move existing blipmap to "last" file
+    #WS-2lines:
+    ( echo "user $LOGIN_INFO";
+      echo "cd $FTPBASEDIR";
+      echo "cd $FTPSUBDIR";
+for PARAM in $PARAMLIST
+do
+  sleep $plotsleep
+     newfile="FCST/${FTPHEAD}${PARAM}.${FTPTAIL}";
+     #TXTKLUDGE     txtfile="FCST/${FTPHEAD}${PARAM}.${FTPTXTTAIL}";
+     lastfile="previous.${FTPHEAD}${PARAM}.${FTPTAIL}"
+     echo "delete $lastfile";
+     echo "rename $newfile $lastfile";
+     #no_last+     echo "delete $newfile";
+     echo "put ${LOCALHEAD}.${PARAM}.${LOCALTAIL} $newfile";
+     #TXTKLUDGE      echo "put ${LOCALHEAD}.${PARAM}.${LOCALTXTTAIL} $txtfile";
+     #pretxtgzip:       echo "put blipmap.${PARAM} $txtfile";
+done
+      ### replace existing "valid" graphics
+      #linux: 
+      #NO_VALIDTIME_USED  echo "delete ${VALIDTIME}z.valid.png";
+      #NO_VALIDTIME_USED  echo "put ${VALIDTIMEDIR}/${VALIDTIME}z.32x16.png ${VALIDTIME}z.valid.png";
+      echo "bye";
+    ) | ftp -n -i $FTPADDRESS > $FILEOUT 2>&1
+    # use "-i" flag to turn off prompt instead of echo "prompt";
+    #old ) | ftp -n -i jane.webbnet.com > $FILEOUT 2>&1
+    #alternate ) | ftp -n -i www.drjack.net > $FILEOUT 2>&1
+    #old ) | ftp -n -i www.webbnet.com > $FILEOUT 2>&1
+    #4test:   ) | ftp -n -i abcdefg.com  > $FILEOUT 2>&1
+
+  fi
+
+  ### test for successful connection => 0 
+  ### typically times out after 60sec if unsuccessful connection
+  ### for unsuccessful attempt get following output:
+  ### ftp: connect: Connection timed out
+  ### Not connected
+  ### Not connected
+  datime2=`date -u +%H':'%M':'%S`
+  ftptest=`grep -c -i 'connect' $FILEOUT`
+
+#unused  ### KEEP LOG OF _ALL_ FTP FAILURES
+#unused  if [ $ftptest -ne 0 -a $iattempt -le $nrepeat ]
+#unused   then
+#unused     echo "$qlog $datime1 $datime2 GMT  $nrepeat $iattemptm1 $sleepsec  $FTPSUBDIR $FTPTAIL $DOFLAG $PARAMLIST  $$" >> $LOGDIR/${program}.log
+#unused     sleep $sleepsec
+#unused   fi
+
+done
+
+#unused ### SEND OUTPUT INDICATING FAILURE/SUCCESS
+#unused if [ $ftptest -ne 0 ]
+#unused then
+#unused #  echo "${program} $LOCALHEAD $FTPSUBDIR $LOCALTAIL $FTPTAIL $DOFLAG
+#unused #  FAILED after ${iattemptm1}*${sleepsec} secs at $datime
+#unused #  Kept temporary output file $FILEOUT on run directory    
+#unused #  " | Mail -s "FAILURE of ${program}" glendeni@nrlmry.navy.mil
+#unused   qlog='*'
+#unused   iattemptm1='*'
+#unused else  
+#unused   #4tests: echo "${program} $LOCALHEAD $FTPSUBDIR $FTPTAIL $LOCALTAIL $DOFLAG
+#unused   #4tests: SUCCESSFUL after ${iattemptm1}*${sleepsec} secs at $datime
+#unused   #4tests: Deleted temporary output file $FILEOUT on run directory    
+#unused   #4tests: " | Mail -s "SUCCESS of ${program}" glendeni@nrlmry.navy.mil
+#unused   rm -f $FILEOUT
+#unused   if [ $iattempt -gt 1 ]
+#unused   then
+#unused     qlog='+'
+#unused   ### KEEP LOG OF _ALL_ FTP RESULTS
+#unused   else
+#unused     qlog='o'
+#unused   fi
+#unused fi
+#unused 
+#unused ### KEEP LOG OF FTP RESULTS
+#unused echo "$qlog $datime1 $datime2 GMT  $nrepeat $iattemptm1 $sleepsec  $FTPSUBDIR $FTPTAIL $DOFLAG $PARAMLIST  $$" >> $LOGDIR/${program}.log
+#unused 
+#unused ### GET TRACEROUTE IF FAILURE
+#unused if [ "$qlog" = "*" -a "$TRACEROUTEEXE" != "" ]
+#unused then
+#unused   eval $TRACEROUTEEXE $FTPADDRESS >> /tmp/${program}.traceroute.$FTPSUBDIR.$FTPTAIL.$datime1
+#unused fi
+
+
+
+
+

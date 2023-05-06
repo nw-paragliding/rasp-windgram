@@ -1,0 +1,16 @@
+
+GRIB | Level| Level| Level| REGRID   |  REGRID  | REGRID                                   |
+Code | Code |   1  |   2  | Name     |  Units   | Description                              |
+-----+------+------+------+----------+----------+------------------------------------------+
+  11 | 100  |   *  |      | T        | K        | Temperature                              |
+  33 | 100  |   *  |      | U        | m s-1    | U                                        |
+  34 | 100  |   *  |      | V        | m s-1    | V                                        |
+  52 | 100  |   *  |      | RH       |          | Relative Humidity                        |
+  7  | 100  |   *  |      | HGT      | m        | Height                                   |
+  11 | 105  |   2  |      | T        | K        | Temperature                              | At 2 m
+  52 | 105  |   2  |      | RH       |          | Relative Humidity                        | At 2 m
+  33 | 105  |  10  |      | U        | m s-1    | U                                        | At 10m
+  34 | 105  |  10  |      | V        | m s-1    | V                                        | At 10m
+   1 |   1  |   0  |      | PSFC     | Pa       | Surface Pressure                         |
+  65 |  1   |   0  |      | SNOWRUC  | m        | Water Equivalent of Accum Snow Depth     | 
+-----+------+------+------+----------+----------+------------------------------------------+

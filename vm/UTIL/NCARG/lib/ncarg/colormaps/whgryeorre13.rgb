@@ -1,0 +1,16 @@
+ncolors= 14
+#  r   g   b  tjo added black oct 31 2015 trying to get black contour lines instead of red.
+ 255 255 255
+ 229 255 229
+ 178 255 178
+ 153 255 153
+  64 255 106
+ 141 255   0
+ 188 255   0
+ 210 255   0
+ 239 255   0
+ 255 225   0
+ 255 203   0
+ 255 150   0
+ 255 0     0
+ 0   0     0
