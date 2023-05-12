@@ -179,7 +179,7 @@ function draw_region(region) {
 }
 
 function set_menu(site, state, latLng) {
-	$('.link_windgrams').attr('href', '/v2/windgrams.html#' + site);
+	$('.link_windgrams').attr('href', 'windgrams.html#' + site);
 	$('.dropdown-header').text(site.replace(/_/g, " "));
 	
 	if (state != "British Columbia")
@@ -195,7 +195,7 @@ function set_menu(site, state, latLng) {
 
 $(document).ready(function(){
 	
-	$.getJSON('/v2/json/sites.json', function(sites) {
+	$.getJSON('json/sites.json', function(sites) {
 	
 		var fcstDate = new Date();
 		var fcstDateUTC = fcstDate.format("UTC:yyyy-mm-dd");
@@ -237,7 +237,7 @@ $(document).ready(function(){
 				'<b>Lat/Lon: </b>' + sites[i]["Lat"] + ', ' + sites[i]["Lon"] +
 				'</div>'+
 				'<p>' +
-				'<img data-toggle="modal" data-target="#myModal" style="width:250px" src="http://wxtofly.net/windgrams/' + fcstDateUTC + '_' + sites[i]["Site"] + '_windgram.png"></img>' + 
+				'<img data-toggle="modal" data-target="#myModal" style="width:250px" src="http://wxtofly.net/windgrams/' + fcstDateUTC + '_' + sites[i]["Site"] + `_windgram.png?${img_timestamp}"></img>` + 
 				'<br/>' +
 				'(Click on image for all available windgrams)';
 			marker.html += '</div>';
@@ -253,22 +253,22 @@ $(document).ready(function(){
 					
 					$("#modalTitle").text(marker.siteName.replace(/_/g, " "));
 					var fcstDate = new Date();
-					$("#modalWindgram1").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + marker.siteName + "_windgram.png" );
+					$("#modalWindgram1").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + marker.siteName + "_windgram.png?" + img_timestamp );
 					$("#modalWindgram1").on("error", function () {
 						$(this).parent().html('');
 					});
 					fcstDate.setDate(fcstDate.getDate() + 1);
-					$("#modalWindgram2").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + marker.siteName + "_windgram.png" );
+					$("#modalWindgram2").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + marker.siteName + "_windgram.png?" + img_timestamp );
 					$("#modalWindgram2").on("error", function () {
 						$(this).parent().html('');
 					});
 					fcstDate.setDate(fcstDate.getDate() + 1);
-					$("#modalWindgram3").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + marker.siteName + "_windgram.png" );
+					$("#modalWindgram3").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + marker.siteName + "_windgram.png?" + img_timestamp );
 					$("#modalWindgram3").on("error", function () {
 						$(this).parent().html('');
 					});
 					fcstDate.setDate(fcstDate.getDate() + 1);
-					$("#modalWindgram4").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + marker.siteName + "_windgram.png" );
+					$("#modalWindgram4").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + marker.siteName + "_windgram.png?" + img_timestamp );
 					$("#modalWindgram4").on("error", function () {
 						$(this).parent().html('');
 					});
@@ -293,7 +293,7 @@ $(document).ready(function(){
 		legend.innerHTML = $('#legend_container').html();
 		map.controls[google.maps.ControlPosition.BOTTOM].push(legend);
 		
-		$.getJSON('/v2/json/grid.json', function(data) {
+		$.getJSON('json/grid.json', function(data) {
 			grid = data;
 		});
 		
@@ -366,7 +366,7 @@ $(document).ready(function(){
 			});
 			
 			// do something only the first time the map is loaded
-			$.getJSON('/v2/json/domains.json', function(data) {
+			$.getJSON('json/domains.json', function(data) {
 				domains = data;
 				var ul = $('#domains');
 				$('#domains').find("div.dropdown").find("a.menu-item").on("click", function(e){

@@ -4,11 +4,11 @@
 	<title>WxToFly - Windgrams</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-	<link href="/v2/css/windgrams.css?20200325" rel="stylesheet">
-	<link href="/v2/css/blipspot.css" rel="stylesheet">
-	<link href="/v2/css/wind.css" rel="stylesheet">
+    <link href="lib/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="lib/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+	<link href="css/windgrams.css?20200325" rel="stylesheet">
+	<link href="css/blipspot.css" rel="stylesheet">
+	<link href="css/wind.css" rel="stylesheet">
 </head>
 
 <body>
@@ -34,15 +34,12 @@
 			</li>
 			<li class="divider"></li>
 			<li>
-				<a class="link_explorer menu-item" href="/v2/explorer.html"><span class="glyphicon glyphicon-globe"></span> Explorer</a>
+				<a class="link_explorer menu-item" href="explorer.html"><span class="glyphicon glyphicon-globe"></span> Explorer</a>
 			</li>    
 			<li class="disabled">
 				<a class="link_nws menu-item" href="#" target="_blank"><span class="glyphicon glyphicon-record"></span> NWS Point-Forecast</a>
 			</li>    
 			<li class="divider"></li>
-			<li>
-				<a data-toggle="modal" data-target="#modal_disclaimer" href="#" class="menu-item"><span class="glyphicon glyphicon-question-sign"></span> Help</a>
-			</li>
 			<li>
 				<a data-toggle="modal" data-target="#modal_disclaimer" href="#" class="menu-item"><span class="glyphicon glyphicon-info-sign"></span> Disclaimer</a>
 			</li>
@@ -108,24 +105,14 @@
 	<div id="modal_disclaimer" class="modal fade" role="dialog">
 	</div>
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="/v2/scripts/jquery.touchSwipe.min.js"></script>
-	<script src="/scripts/wxtofly.js?20221101"></script>
-	<script src="/v2/scripts/blipspotParam.js?20200504"></script>
-	<script src="/v2/scripts/blipspots.js?20200504"></script>
-	<script src="/v2/scripts/windgrams.js?20230315"></script>
-	<script src="/scripts/date.format.js"></script>
-	<script type="text/javascript">
-		var sc_project=5298726; 
-		var sc_invisible=1; 
-		var sc_partition=59; 
-		var sc_click_stat=0; 
-		var sc_security="fd63fa1a"; 
-		var sc_text=2; 
-	</script>
-	<script src="http://www.statcounter.com/counter/counter.js"></script>
-	<script src="/scripts/analytics.js"></script>
+	<script src="lib/jquery/3.1.1/jquery-3.1.1.min.js"></script>
+	<script src="lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="lib/jquery.touchSwipe.min.js"></script>
+	<script src="js/wxtofly.js?20221101"></script>
+	<script src="js/blipspotParam.js?20200504"></script>
+	<script src="js/blipspots.js?20200504"></script>
+	<script src="js/windgrams.js?20230315"></script>
+	<script src="lib/date.format.js"></script>
 	
 </body>
 </html>

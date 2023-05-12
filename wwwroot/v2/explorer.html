@@ -4,9 +4,9 @@
   <title>WxToFly - Site Explorer</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/v2/css/wxtofly.css">
-  <link rel="stylesheet" href="/v2/css/explorer.css">
+  <link href="lib/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/wxtofly.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/explorer.css">
 	
 </head>
 <body>
@@ -21,7 +21,7 @@
 				<li class="divider"></li>
 				<li class="dropdown-header"></li>
 				<li>
-					<a class="link_windgrams menu-item" href="/v2/windgrams.html"><span class="glyphicon glyphicon-picture"></span> Windgrams</a>
+					<a class="link_windgrams menu-item" href="windgrams.html"><span class="glyphicon glyphicon-picture"></span> Windgrams</a>
 				</li>    
 				<li class="disabled">
 					<a class="link_nws menu-item" href="#" target="_blank"><span class="glyphicon glyphicon-record"></span> NWS Point-Forecast</a>
@@ -88,24 +88,14 @@
 	<div id="modal_disclaimer" class="modal fade" role="dialog">
 	</div>
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="lib/jquery/3.1.1/jquery-3.1.1.min.js"></script>
+	<script src="lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXKxWuliXLUGDNLvS0Jj9k9_TNyP2fiDc&libraries=geometry"></script>
-	<script src="/scripts/date.format.js"></script>
-	<script type="text/javascript" src="/v2/scripts/infobox_packed.js"></script>
-	<script type="text/javascript" src="/v2/scripts/airspace.js"></script>
-	<script type="text/javascript" src="/v2/scripts/explorer.js"></script>
-	<script type="text/javascript" src="/scripts/wxtofly.js"></script>
-	<script type="text/javascript">
-		var sc_project=5298726; 
-		var sc_invisible=1; 
-		var sc_partition=59; 
-		var sc_click_stat=0; 
-		var sc_security="fd63fa1a"; 
-		var sc_text=2; 
-	</script>
-	<script type="text/javascript" src="http://www.statcounter.com/counter/counter.js"></script>
-	<script type="text/javascript" src="/scripts/analytics.js"></script>
+	<script src="lib/date.format.js"></script>
+	<script type="text/javascript" src="lib/infobox_packed.js"></script>
+	<script type="text/javascript" src="js/airspace.js"></script>
+	<script type="text/javascript" src="js/explorer.js"></script>
+	<script type="text/javascript" src="js/wxtofly.js"></script>
 
 </body>
 </html>

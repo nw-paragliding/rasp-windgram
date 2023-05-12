@@ -79,7 +79,7 @@ $(document).ready(function(){
 		}
 		
 		//set menu
-		$('.link_explorer').attr('href', '/v2/explorer.html#' + site.name);
+		$('.link_explorer').attr('href', 'explorer.html#' + site.name);
 		
 		if (site.us)
 		{
@@ -96,25 +96,25 @@ $(document).ready(function(){
 		
 		var fcstDate = new Date();
 		$("#imgWindgram1").show();
-		$("#imgWindgram1").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + site.name + "_windgram.png?" + (new Date().getTime()) );
+		$("#imgWindgram1").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + site.name + "_windgram.png?" + img_timestamp );
 		$("#imgWindgram1").on("error", function () {
 			$(this).hide();
 		});
 		fcstDate.setDate(fcstDate.getDate() + 1);
 		$("#imgWindgram2").show();
-		$("#imgWindgram2").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + site.name + "_windgram.png?" + (new Date().getTime()));
+		$("#imgWindgram2").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + site.name + "_windgram.png?" + img_timestamp);
 		$("#imgWindgram2").on("error", function () {
 			$(this).hide();
 		});
 		fcstDate.setDate(fcstDate.getDate() + 1);
 		$("#imgWindgram3").show();
-		$("#imgWindgram3").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + site.name + "_windgram.png?" + (new Date().getTime()) );
+		$("#imgWindgram3").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + site.name + "_windgram.png?" + img_timestamp );
 		$("#imgWindgram3").on("error", function () {
 			$(this).hide();
 		});
 		fcstDate.setDate(fcstDate.getDate() + 1);
 		$("#imgWindgram4").show();
-		$("#imgWindgram4").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + site.name + "_windgram.png?" + (new Date().getTime()) );
+		$("#imgWindgram4").attr( "src", "http://wxtofly.net/windgrams/" + fcstDate.format("UTC:yyyy-mm-dd") + "_" + site.name + "_windgram.png?" + img_timestamp );
 		$("#imgWindgram4").on("error", function () {
 			$(this).hide();
 		});
@@ -298,7 +298,7 @@ $(document).ready(function(){
 		}
 	}
 	
-	$.getJSON('/v2/json/sites.json?20230315', function(sites) {
+	$.getJSON('json/sites.json?20230315', function(sites) {
 		
 		root["favorites"] = { 
 			name: "Favorites",
