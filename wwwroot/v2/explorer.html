@@ -4,98 +4,72 @@
   <title>WxToFly - Site Explorer</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="lib/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <link href="lib/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <link href="lib/bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+  <link href="lib/leaflet/leaflet.css" rel="stylesheet">
+  <link href="css/leaflet.control.toolbar.css" rel="stylesheet">
+  <link href="css/leaflet.control.responsive-coordinates.css" rel="stylesheet">
+  <link href="css/leaflet.control.airspace.css" rel="stylesheet">
   <link href="css/wxtofly.css" rel="stylesheet">
-  <link rel="stylesheet" href="css/explorer.css">
+  <link href="css/explorer.css" rel="stylesheet">
 	
 </head>
 <body>
 
-	<div id="menu_container" style="display: none">
-		<div class="dropdown">
-			<button class="btn btn-default dropdown-toggle btn-map-menu" type="button" data-toggle="dropdown"><span class="glyphicon glyphicon-menu-hamburger"></span></button>
-			<ul class="dropdown-menu">
-				<li>
-					<a href="/v2" class="menu-item"><span class="glyphicon glyphicon-home"></span> Home</a>
-				</li>
-				<li class="divider"></li>
-				<li class="dropdown-header"></li>
-				<li>
-					<a class="link_windgrams menu-item" href="windgrams.html"><span class="glyphicon glyphicon-picture"></span> Windgrams</a>
-				</li>    
-				<li class="disabled">
-					<a class="link_nws menu-item" href="#" target="_blank"><span class="glyphicon glyphicon-record"></span> NWS Point-Forecast</a>
-				</li>    
-				<li class="divider"></li>
-				
-				<li class="dropdown-submenu">
-					<a class="test" tabindex="-1" href="#">Show Domain <span class="caret"></span></a>
-					<ul id="domains" class="dropdown-menu">
+	<div id="toolbar-menu" class="leaflet-control leaflet-control-toolbar-panel">
+        <div id="menu" class="leaflet-control-toolbar-panel-body navbar navbar-light">
+			<nav class="nav flex-column">
+				<a class="nav-link" id="nav-link-windgrams" aria-current="page" href="windgrams.html">Windgrams</a>
+				<a class="nav-link disabled" id="nav-link-noaa" aria-current="page" href="#" target="_blank">NWS Point Forecast</a>
+				<hr class="my-1" />
+				<li class="nav-item dropdown dropend">
+					<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Forecast Areas</a>
+					<ul class="dropdown-menu" id="list-domains">
 					</ul>
 				</li>
-				<li>
-					<span class="button-checkbox">
-						<button type="button" class="btn" data-color="primary"> Airspace</button>
-						<input type="checkbox" class="hidden" checked />
-					</span>
+				<hr class="my-1" />
+				<a class="nav-link" id="nav-link-airspace" aria-current="page" href="#">Hide Airspace</a>
 				</li>
-				<li class="divider"></li>
-				<li>
-					<a data-toggle="modal" data-target="#modal_disclaimer" href="#" class="menu-item"><span class="glyphicon glyphicon-info-sign"></span> Disclaimer</a>
-				</li>
-				<li>
-					<a id="operator_email" class="menu-item"><span class="glyphicon glyphicon-envelope"></span> Contact</a>
-				</li>
-			</ul>
-		</div>	
-	</div>	
-
-	<div id="legend_container" style="display: none">
-		<div class="panel panel-default panel-legend">
-		Forecast area 
-		<span class="legend-4km">4km</span>
-		<span class="legend-1-3km">1.3km</span>
-		resolution
-		<div id="current_loc" style="text-align: center; padding-top:2px"></div>
-		</div>
-	</div>
-	
-	<div id="mapCanvas" style="width:100%">
+			</nav>
+        </div>
 	</div>
 
-	<!-- Modal windgrams window -->
-	<div id="myModal" class="modal fade" role="dialog">
-	  <div class="modal-dialog">
+	<div id="map"></div>
 
-		<!-- Modal content-->
-		<div class="modal-content" data-dismiss="modal" >
-		  <div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal">&times;</button>
-			<h4 id="modalTitle" class="modal-title">Modal Header</h4>
-		  </div>
-		  <div class="modal-body" style="position: center">
-			<div><p><img width="100%" id="modalWindgram1" src="#"></img></p></div>
-			<div><p><img width="100%" id="modalWindgram2" src="#"></img></p></div>
-			<div><p><img width="100%" id="modalWindgram3" src="#"></img></p></div>
-			<div><p><img width="100%" id="modalWindgram4" src="#"></img></p></div>
+	<div id="dialog-windgrams" class="modal" tabindex="-1">
+		<div class="modal-dialog">
+		  <div class="modal-content">
+			<div class="modal-header bg-light">
+			  <h5 class="modal-title">Modal title</h5>
+			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body" style="position: center">
+				<div><p><img width="100%" id="modalWindgram1" src="#"></img></p></div>
+				<div><p><img width="100%" id="modalWindgram2" src="#"></img></p></div>
+				<div><p><img width="100%" id="modalWindgram3" src="#"></img></p></div>
+				<div><p><img width="100%" id="modalWindgram4" src="#"></img></p></div>
+			</div>
 		  </div>
 		</div>
-
-	  </div>
-	</div>
+	  </div>	
 	
-	<!-- Modal disclaimer -->
-	<div id="modal_disclaimer" class="modal fade" role="dialog">
-	</div>
-
 	<script src="lib/jquery/3.1.1/jquery-3.1.1.min.js"></script>
-	<script src="lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXKxWuliXLUGDNLvS0Jj9k9_TNyP2fiDc&libraries=geometry"></script>
+	<script src="lib/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+	<script src="lib/leaflet/leaflet.js"></script>
+	<script src="lib/leaflet-color-markers/js/leaflet-color-markers.js"></script>
+	<script src="lib/leaflet-geometryutil/leaflet.geometryutil.js"></script>
 	<script src="lib/date.format.js"></script>
-	<script type="text/javascript" src="lib/infobox_packed.js"></script>
+	<script src="lib/polyline.js"></script>
+	<script type="text/javascript" src="js/leaflet.control.persistent-layers.js"></script>
+	<script type="text/javascript" src="js/leaflet.control.responsive-coordinates.js"></script>
+	<script type="text/javascript" src="js/leaflet.providers.js"></script>
+	<script type="text/javascript" src="js/leaflet.map.ordered-controls.js"></script>
+	<script type="text/javascript" src="js/leaflet.control.toolbar.js"></script>
+	<script type="text/javascript" src="js/leaflet.layer.airspace.js"></script>
+	<script type="text/javascript" src="js/wxtofly.map.js"></script>
+	<script type="text/javascript" src="js/wxtofly.js"></script>
 	<script type="text/javascript" src="js/airspace.js"></script>
 	<script type="text/javascript" src="js/explorer.js"></script>
-	<script type="text/javascript" src="js/wxtofly.js"></script>
 
 </body>
 </html>
