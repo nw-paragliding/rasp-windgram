@@ -35,7 +35,7 @@ def get_site_key(site):
     return f'{site[0].lower()}_{site[1].lower()}_{site[2].lower()}'
 
 with open(csv_file, "r") as f:
-    data = list(csv.reader(f, delimiter=","))
+    data = list(filter(lambda x: len(x) == 7, csv.reader(f, delimiter=",")))
     f.close()
 
 sorted_data = sorted(data[1::], key=get_site_key)

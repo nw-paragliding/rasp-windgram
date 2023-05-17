@@ -246,11 +246,11 @@ L.control.responsiveCoordinates({
 	}
 }).addTo(leafletMap);
 
-$.getJSON('json/sites.json', function(sites) {
+$.getJSON('json/sites.json?{{timestamp}}', function(sites) {
 	initSites(sites);
 });
 
-$.getJSON('json/grid.json', function(data) {
+$.getJSON('json/grid.json?{{timestamp}}', function(data) {
 	gridData = data;
 	if (selectedMarker){
 		drawSiteGrid(selectedMarker.siteName);
@@ -270,7 +270,7 @@ var toolbarControl = L.control.toolbar([
 		'buttonOffset': 2
 	}).addTo(leafletMap);
 
-$.getJSON('json/domains.json', function(data) {
+$.getJSON('json/domains.json?{{timestamp}}', function(data) {
 	domainData = data;
 
 	var ul = $('#list-domains');
@@ -291,7 +291,7 @@ $.getJSON('json/domains.json', function(data) {
 	ul.append(li);
 });	
 
-$.getJSON('json/airspace.json', function(data) {
+$.getJSON('json/airspace.json?{{timestamp}}', function(data) {
 	const airspace = L.airspace(data).addTo(leafletMap);
 	const buttonAirspace = $('#nav-link-airspace');
 	airspace.visible = true;

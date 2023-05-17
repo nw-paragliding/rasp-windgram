@@ -298,7 +298,7 @@ $(document).ready(function(){
 		}
 	}
 	
-	$.getJSON('json/sites.json?20230315', function(sites) {
+	$.getJSON('json/sites.json?{{timestamp}}', function(sites) {
 		
 		root["favorites"] = { 
 			name: "Favorites",
