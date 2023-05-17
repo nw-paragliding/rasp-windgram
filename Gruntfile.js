@@ -11,17 +11,17 @@ module.exports = function(grunt) {
       css: {
         expand: true,
         src: 'wwwroot\\v2\\*.css',
-        dest: 'publish\\wwwroot\\v2\\',
+        dest: 'publish\\',
       },
       json: {
         expand: true,
         src: 'wwwroot\\v2\\json\\*.json',
-        dest: 'publish\\wwwroot\\v2\\',
+        dest: 'publish\\',
       },
       lib: {
         expand: true,
-        src: 'wwwroot/v2/lib/*',
-        dest: 'publish\\wwwroot\\v2\\',
+        src: 'wwwroot/v2/lib/**',
+        dest: 'publish\\',
       },
     },
 
