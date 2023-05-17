@@ -62,3 +62,7 @@ div#map {
 path.leaflet-interactive:focus {
     outline: none;
 }
+
+.cursor-crosshair {
+	cursor: crosshair;
+}

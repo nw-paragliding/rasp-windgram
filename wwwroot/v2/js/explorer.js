@@ -239,6 +239,10 @@ L.control.responsiveCoordinates({
 	'click': function (e) {
 	},
 	'contextmenu': function (e) {
+		navigator.clipboard.writeText(`${e.latlng.lat.toFixed(5)},${e.latlng.lng.toFixed(5)}`);
+		L.alert('Location coppied to clipboard', {
+			'duration': 2,
+		}).addTo(leafletMap).open();
 	}
 }).addTo(leafletMap);
 
