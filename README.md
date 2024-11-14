@@ -19,3 +19,23 @@ This repo contains files for RASP based soaring forecasting for PNW. This is the
 - wwwroot
     - Web content related to V2
     - The file structure corresponds to file structure on the web server
+
+
+# Update web site
+After making changes follow this sequence to upload updated files to web host
+
+1. Publish new files
+
+    In VS Code terminat run ``grunt``. This will update and copy HTML files to the publish folder
+
+2. Upload HTML files to web host
+
+    Run ``upload-website.py -w [V2_PUBLISH_PATH] -u [USENAME] -p [PASSWORD] -f v2``
+
+    For example: Run ``upload-website.py -w C:\\Code\\Repos\\raspnw-v2\\publish\\wwwroot\\v2 -u [USENAME] -p [PASSWORD] -f v2``
+
+3. Upload status files to web host
+
+    Run ``upload-website.py -w [STATUS_PUBLISH_PATH] -u [USENAME] -p [PASSWORD] -f status``
+    
+    For example: Run ``upload-website.py -w C:\\Code\\Repos\\raspnw-v2\\publish\\wwwroot\\status -u [USENAME] -p [PASSWORD] -f status``
