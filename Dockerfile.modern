@@ -216,6 +216,13 @@ COPY model/ $BASEDIR/
 COPY docker-run.sh $BASEDIR/docker-run.sh
 RUN chmod +x $BASEDIR/docker-run.sh
 
+# ── Copy jasper shared library from builder ───────────────────────────────────
+# jasper was built from source in the builder (not in ubuntu 22.04 repos).
+# ungrib.exe and metgrid.exe link against libjasper.so.4 for GRIB2 JPEG2000.
+COPY --from=wrf-builder /usr/local/lib/libjasper.so.4  /usr/local/lib/libjasper.so.4
+COPY --from=wrf-builder /usr/local/lib/libjasper.so    /usr/local/lib/libjasper.so
+RUN ldconfig
+
 # ── Copy WRF binaries from builder (overwrite legacy x86 binaries from model/) ──
 RUN mkdir -p ${BASEDIR}/WRF/WRFV2/main
 COPY --from=wrf-builder /build/WRF/main/wrf.exe   ${BASEDIR}/WRF/WRFV2/main/wrf.exe

@@ -81,5 +81,5 @@ echo "Datasets:"
 ls "${GEOG_ROOT}/" | sed 's/^/  /'
 echo
 echo "Mount in docker run with:"
-echo "  -v ${DEST_DIR}:/mnt/geog:ro"
-echo "  (geog_data_path inside container: /mnt/geog/$(basename "${GEOG_ROOT}"))"
+echo "  -v ${GEOG_ROOT}:/mnt/geog:ro"
+echo "  (mount the data root directly so /mnt/geog/topo_gmted2010_5m/ etc. are visible)"

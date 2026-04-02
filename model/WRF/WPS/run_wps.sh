@@ -117,21 +117,32 @@ fi
 # Remove old FILE: intermediates from a previous run.
 rm -f FILE:*
 
-# Link the Vtable for NAM GRIB2 (pressure-level awip3d files).
-# Vtable.NAMb is for NAM GRIB2 on pressure levels (awip3d / awp212 files).
-ln -sf "${WPS_DIR}/Variable_Tables/Vtable.NAMb" Vtable
+# Link the Vtable for NAM GRIB2 (awip3d pressure-level files).
+# WPS 4.5 provides only Vtable.NAM (Vtable.NAMb was merged/removed upstream).
+ln -sf "${WPS_DIR}/Variable_Tables/Vtable.NAM" Vtable
 
-# Link GRIB files using link_grib.csh (creates GRIBFILE.AA, GRIBFILE.AB, ...)
+# Link GRIB files as GRIBFILE.AAA, GRIBFILE.AAB, ... (replicates link_grib.csh in bash)
+# ungrib.exe reads the 3-character suffix sequence starting at AAA.
 rm -f GRIBFILE.*
-csh "${WPS_DIR}/link_grib.csh" "${GRIB_DIR}"/*.grib2
+I=0
+for f in "${GRIB_DIR}"/*.grib2; do
+    C1=$(awk "BEGIN { printf \"%c\", 65 + int(${I}/676) }")
+    C2=$(awk "BEGIN { printf \"%c\", 65 + int((${I}%676)/26) }")
+    C3=$(awk "BEGIN { printf \"%c\", 65 + ${I}%26 }")
+    ln -sf "${f}" "GRIBFILE.${C1}${C2}${C3}"
+    I=$((I+1))
+done
+echo "  Linked ${I} GRIB files (GRIBFILE.AAA..$(ls GRIBFILE.* | tail -1 | sed 's/GRIBFILE\.//'))"
 
 echo "  Running ungrib.exe..."
-"${WPS_DIR}/ungrib.exe" >| "${LOG_DIR}/ungrib.log" 2>&1 && \
-    echo "  ungrib.exe: OK ($(ls FILE:* 2>/dev/null | wc -l) intermediate files)" || {
-    echo "ERROR: ungrib.exe failed — see ${LOG_DIR}/ungrib.log"
+"${WPS_DIR}/ungrib.exe" >| "${LOG_DIR}/ungrib.log" 2>&1
+FILE_COUNT=$(ls FILE:* 2>/dev/null | wc -l)
+if [ "${FILE_COUNT}" -eq 0 ]; then
+    echo "ERROR: ungrib.exe produced no FILE:* output — see ${LOG_DIR}/ungrib.log"
     tail -20 "${LOG_DIR}/ungrib.log"
     exit 1
-}
+fi
+echo "  ungrib.exe: OK (${FILE_COUNT} intermediate files)"
 
 # ── 4. metgrid — interpolate to WRF grid ─────────────────────────────────────
 # Remove old met_em files from a previous run.

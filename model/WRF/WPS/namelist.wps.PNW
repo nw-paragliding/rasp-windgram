@@ -53,10 +53,11 @@
  stand_lon = -121.33,
  !
  geog_data_path = '__GEOG_PATH__',
- ! 'default+lowres' uses highest available resolution; falls back to low-res
- ! datasets present in the mandatory package (e.g. topo_gmted2010_5m not _30s).
+ ! 'lowres' uses the low-res mandatory package datasets (e.g. topo_gmted2010_5m,
+ ! modis_landuse_20class_5m_with_lakes, soiltype_*_5m, etc.).
+ ! 'default+lowres' does NOT work — geogrid still tries 'default' first and fails.
  ! Replace with 'default' once high-res tiles are downloaded (Phase 3).
- geog_data_res  = 'default+lowres', 'default+lowres', 'default+lowres',
+ geog_data_res  = 'lowres', 'lowres', 'lowres',
  opt_geogrid_tbl_path = './geogrid/',
 /
 
