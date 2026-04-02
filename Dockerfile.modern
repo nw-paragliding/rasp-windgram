@@ -222,6 +222,13 @@ COPY --from=wrf-builder /build/WRF/main/wrf.exe   ${BASEDIR}/WRF/WRFV2/main/wrf.
 COPY --from=wrf-builder /build/WRF/main/real.exe  ${BASEDIR}/WRF/WRFV2/main/real.exe
 COPY --from=wrf-builder /build/WRF/main/ndown.exe ${BASEDIR}/WRF/WRFV2/main/ndown.exe
 
+# ── Copy WRF run-directory table files ───────────────────────────────────────
+# real.exe and wrf.exe look for physics tables (RRTM_DATA, LANDUSE.TBL, etc.)
+# in the CWD. We install them to ${BASEDIR}/WRF/WRFV2/run/ and run_real_wrf.sh
+# symlinks them into the actual run directory at runtime.
+RUN mkdir -p ${BASEDIR}/WRF/WRFV2/run
+COPY --from=wrf-builder /build/WRF/run/ ${BASEDIR}/WRF/WRFV2/run/
+
 # ── Copy WPS binaries + support files from builder ───────────────────────────
 # WPS executables look for TBL files in ./geogrid/ and ./metgrid/ relative to CWD.
 # link_grib.csh is used to symlink GRIB files for ungrib.exe.

@@ -65,10 +65,21 @@ echo "Moving data into ${DEST_DIR}..."
 mv "${EXTRACTED_GEOG}"/* "${DEST_DIR}/"
 rm -rf "${TMP_EXTRACT}" "${TMP_TAR}"
 
+# Identify the actual GEOG data root (may be a subdirectory like WPS_GEOG_LOW_RES/)
+GEOG_ROOT="${DEST_DIR}"
+for sub in "${DEST_DIR}"/*/; do
+    if ls "${sub}"modis_landuse* "${sub}"albedo_* 2>/dev/null | grep -q .; then
+        GEOG_ROOT="${sub%/}"
+        break
+    fi
+done
+
 echo
 echo "=== Done ==="
-echo "GEOG datasets in ${DEST_DIR}:"
-ls "${DEST_DIR}/" | sed 's/^/  /'
+echo "GEOG data root: ${GEOG_ROOT}"
+echo "Datasets:"
+ls "${GEOG_ROOT}/" | sed 's/^/  /'
 echo
 echo "Mount in docker run with:"
 echo "  -v ${DEST_DIR}:/mnt/geog:ro"
+echo "  (geog_data_path inside container: /mnt/geog/$(basename "${GEOG_ROOT}"))"

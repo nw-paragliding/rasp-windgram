@@ -29,9 +29,31 @@ END_DATE="${3:?Missing end_date (YYYY-MM-DD_HH)}"
 BASEDIR="${BASEDIR:-/opt/rasp}"
 WPS_DIR="${WPS_DIR:-${BASEDIR}/WRF/WPS}"
 WPS_RUN_DIR="${WPS_RUN_DIR:-${WPS_DIR}}"
+
 # /mnt/geog is volume-mounted from $HOME/rasp-data/wps-geog on the host.
 # Download once with setup_geog.sh; never baked into the image.
-GEOG_PATH="${4:-/mnt/geog}"
+# The tarball may extract into a subdirectory (e.g. WPS_GEOG_LOW_RES/);
+# auto-detect if not explicitly provided.
+_resolve_geog_path() {
+    local base="${1}"
+    # If it already looks like a GEOG root (contains landuse data), use it directly.
+    if ls "${base}"/modis_landuse* "${base}"/albedo_* "${base}"/orogwd* 2>/dev/null | grep -q .; then
+        echo "${base}"
+        return
+    fi
+    # Look one level deep for a subdirectory that IS a GEOG root.
+    local sub
+    sub=$(find "${base}" -maxdepth 1 -mindepth 1 -type d | while read -r d; do
+        ls "${d}"/modis_landuse* "${d}"/albedo_* "${d}"/orogwd* 2>/dev/null | grep -q . && echo "${d}" && break
+    done | head -1)
+    if [ -n "${sub}" ]; then
+        echo "${sub}"
+    else
+        echo "${base}"
+    fi
+}
+
+GEOG_PATH="${4:-$(_resolve_geog_path /mnt/geog)}"
 NAMELIST_TEMPLATE="${WPS_DIR}/namelist.wps.PNW"
 LOG_DIR="${WPS_RUN_DIR}/log"
 
@@ -69,12 +91,20 @@ elif [ -f "${GEO_EM_CACHE}/geo_em.d01.nc" ] && [ -f "${GEO_EM_CACHE}/geo_em.d02.
     cp "${GEO_EM_CACHE}"/geo_em.d0*.nc .
 else
     echo "  Running geogrid.exe (one-time static step)..."
-    "${WPS_DIR}/geogrid.exe" >| "${LOG_DIR}/geogrid.log" 2>&1 && \
-        echo "  geogrid.exe: OK ($(ls geo_em.d0*.nc 2>/dev/null | wc -l) domains)" || {
-        echo "ERROR: geogrid.exe failed — see ${LOG_DIR}/geogrid.log"
-        tail -20 "${LOG_DIR}/geogrid.log"
+    echo "  GEOG_PATH = ${GEOG_PATH}"
+    if [ ! -d "${GEOG_PATH}" ]; then
+        echo "ERROR: GEOG_PATH does not exist: ${GEOG_PATH}"
+        echo "  Mount the WPS GEOG static data at /mnt/geog (run setup_geog.sh on the host)"
         exit 1
-    }
+    fi
+    "${WPS_DIR}/geogrid.exe" >| "${LOG_DIR}/geogrid.log" 2>&1
+    GEO_EM_COUNT=$(ls geo_em.d0*.nc 2>/dev/null | wc -l)
+    if [ "${GEO_EM_COUNT}" -eq 0 ]; then
+        echo "ERROR: geogrid.exe ran but produced no geo_em files — see ${LOG_DIR}/geogrid.log"
+        tail -30 "${LOG_DIR}/geogrid.log"
+        exit 1
+    fi
+    echo "  geogrid.exe: OK (${GEO_EM_COUNT} domains)"
     # Save to persistent cache for future container runs
     if [ -w /mnt/wrfout ]; then
         mkdir -p "${GEO_EM_CACHE}"
