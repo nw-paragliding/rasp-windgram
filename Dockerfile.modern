@@ -1,0 +1,347 @@
+# syntax=docker/dockerfile:1
+# =============================================================================
+# RASP Modern Image — native arm64 (Apple Silicon / linux/arm64)
+# =============================================================================
+#
+# Phase 1: eliminates QEMU emulation for WRF (the 5.5h → ~30min win).
+#
+# What this image handles:
+#   - WRF 4.5 (wrf.exe, real.exe, ndown.exe) — compiled natively from source
+#   - wrfsi preprocessing (grib_prep, hinterp, vinterp) — still x86 QEMU via
+#     the legacy image; extprd files are passed in via shared volume
+#
+# What is NOT yet in this image (needs ncl_jack_fortran.so source):
+#   - NCL post-processing (rasp.ncl, windgrams.ncl) — still runs in legacy image
+#   See: model/INSTALL/LIB/NCL/ncl_jack_fortran.so — x86-64 binary, no source
+#
+# Build:
+#   docker build --platform linux/arm64 -f Dockerfile.modern -t rasp-modern .
+#
+# The WRF configure option for aarch64 Linux gfortran may need adjustment.
+# See note in the builder stage below.
+# =============================================================================
+
+# ── Stage 1: build WRF from source ───────────────────────────────────────────
+# No --platform pin here: BuildKit sets TARGETPLATFORM automatically.
+# Build for arm64:  docker buildx build --platform linux/arm64 ...
+# Build for amd64:  docker buildx build --platform linux/amd64 ...
+# Both:             docker buildx build --platform linux/arm64,linux/amd64 ...
+FROM ubuntu:22.04 AS wrf-builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
+RUN apt-get update && apt-get install -y \
+    gfortran \
+    gcc \
+    g++ \
+    cpp \
+    m4 \
+    make \
+    perl \
+    csh \
+    git \
+    wget \
+    python3 \
+    cmake \
+    libnetcdf-dev \
+    libnetcdff-dev \
+    libhdf5-dev \
+    libpng-dev \
+    zlib1g-dev \
+    libjpeg-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# NetCDF: apt puts headers in /usr/include and libs in /usr/lib/<arch>.
+# Symlink /usr as /usr/local/netcdf so WRF configure finds $NETCDF/include and $NETCDF/lib.
+RUN ln -sf /usr /usr/local/netcdf
+ENV NETCDF=/usr/local/netcdf
+
+# HDF5: on ubuntu 22.04 libs land in /usr/lib/<arch>/hdf5/serial/ and headers in
+# /usr/include/hdf5/serial/ — WRF expects $HDF5/lib and $HDF5/include.
+# Also: ubuntu names the HL Fortran lib "libhdf5hl_fortran" (no underscore between hdf5 and hl)
+# but WRF links against -lhdf5_hl_fortran, so we add a symlink to fix the mismatch.
+# This is arch-agnostic via $(gcc -print-multiarch).
+RUN ARCH_TRIPLE=$(gcc -print-multiarch) && \
+    HDF5_LIB=/usr/lib/${ARCH_TRIPLE}/hdf5/serial && \
+    mkdir -p /usr/local/hdf5 && \
+    ln -sf /usr/include/hdf5/serial /usr/local/hdf5/include && \
+    ln -sf ${HDF5_LIB}              /usr/local/hdf5/lib && \
+    ln -sf ${HDF5_LIB}/libhdf5hl_fortran.so \
+           ${HDF5_LIB}/libhdf5_hl_fortran.so && \
+    ln -sf ${HDF5_LIB}/libhdf5hl_fortran.a \
+           ${HDF5_LIB}/libhdf5_hl_fortran.a
+ENV HDF5=/usr/local/hdf5
+
+# ── Jasper (GRIB2 JPEG2000 compression) ──────────────────────────────────────
+# libjasper-dev was removed from ubuntu 22.04 repos. Build from source.
+# WPS links against -ljasper for GRIB2 support (NAM input is GRIB2).
+ARG JASPER_VERSION=2.0.33
+RUN wget -q https://github.com/jasper-software/jasper/releases/download/version-${JASPER_VERSION}/jasper-${JASPER_VERSION}.tar.gz \
+        -O /tmp/jasper.tar.gz && \
+    cd /tmp && tar xzf jasper.tar.gz && cd jasper-${JASPER_VERSION} && \
+    mkdir build_cmake && cd build_cmake && \
+    cmake -DCMAKE_INSTALL_PREFIX=/usr/local \
+          -DJAS_ENABLE_SHARED=ON \
+          -DJAS_ENABLE_LIBJPEG=ON \
+          -DJAS_ENABLE_OPENGL=OFF \
+          -DJAS_ENABLE_DOC=OFF \
+          -DJAS_ENABLE_PROGRAMS=OFF \
+          .. && \
+    make -j4 && make install && \
+    rm -rf /tmp/jasper* && \
+    ldconfig
+ENV JASPER_DIR=/usr/local
+
+# ── WRF 4.5 ──────────────────────────────────────────────────────────────────
+# WRF 4.5 + WPS replaces the wrfsi preprocessing chain entirely.
+# real.exe reads WPS metgrid output (met_em.d01.*) — produced by WPS metgrid.exe.
+ARG WRF_VERSION=v4.5.2
+RUN git clone --depth 1 --branch ${WRF_VERSION} \
+    https://github.com/wrf-model/WRF /build/WRF
+
+WORKDIR /build/WRF
+
+# Configure WRF.
+# Option numbers differ by platform:
+#   aarch64: option 1 = serial GNU gfortran
+#   x86_64:  option 34 = dmpar GNU gfortran
+RUN ARCH=$(uname -m); \
+    if   [ "$ARCH" = "aarch64" ]; then OPT=1;  \
+    elif [ "$ARCH" = "x86_64"  ]; then OPT=34; \
+    else echo "Unknown arch: $ARCH" && exit 1; fi; \
+    printf "${OPT}\n1\n" | ./configure 2>&1 | tee /build/configure.log
+
+# Suppress gfortran 10+ argument mismatch errors in WRF 4.x Fortran code.
+RUN sed -i \
+    -e 's/-ffree-form/-ffree-form -fallow-argument-mismatch -fallow-invalid-boz/g' \
+    -e 's/-ffixed-form/-ffixed-form -fallow-argument-mismatch -fallow-invalid-boz/g' \
+    configure.wrf
+
+RUN ./compile em_real 2>&1 | tee /build/compile.log && \
+    test -f main/wrf.exe   || (echo "ERROR: wrf.exe not built"   && exit 1) && \
+    test -f main/real.exe  || (echo "ERROR: real.exe not built"  && exit 1) && \
+    test -f main/ndown.exe || (echo "ERROR: ndown.exe not built" && exit 1)
+
+# ── WPS 4.5 ──────────────────────────────────────────────────────────────────
+# WPS replaces wrfsi preprocessing: ungrib.exe (← grib_prep), metgrid.exe (← hinterp+vinterp).
+# geogrid.exe processes static geographic data (one-time setup per domain).
+ARG WPS_VERSION=v4.5
+RUN git clone --depth 1 --branch ${WPS_VERSION} \
+    https://github.com/wrf-model/WPS /build/WPS
+
+WORKDIR /build/WPS
+
+# WPS configure requires WRF_DIR to find WRF's configure.wrf and detect compilers.
+# WPS 4.5 configure.defaults has no aarch64 entry. The gfortran flags in the x86_64
+# entry are fully architecture-agnostic, so we spoof uname -m → x86_64 for configure
+# only, letting Config.pl match the existing "Linux x86_64, gfortran" entry.
+# Option 1 = serial gfortran.
+ENV WRF_DIR=/build/WRF
+ENV WPS_NETCDF=/usr/local/netcdf
+ENV WPS_HDF5=/usr/local/hdf5
+ENV JASPER=/usr/local
+ENV JASPERLIB=/usr/local/lib
+ENV JASPERINC=/usr/local/include/jasper
+RUN printf '#!/bin/sh\n[ "$1" = "-m" ] && echo x86_64 || exec /bin/uname "$@"\n' \
+        > /usr/local/bin/uname && chmod +x /usr/local/bin/uname && \
+    printf "1\n" | ./configure 2>&1 | tee /build/wps_configure.log && \
+    rm /usr/local/bin/uname && \
+    grep "SFC\|JASPER\|COMPRESSION" configure.wps
+
+RUN sed -i \
+    -e 's/-ffree-form/-ffree-form -fallow-argument-mismatch -fallow-invalid-boz/g' \
+    -e 's/-ffixed-form/-ffixed-form -fallow-argument-mismatch -fallow-invalid-boz/g' \
+    configure.wps && \
+    # Add -lnetcdff to every -lnetcdf occurrence (but not -lnetcdff itself).
+    # WPS configure.wps sets NETCDF_LIB = -lnetcdf but metgrid/geogrid also link
+    # libwrfio_nf.a which calls the netCDF Fortran API (nf_create_ etc.) from -lnetcdff.
+    sed -i 's/-lnetcdf\b/-lnetcdf -lnetcdff/g' configure.wps && \
+    grep "NETCDF" configure.wps | head -5
+
+RUN ./compile 2>&1 | tee /build/wps_compile.log && \
+    test -f ungrib/src/ungrib.exe  || (echo "ERROR: ungrib.exe not built"  && exit 1) && \
+    test -f metgrid/src/metgrid.exe || (echo "ERROR: metgrid.exe not built" && exit 1) && \
+    test -f geogrid/src/geogrid.exe || (echo "ERROR: geogrid.exe not built" && exit 1)
+
+RUN echo "=== WRF + WPS build OK ===" && \
+    ls -lh /build/WRF/main/wrf.exe /build/WRF/main/real.exe /build/WRF/main/ndown.exe && \
+    ls -lh /build/WPS/ungrib/src/ungrib.exe /build/WPS/metgrid/src/metgrid.exe /build/WPS/geogrid/src/geogrid.exe
+
+# ── Stage 2: runtime image ────────────────────────────────────────────────────
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+ENV BASEDIR=/opt/rasp
+
+# Runtime libs only — no compilers
+RUN apt-get update && apt-get install -y \
+    perl \
+    libproc-background-perl \
+    curl \
+    zip \
+    gzip \
+    rsync \
+    imagemagick \
+    netcdf-bin \
+    cron \
+    locales \
+    # NetCDF runtime (linked by wrf.exe, real.exe)
+    libnetcdf-dev \
+    libnetcdff-dev \
+    libhdf5-dev \
+    libpng-dev \
+    zlib1g-dev \
+    # X11 libs required by NCL renderer (for future NCL migration)
+    libxaw7 \
+    libxmu6 \
+    libxt6 \
+    libsm6 \
+    libice6 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN locale-gen en_US.UTF-8
+ENV LANG=en_US.UTF-8
+
+# Symlink so WRF runtime can find netcdf (same as builder)
+RUN ln -sf /usr /usr/local/netcdf
+ENV NETCDF=/usr/local/netcdf
+
+# ── Copy model/ (wrfsi configs, Perl scripts, RASP scripts) ──────────────────
+# IMPORTANT: model/ contains legacy x86 wrf.exe/real.exe/ndown.exe from the
+# wrfsi era. Copy model/ first, then overwrite WRF/WPS binaries with the
+# freshly-compiled native arm64 versions from the builder stage.
+COPY model/ $BASEDIR/
+COPY docker-run.sh $BASEDIR/docker-run.sh
+RUN chmod +x $BASEDIR/docker-run.sh
+
+# ── Copy WRF binaries from builder (overwrite legacy x86 binaries from model/) ──
+RUN mkdir -p ${BASEDIR}/WRF/WRFV2/main
+COPY --from=wrf-builder /build/WRF/main/wrf.exe   ${BASEDIR}/WRF/WRFV2/main/wrf.exe
+COPY --from=wrf-builder /build/WRF/main/real.exe  ${BASEDIR}/WRF/WRFV2/main/real.exe
+COPY --from=wrf-builder /build/WRF/main/ndown.exe ${BASEDIR}/WRF/WRFV2/main/ndown.exe
+
+# ── Copy WPS binaries from builder ───────────────────────────────────────────
+# WPS replaces wrfsi preprocessing. Binaries go to /opt/rasp/WRF/WPS/
+RUN mkdir -p ${BASEDIR}/WRF/WPS
+COPY --from=wrf-builder /build/WPS/ungrib/src/ungrib.exe   ${BASEDIR}/WRF/WPS/ungrib.exe
+COPY --from=wrf-builder /build/WPS/metgrid/src/metgrid.exe ${BASEDIR}/WRF/WPS/metgrid.exe
+COPY --from=wrf-builder /build/WPS/geogrid/src/geogrid.exe ${BASEDIR}/WRF/WPS/geogrid.exe
+# Copy Vtables (field extraction tables for different model inputs)
+COPY --from=wrf-builder /build/WPS/ungrib/Variable_Tables/ ${BASEDIR}/WRF/WPS/Variable_Tables/
+
+# Restore symlinks that git cannot track
+RUN tar xzf $BASEDIR/all_links.tgz -C $BASEDIR
+
+# ── NCL: install via conda-forge (arm64 native binary) ───────────────────────
+# TODO Phase 1B: this installs NCL for arm64 but ncl_jack_fortran.so still
+# needs to be recompiled from source (DrJack's Fortran source).
+# Until that source is available, NCL post-processing should run in the legacy
+# x86 image. The conda install below is a placeholder for when we have the source.
+#
+# Uncomment when ncl_jack_fortran.so source is available:
+# RUN wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh -O /tmp/miniconda.sh && \
+#     bash /tmp/miniconda.sh -b -p /opt/conda && \
+#     rm /tmp/miniconda.sh
+# ENV PATH=/opt/conda/bin:$PATH
+# RUN conda install -y -c conda-forge ncl && conda clean -afy
+
+# For now, keep the x86 NCL binary available for when this runs under legacy image.
+# The NCARG tarball is x86-only and will not work natively — skip extraction.
+# NCL-dependent stages (rasp.ncl, windgrams.ncl) must run in the legacy container.
+
+# ── Fortran shared libs ───────────────────────────────────────────────────────
+# TODO Phase 1B: compile ncl_jack_fortran.so and wrf_user_fortran_util from source.
+# For now, copy the x86 binaries — they will only work in legacy context.
+RUN mkdir -p $BASEDIR/WRF/NCL/LIB && \
+    cp $BASEDIR/INSTALL/LIB/NCL/ncl_jack_fortran.so \
+       $BASEDIR/INSTALL/LIB/NCL/wrf_user_fortran_util_0-64bit.so \
+       $BASEDIR/WRF/NCL/LIB/
+
+RUN ln -sf LIB/ncl_jack_fortran.so              $BASEDIR/WRF/NCL/ncl_jack_fortran.so && \
+    ln -sf LIB/wrf_user_fortran_util_0-64bit.so $BASEDIR/WRF/NCL/wrf_user_fortran_util_0.so
+
+# ── 32-bit runtime for wrfsi ──────────────────────────────────────────────────
+# NOTE: wrfsi binaries are x86_64 32-bit and require QEMU x86 emulation.
+# On arm64 natively these will not run. They belong in the legacy image.
+# This section is left here for reference only — do not enable on native arm64.
+
+# ── ldconfig ─────────────────────────────────────────────────────────────────
+RUN echo "$BASEDIR/WRF/NCL/LIB" > /etc/ld.so.conf.d/rasp.conf && ldconfig
+
+# ── Symlinks — UTIL ──────────────────────────────────────────────────────────
+RUN ln -sf "$(which zip)"     $BASEDIR/UTIL/zip     && \
+    ln -sf "$(which gzip)"    $BASEDIR/UTIL/gzip    && \
+    printf '#!/bin/sh\nexec /usr/bin/curl -L "$@"\n' > $BASEDIR/UTIL/curl && chmod +x $BASEDIR/UTIL/curl && \
+    ln -sf "$(which convert)" $BASEDIR/UTIL/convert
+
+# ── Symlinks — RASP/RUN/UTIL ─────────────────────────────────────────────────
+RUN mkdir -p $BASEDIR/RASP/RUN/UTIL && \
+    ln -sf $BASEDIR/UTIL/convert $BASEDIR/RASP/RUN/UTIL/convert && \
+    ln -sf $BASEDIR/UTIL/curl    $BASEDIR/RASP/RUN/UTIL/curl    && \
+    ln -sf $BASEDIR/UTIL/zip     $BASEDIR/RASP/RUN/UTIL/zip     && \
+    ln -sf $BASEDIR/UTIL/gzip    $BASEDIR/RASP/RUN/UTIL/gzip
+
+# ── Symlinks — WRF structural ─────────────────────────────────────────────────
+RUN ln -sf $BASEDIR/WRF/wrfsi         $BASEDIR/WRF/WRFSI && \
+    ln -sf $BASEDIR/WRF/wrfsi/domains $BASEDIR/WRF/wrfsi/DOMAINS
+
+RUN find $BASEDIR/WRF/wrfsi/domains -mindepth 1 -maxdepth 1 -type d \
+         -exec mkdir -p {}/siprd {}/log \;
+
+RUN mkdir -p $BASEDIR/RASP/RUN/AVN/GRIB  \
+             $BASEDIR/RASP/RUN/ETA/GRIB  \
+             $BASEDIR/RASP/RUN/GFS/GRIB  \
+             $BASEDIR/RASP/RUN/RUCH/GRIB \
+             $BASEDIR/RASP/RUN/OUT       \
+             $BASEDIR/RASP/HTML          && \
+    ln -sf $BASEDIR/RASP/RUN/AVN/GRIB  $BASEDIR/WRF/wrfsi/GRIB/AVN  && \
+    ln -sf $BASEDIR/RASP/RUN/ETA/GRIB  $BASEDIR/WRF/wrfsi/GRIB/ETA  && \
+    ln -sf $BASEDIR/RASP/RUN/GFS/GRIB  $BASEDIR/WRF/wrfsi/GRIB/GFS  && \
+    ln -sf $BASEDIR/RASP/RUN/RUCH/GRIB $BASEDIR/WRF/wrfsi/GRIB/RUCH
+
+# ── rasp.env ──────────────────────────────────────────────────────────────────
+RUN { echo '#!/bin/bash';                                          \
+      echo '';                                                     \
+      echo "export BASEDIR=$BASEDIR";                             \
+      echo '';                                                     \
+      echo "export NETCDF=$BASEDIR/UTIL/NETCDF";                  \
+      echo "export NCARG_ROOT=$BASEDIR/UTIL/NCARG";               \
+      echo "export NCL_COMMAND=$BASEDIR/UTIL/NCARG/bin/ncl";      \
+      echo 'export PATH=$PATH:'"$BASEDIR/UTIL";                   \
+      echo '';                                                     \
+      echo "export EXT_DATAROOT=$BASEDIR/WRF/wrfsi/extdata";      \
+      echo "export SOURCE_ROOT=$BASEDIR/WRF/wrfsi";               \
+      echo "export INSTALLROOT=$BASEDIR/WRF/wrfsi";               \
+      echo "export GEOG_DATAROOT=$BASEDIR/WRF/wrfsi/extdata/GEOG";\
+      echo "export DATAROOT=$BASEDIR/WRF/wrfsi/domains";          \
+    } > $BASEDIR/rasp.env && \
+    chmod +x $BASEDIR/rasp.env $BASEDIR/RASP/RUN/run.rasp
+
+# ── Fix [BASEDIR] placeholders ────────────────────────────────────────────────
+RUN find $BASEDIR/WXTOFLY -type f | xargs grep -rl '\[BASEDIR\]' 2>/dev/null | \
+        xargs -r sed -i "s|\[BASEDIR\]|$BASEDIR|g" ; \
+    find $BASEDIR/WRF/wrfsi -type f | xargs grep -rl '\[BASEDIR\]' 2>/dev/null | \
+        xargs -r sed -i "s|\[BASEDIR\]|$BASEDIR|g"
+
+# ── Permissions ───────────────────────────────────────────────────────────────
+RUN find $BASEDIR/WXTOFLY -type f -name "*.sh" -exec chmod +x {} \; && \
+    find $BASEDIR           -type f -name "*.pl"  -exec chmod +x {} \; && \
+    find $BASEDIR           -type f -name "*.PL"  -exec chmod +x {} \; && \
+    find $BASEDIR/WRF/wrfsi/bin  -type f              -exec chmod +x {} \; && \
+    find $BASEDIR/WRF/WRFV2/main -type f              -exec chmod +x {} \; && \
+    find $BASEDIR/WRF/WRFV2/RASP -type f -name "*.exe" -exec chmod +x {} \; && \
+    find $BASEDIR/UTIL            -maxdepth 1 -type f  -exec chmod +x {} \; && \
+    chmod +x $BASEDIR/RASP/RUN/run.rasp \
+             $BASEDIR/RASP/RUN/run.rasp2 \
+             $BASEDIR/RASP/RUN/LOCAL/results_output.hook && \
+    find $BASEDIR/RASP/RUN/UTIL -type f -exec chmod +x {} \;
+
+# ── Runtime environment ───────────────────────────────────────────────────────
+ENV PERL5LIB=/opt/rasp/RASP/RUN
+ENV NCARG_ROOT=$BASEDIR/UTIL/NCARG
+ENV PATH=$BASEDIR/UTIL:$PATH
+
+WORKDIR $BASEDIR
+CMD ["/bin/bash"]
