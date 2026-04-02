@@ -4,7 +4,9 @@
 #
 # Volume mounts:
 #   /mnt/grib            — NAM GRIB2 files (read-only)
-#   /mnt/wrfout          — persistent cache: wrfout/ and extprd/ subdirs (read-write)
+#   /mnt/wrfout          — persistent cache: wrfout/, extprd/, geo_em/ subdirs (read-write)
+#   /mnt/geog            — WPS GEOG static data (read-only); download once with setup_geog.sh
+#                          e.g. docker run ... -v $HOME/rasp-data/wps-geog:/mnt/geog:ro
 #   /opt/rasp/WXTOFLY/WINDGRAMS/OUT — PNG output destination
 #
 # Stage 1 acceleration tiers (checked in order):
@@ -15,6 +17,13 @@
 #   Tier C: no pre-computed data
 #           → full Stage 1: grib_prep + WRF (~6h)
 #           → saves wrfout + extprd to /mnt/wrfout/ for future Tier A runs
+#
+# NOTE (Phase 2 — WPS migration):
+#   Once WPS replaces wrfsi preprocessing, Stage 1 Tier C will call run_wps.sh
+#   instead of grib_prep.pl. run_wps.sh reads GRIB files from /mnt/grib and
+#   writes met_em.d0*.nc files used by real.exe. The /mnt/geog volume and
+#   /mnt/wrfout/geo_em/ cache support that. For now the legacy wrfsi path is
+#   still active. See: modernization_plan.md Phase 2.
 
 set -e
 

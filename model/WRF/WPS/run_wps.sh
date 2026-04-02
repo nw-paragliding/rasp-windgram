@@ -29,7 +29,9 @@ END_DATE="${3:?Missing end_date (YYYY-MM-DD_HH)}"
 BASEDIR="${BASEDIR:-/opt/rasp}"
 WPS_DIR="${WPS_DIR:-${BASEDIR}/WRF/WPS}"
 WPS_RUN_DIR="${WPS_RUN_DIR:-${WPS_DIR}}"
-GEOG_PATH="${4:-${WPS_DIR}/geog}"
+# /mnt/geog is volume-mounted from $HOME/rasp-data/wps-geog on the host.
+# Download once with setup_geog.sh; never baked into the image.
+GEOG_PATH="${4:-/mnt/geog}"
 NAMELIST_TEMPLATE="${WPS_DIR}/namelist.wps.PNW"
 LOG_DIR="${WPS_RUN_DIR}/log"
 
@@ -55,16 +57,30 @@ sed -e "s|__START_DATE__|${START_NL}|g" \
 echo "  namelist.wps written (start=${START_NL}, end=${END_NL})"
 
 # ── 2. geogrid — run once; skip if geo_em files already exist ────────────────
+# geo_em files are static (depend only on domain config, not forecast date).
+# Cache them in /mnt/wrfout/geo_em/ so geogrid only runs once even across
+# container restarts. On first run they're computed and saved; after that restored.
+GEO_EM_CACHE="/mnt/wrfout/geo_em"
+
 if [ -f "geo_em.d01.nc" ] && [ -f "geo_em.d02.nc" ]; then
-    echo "  geogrid: geo_em files already exist — skipping"
+    echo "  geogrid: geo_em files in WPS run dir — skipping"
+elif [ -f "${GEO_EM_CACHE}/geo_em.d01.nc" ] && [ -f "${GEO_EM_CACHE}/geo_em.d02.nc" ]; then
+    echo "  geogrid: restoring cached geo_em files from ${GEO_EM_CACHE}"
+    cp "${GEO_EM_CACHE}"/geo_em.d0*.nc .
 else
-    echo "  Running geogrid.exe..."
+    echo "  Running geogrid.exe (one-time static step)..."
     "${WPS_DIR}/geogrid.exe" >| "${LOG_DIR}/geogrid.log" 2>&1 && \
         echo "  geogrid.exe: OK ($(ls geo_em.d0*.nc 2>/dev/null | wc -l) domains)" || {
         echo "ERROR: geogrid.exe failed — see ${LOG_DIR}/geogrid.log"
         tail -20 "${LOG_DIR}/geogrid.log"
         exit 1
     }
+    # Save to persistent cache for future container runs
+    if [ -w /mnt/wrfout ]; then
+        mkdir -p "${GEO_EM_CACHE}"
+        cp geo_em.d0*.nc "${GEO_EM_CACHE}/"
+        echo "  geo_em files cached to ${GEO_EM_CACHE}"
+    fi
 fi
 
 # ── 3. ungrib — link GRIB files and extract fields ───────────────────────────

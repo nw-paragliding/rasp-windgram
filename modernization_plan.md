@@ -196,7 +196,15 @@ the full pipeline natively.
   parameters, but verify that `TRUELAT1`, `TRUELAT2`, `STAND_LON`, `REF_LAT`,
   `REF_LON` map correctly between wrfsi's `wrfsi.nl` and WPS's `namelist.wps`
 - **GEOG data**: wrfsi uses its own static geographic dataset. WPS GEOG data
-  is available from NCAR but is a separate ~50GB download. The domains are
+  is available from NCAR. **Current approach**: use mandatory low/medium
+  resolution package (~3 GB, ~8 GB unpacked) via `setup_geog.sh`, mounted as
+  `/mnt/geog` volume. `geo_em.d0*.nc` output cached in `/mnt/wrfout/geo_em/`
+  so geogrid.exe runs only once. **Future improvement**: for better forecast
+  quality (higher-res terrain/land-use), replace with 30-arcsecond datasets or
+  domain-specific tile downloads. Also consider baking the PNW tiles into the
+  image once domains are stable (eliminates the volume mount, faster cold starts).
+  See: Phase 3 / productionization notes below.
+  The domains are
   already defined so only the relevant tiles are needed.
 - **rasp.pl orchestration**: `rasp.pl` has deep wrfsi assumptions (directory
   structure, file naming, log parsing). Either patch rasp.pl or write a WPS
@@ -308,4 +316,40 @@ COPY model/ /opt/rasp/
 | `model/INSTALL/LIB/NCL/ncl_jack_fortran.so` | Pre-compiled Fortran lib (recompile for arm64) |
 | `model/RASP/RUN/rasp.pl` | Pipeline orchestrator (wrfsi-specific, needs WPS wrapper in Ph2) |
 | `Dockerfile` | Current ubuntu:18.04 x86 image |
+| `Dockerfile.modern` | New arm64 image: WRF 4.5.2 + WPS 4.5 (Phase 1/2) |
 | `docker_run_notes.md` | Session notes: what worked, timings, issues encountered |
+| `setup_geog.sh` | One-time GEOG download to `$HOME/rasp-data/wps-geog` |
+| `model/WRF/WPS/namelist.wps.PNW` | WPS namelist template (dates/geog_path filled at runtime) |
+| `model/WRF/WPS/run_wps.sh` | Runs ungrib+geogrid+metgrid for a forecast cycle |
+
+---
+
+## Phase 3 — Productionization and Forecast Quality
+
+These are deferred until Phase 2 WPS migration is working end-to-end.
+
+### GEOG data resolution
+- **Current**: mandatory low/medium resolution package, mounted as `/mnt/geog` volume
+- **Improvement**: download 30-arcsecond terrain (`topo_30s`), 30-arcsecond land use
+  (`modis_landuse_20class_30s`), and 30-arcsecond soil type for PNW domain bounds only
+  — roughly 1/5th the size, much higher quality for soaring terrain
+- **Productionization**: once domains are stable, bake the PNW-only GEOG tiles directly
+  into the image (eliminates the volume mount, avoids a cold-start download step)
+
+### GEOG tile bounds for PNW domain
+Approximate bounding box to subset the full GEOG datasets:
+- Lat: 40°N – 54°N
+- Lon: 133°W – 110°W
+The `geogrid.exe` already subsets by domain; downloading the full global dataset is
+just wasteful at build time. NCAR provides per-tile downloads for most high-res datasets.
+
+### Vtable selection
+- Current: `Vtable.NAMb` (NAM GRIB2 on pressure levels — awip3d files)
+- If switching to NAM on native eta/sigma levels (awip3d1 files): use `Vtable.NAM`
+- Pressure-level input works fine for RASP use; eta-level may give slightly better
+  initial conditions for planetary boundary layer fields
+
+### Colima / container runtime
+- Current: single `rasp-modern` container on `colima default` (arm64 native)
+- Future: consider running on a cloud arm64 instance for fully headless daily runs
+  (AWS Graviton, Hetzner ARM) to eliminate the Mac dependency entirely
