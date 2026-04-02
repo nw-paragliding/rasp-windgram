@@ -222,14 +222,24 @@ COPY --from=wrf-builder /build/WRF/main/wrf.exe   ${BASEDIR}/WRF/WRFV2/main/wrf.
 COPY --from=wrf-builder /build/WRF/main/real.exe  ${BASEDIR}/WRF/WRFV2/main/real.exe
 COPY --from=wrf-builder /build/WRF/main/ndown.exe ${BASEDIR}/WRF/WRFV2/main/ndown.exe
 
-# ── Copy WPS binaries from builder ───────────────────────────────────────────
-# WPS replaces wrfsi preprocessing. Binaries go to /opt/rasp/WRF/WPS/
-RUN mkdir -p ${BASEDIR}/WRF/WPS
-COPY --from=wrf-builder /build/WPS/ungrib/src/ungrib.exe   ${BASEDIR}/WRF/WPS/ungrib.exe
-COPY --from=wrf-builder /build/WPS/metgrid/src/metgrid.exe ${BASEDIR}/WRF/WPS/metgrid.exe
-COPY --from=wrf-builder /build/WPS/geogrid/src/geogrid.exe ${BASEDIR}/WRF/WPS/geogrid.exe
+# ── Copy WPS binaries + support files from builder ───────────────────────────
+# WPS executables look for TBL files in ./geogrid/ and ./metgrid/ relative to CWD.
+# link_grib.csh is used to symlink GRIB files for ungrib.exe.
+RUN mkdir -p ${BASEDIR}/WRF/WPS/geogrid \
+             ${BASEDIR}/WRF/WPS/metgrid
+COPY --from=wrf-builder /build/WPS/ungrib/src/ungrib.exe        ${BASEDIR}/WRF/WPS/ungrib.exe
+COPY --from=wrf-builder /build/WPS/metgrid/src/metgrid.exe      ${BASEDIR}/WRF/WPS/metgrid.exe
+COPY --from=wrf-builder /build/WPS/geogrid/src/geogrid.exe      ${BASEDIR}/WRF/WPS/geogrid.exe
+COPY --from=wrf-builder /build/WPS/link_grib.csh                ${BASEDIR}/WRF/WPS/link_grib.csh
+# TBL files: executables search for these relative to namelist.wps location
+COPY --from=wrf-builder /build/WPS/geogrid/GEOGRID.TBL.ARW      ${BASEDIR}/WRF/WPS/geogrid/GEOGRID.TBL
+COPY --from=wrf-builder /build/WPS/metgrid/METGRID.TBL.ARW      ${BASEDIR}/WRF/WPS/metgrid/METGRID.TBL
 # Copy Vtables (field extraction tables for different model inputs)
-COPY --from=wrf-builder /build/WPS/ungrib/Variable_Tables/ ${BASEDIR}/WRF/WPS/Variable_Tables/
+COPY --from=wrf-builder /build/WPS/ungrib/Variable_Tables/       ${BASEDIR}/WRF/WPS/Variable_Tables/
+RUN chmod +x ${BASEDIR}/WRF/WPS/ungrib.exe \
+             ${BASEDIR}/WRF/WPS/metgrid.exe \
+             ${BASEDIR}/WRF/WPS/geogrid.exe \
+             ${BASEDIR}/WRF/WPS/link_grib.csh
 
 # Restore symlinks that git cannot track
 RUN tar xzf $BASEDIR/all_links.tgz -C $BASEDIR
