@@ -29,7 +29,6 @@ from matplotlib.colors import ListedColormap, BoundaryNorm
 from matplotlib.path import Path
 from matplotlib.markers import MarkerStyle
 from pathlib import Path as FilePath
-from scipy.interpolate import griddata
 
 
 # ---------------------------------------------------------------------------
@@ -195,7 +194,8 @@ def _extract_site_data(wrfout_path, lat, lon):
 
 
 def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
-                    p_top_mb=620.0, utc_offset=-7, dpi=100):
+                    p_top_mb=None, headroom_ft=4000, utc_offset=-7,
+                    start_hour=8, dpi=100):
     """Render a windgram PNG for a single site.
 
     Args:
@@ -203,8 +203,10 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
         lat, lon:    site latitude and longitude
         site_name:   name for the output file and title
         output_dir:  directory to write PNG to
-        p_top_mb:    top of chart in millibars (default 620)
+        p_top_mb:    top of chart in millibars (None = auto from max PBL + headroom)
+        headroom_ft: feet above max PBL top for chart ceiling (default 4000)
         utc_offset:  hours to add to UTC for local time labels (default -7 PDT)
+        start_hour:  earliest local hour to show (default 8, skips pre-dawn)
         dpi:         output resolution
 
     Returns:
@@ -212,8 +214,37 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     """
     d = _extract_site_data(wrfout_path, lat, lon)
 
+    # Filter to local hours >= start_hour (skip pre-dawn)
+    local_all = (d["hours_utc"] + utc_offset) % 24
+    keep = local_all >= start_hour
+    if not np.any(keep):
+        keep = np.ones(len(local_all), dtype=bool)  # fallback: keep all
+
+    # Slice all time-dependent arrays
+    for key in ["ptot", "p_mid", "z_ft", "tk", "tc", "td", "rh",
+                "u_kts", "v_kts", "lapse", "wstar", "hglider_p",
+                "pbl_p", "freeze_p", "sfc_p", "hours_utc", "time_strings"]:
+        val = d[key]
+        if isinstance(val, np.ndarray) and val.shape[0] == d["ntimes"]:
+            d[key] = val[keep]
+        elif isinstance(val, list) and len(val) == d["ntimes"]:
+            d[key] = [v for v, k in zip(val, keep) if k]
+    d["ntimes"] = int(np.sum(keep))
+
     ntimes = d["ntimes"]
     ptot = d["ptot"]
+
+    # Auto-compute chart ceiling from max PBL height + headroom
+    if p_top_mb is None:
+        max_pbl_p = np.min(d["pbl_p"])  # lowest pressure = highest PBL
+        # Convert headroom from feet to pressure delta
+        headroom_p = headroom_ft / 32.0
+        p_top_mb = max_pbl_p - headroom_p
+        # Clamp to reasonable range (don't go above ~500mb / ~18,000ft)
+        p_top_mb = max(p_top_mb, 500.0)
+        # Round to nearest 10mb
+        p_top_mb = round(p_top_mb / 10) * 10
+
     ptop_idx = max(np.searchsorted(-ptot[0, :], -p_top_mb), 10)
     taus = np.arange(ntimes)
 
@@ -232,21 +263,12 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     cmap = ListedColormap(LAPSE_COLORS)
     norm = BoundaryNorm(LAPSE_LEVELS, cmap.N)
 
-    # Interpolate lapse rate onto a fine grid for smooth contours
-    p_fine = np.linspace(ptot[0, 0], p_top_mb, 200)
-    t_fine = np.linspace(0, ntimes - 1, ntimes * 4)
-    T_grid, P_grid = np.meshgrid(t_fine, p_fine)
+    # Use fixed pressure levels (from first time step) as Y axis for the
+    # regular 2D grid. This avoids scattered griddata interpolation artifacts.
+    p_levels_mid = d["p_mid"][0, :ptop_idx - 1]  # midpoint pressures
+    lapse_grid = d["lapse"][:, :ptop_idx - 1].T  # (levels, time)
 
-    pts, vals = [], []
-    for t in range(ntimes):
-        for k in range(min(ptop_idx - 1, d["lapse"].shape[1])):
-            pts.append([taus[t], d["p_mid"][t, k]])
-            vals.append(d["lapse"][t, k])
-
-    lapse_interp = griddata(np.array(pts), np.array(vals),
-                            (T_grid, P_grid), method="linear")
-    lapse_interp = np.where(np.isnan(lapse_interp), 0, lapse_interp)
-    ax.contourf(t_fine, p_fine, lapse_interp,
+    ax.contourf(taus, p_levels_mid, lapse_grid,
                 levels=LAPSE_LEVELS, colors=LAPSE_COLORS, extend="both")
 
     # --- Condensation cross-hatching (RH > 94% per TJ's docs) ---
@@ -272,18 +294,10 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     # --- Temperature contour lines (isotherms in F) ---
     tc = d["tc"]
     tc_f = tc * 9.0/5.0 + 32  # convert to Fahrenheit
-    # Interpolate temperature onto fine grid
-    tc_pts, tc_vals = [], []
-    for t in range(ntimes):
-        for k in range(min(ptop_idx, tc.shape[1])):
-            tc_pts.append([taus[t], ptot[t, k]])
-            tc_vals.append(tc_f[t, k])
-    tc_interp = griddata(np.array(tc_pts), np.array(tc_vals),
-                         (T_grid, P_grid), method="linear")
-    tc_interp = np.where(np.isnan(tc_interp), 0, tc_interp)
-    # Draw isotherms every 10F
+    p_levels_full = ptot[0, :ptop_idx]
+    tc_grid = tc_f[:, :ptop_idx].T  # (levels, time)
     temp_levels = np.arange(-40, 120, 10)
-    cs = ax.contour(t_fine, p_fine, tc_interp, levels=temp_levels,
+    cs = ax.contour(taus, p_levels_full, tc_grid, levels=temp_levels,
                     colors="white", linewidths=0.4, alpha=0.5)
     ax.clabel(cs, inline=True, fontsize=6, fmt="%d\u00b0F",
               colors="white")
@@ -294,10 +308,10 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
         for k in range(ptop_idx):
             if ptot[t, k] < p_top_mb:
                 break
-            c = "green" if wspeed[t, k] < 9 else "white"
+            c = "limegreen" if wspeed[t, k] < 9 else "white"
             ax.barbs(taus[t], ptot[t, k],
                      d["u_kts"][t, k], d["v_kts"][t, k],
-                     length=5, linewidth=0.5, color=c,
+                     length=6, linewidth=0.6, color=c,
                      barb_increments=dict(half=5, full=10, flag=50))
 
     # --- PBL top line ---
@@ -329,24 +343,37 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
                 fontsize=7, color="yellow", fontweight="bold")
 
     # --- Axis formatting ---
-    ax.set_ylim(ptot[0, 0] + 5, p_top_mb)
-    ax.set_xlim(-0.5, ntimes - 0.5)
+    ax.set_ylim(ptot[0, 0], p_top_mb)
+    ax.set_xlim(0, ntimes - 1)
+    ax.margins(0)
     ax.set_xticks(taus)
-    ax.set_xticklabels([str(h) for h in l12], fontsize=8, color="white")
-    ax.set_xlabel("Time (local)", color="white", fontsize=10)
-    ax.set_ylabel("Pressure (mb)", color="white", fontsize=10)
-    ax.tick_params(colors="white", labelsize=8)
+    ax.set_xticklabels([str(h) for h in l12], fontsize=11, color="white")
+    ax.set_xlabel("Time", color="white", fontsize=11)
 
-    # Right Y axis: altitude (feet ASL)
+    # Left Y axis: pressure at round values (mb)
+    p_round = np.array([950, 900, 850, 800, 750, 700, 650])
+    p_ylim = ax.get_ylim()
+    p_valid = (p_round >= min(p_ylim)) & (p_round <= max(p_ylim))
+    ax.set_yticks(p_round[p_valid])
+    ax.set_yticklabels([f"{int(p)}mb" for p in p_round[p_valid]],
+                       fontsize=10, color="white")
+    ax.set_ylabel("Pressure (mb)", color="white", fontsize=11)
+    ax.tick_params(colors="white", labelsize=10)
+
+    # Right Y axis: altitude at round values (feet ASL)
     ax2 = ax.twinx()
     ax2.set_ylim(ax.get_ylim())
-    ft_vals = np.arange(0, 18001, 2000)
-    p_ft = d["sfc_p"][0] - ft_vals / 32.0
-    valid_ft = (p_ft > p_top_mb) & (p_ft < ptot[0, 0] + 5)
-    ax2.set_yticks(p_ft[valid_ft])
-    ax2.set_yticklabels([f"{int(f + d['ter_ft'])}'" for f in ft_vals[valid_ft]],
-                        fontsize=8, color="white")
-    ax2.tick_params(colors="white")
+    # Round altitude ticks: every 1000ft from nearest 1000 above terrain
+    ter_ft = d["ter_ft"]
+    first_tick = int(np.ceil(ter_ft / 1000) * 1000)
+    ft_asl = np.arange(first_tick, 18001, 1000)
+    # Convert feet ASL to pressure using surface reference
+    p_for_ft = d["sfc_p"][0] - (ft_asl - ter_ft) / 32.0
+    valid_ft = (p_for_ft >= min(p_ylim)) & (p_for_ft <= max(p_ylim))
+    ax2.set_yticks(p_for_ft[valid_ft])
+    ax2.set_yticklabels([f"{int(f)}'" for f in ft_asl[valid_ft]],
+                        fontsize=10, color="white")
+    ax2.tick_params(colors="white", labelsize=10)
 
     # Title
     date_str = d["time_strings"][0][:10]
