@@ -32,19 +32,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && locale-gen en_US.UTF-8
 ENV LANG=en_US.UTF-8
 
-# Python packages for windgram rendering
-RUN pip3 install --no-cache-dir numpy && \
-    pip3 install --no-cache-dir --no-deps wrf-python && \
-    pip3 install --no-cache-dir \
-    netCDF4 \
-    matplotlib \
-    scipy \
-    pyyaml \
-    xarray
+# ── Install rasp-windgram Python package ────────────────────────────────────
+COPY pyproject.toml ${BASEDIR}/pyproject.toml
+COPY rasp/ ${BASEDIR}/rasp/
+RUN pip3 install --no-cache-dir ${BASEDIR}/[all]
 
 # ── RASP application code ───────────────────────────────────────────────────
-# These layers change frequently — kept at the end for fast rebuilds.
-
 # WRF/WPS support scripts
 COPY model/WRF/WPS/run_wps.sh       ${BASEDIR}/WRF/WPS/run_wps.sh
 COPY model/WRF/WPS/run_real_wrf.sh  ${BASEDIR}/WRF/WPS/run_real_wrf.sh
@@ -69,8 +62,6 @@ RUN mkdir -p ${BASEDIR}/WRF/WPS/geogrid ${BASEDIR}/WRF/WPS/metgrid && \
     ln -sf /opt/wrf/wps/link_grib.csh       ${BASEDIR}/WRF/WPS/link_grib.csh && \
     ln -sf /opt/wrf/wps/Variable_Tables     ${BASEDIR}/WRF/WPS/Variable_Tables
 
-# Python package
-COPY rasp/ ${BASEDIR}/rasp/
 COPY examples/ ${BASEDIR}/examples/
 COPY VERSION ${BASEDIR}/VERSION
 
