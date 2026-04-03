@@ -29,8 +29,11 @@ WRF_RUN_DIR="${WRF_RUN_DIR:-${BASEDIR}/WRF/WRFV2/RASP/PNW}"
 WPS_DIR="${BASEDIR}/WRF/WPS"
 NL_TEMPLATE="${WPS_DIR}/namelist.input.PNW"
 LOG_DIR="${WRF_RUN_DIR}/log"
+# Also save logs to /mnt/wrfout/logs/ so they survive container exit (--rm)
+PERSIST_LOG_DIR="/mnt/wrfout/logs"
 
 mkdir -p "${WRF_RUN_DIR}" "${LOG_DIR}"
+[ -w /mnt/wrfout ] && mkdir -p "${PERSIST_LOG_DIR}"
 cd "${WRF_RUN_DIR}"
 
 echo "=== real.exe + wrf.exe run ==="
@@ -109,6 +112,7 @@ echo "  met_em files linked: ${MET_COUNT}"
 # ── Run real.exe ─────────────────────────────────────────────────────────────
 echo "  Running real.exe..."
 ./real.exe >| "${LOG_DIR}/real.log" 2>&1
+[ -w /mnt/wrfout ] && cp "${LOG_DIR}/real.log" "${PERSIST_LOG_DIR}/real.log"
 if [ -f "wrfinput_d01" ] && [ -f "wrfbdy_d01" ]; then
     echo "  real.exe: OK — wrfinput_d01 ($(du -sh wrfinput_d01 | cut -f1)), wrfbdy_d01 ($(du -sh wrfbdy_d01 | cut -f1))"
 else
@@ -130,6 +134,8 @@ while kill -0 "${WRF_PID}" 2>/dev/null; do
     echo "  wrf.exe: ${WRFOUT_COUNT} wrfout files, last timestep: ${LAST_TIME}"
     sleep 60
 done
+
+[ -w /mnt/wrfout ] && cp "${LOG_DIR}/wrf.log" "${PERSIST_LOG_DIR}/wrf.log"
 
 if ls wrfout_d01_* 2>/dev/null | grep -q .; then
     WRFOUT_COUNT=$(ls wrfout_d01_* | wc -l)
