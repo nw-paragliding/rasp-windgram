@@ -246,6 +246,8 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
         p_top_mb = round(p_top_mb / 10) * 10
 
     ptop_idx = max(np.searchsorted(-ptot[0, :], -p_top_mb), 10)
+    # Actual top pressure from data (last midpoint level with lapse data)
+    p_top_actual = 0.5 * (ptot[0, ptop_idx - 2] + ptot[0, ptop_idx - 1])
     taus = np.arange(ntimes)
 
     # Local time labels (12-hour)
@@ -263,19 +265,27 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     cmap = ListedColormap(LAPSE_COLORS)
     norm = BoundaryNorm(LAPSE_LEVELS, cmap.N)
 
-    # Use fixed pressure levels (from first time step) as Y axis for the
-    # regular 2D grid. This avoids scattered griddata interpolation artifacts.
-    p_levels_mid = d["p_mid"][0, :ptop_idx - 1]  # midpoint pressures
-    lapse_grid = d["lapse"][:, :ptop_idx - 1].T  # (levels, time)
+    # Use fixed pressure levels (from first time step) as Y axis.
+    # Interpolate along time axis only (4x oversampling) for smooth
+    # horizontal transitions without vertical waviness.
+    from scipy.interpolate import interp1d
+    p_levels_mid = d["p_mid"][0, :ptop_idx - 1]
+    lapse_raw = d["lapse"][:, :ptop_idx - 1].T  # (levels, time)
+    t_fine = np.linspace(0, ntimes - 1, ntimes * 4)
+    lapse_smooth = np.zeros((lapse_raw.shape[0], len(t_fine)))
+    for k in range(lapse_raw.shape[0]):
+        f = interp1d(taus, lapse_raw[k, :], kind="cubic",
+                     bounds_error=False, fill_value="extrapolate")
+        lapse_smooth[k, :] = f(t_fine)
 
-    ax.contourf(taus, p_levels_mid, lapse_grid,
+    ax.contourf(t_fine, p_levels_mid, lapse_smooth,
                 levels=LAPSE_LEVELS, colors=LAPSE_COLORS, extend="both")
 
     # --- Condensation cross-hatching (RH > 94% per TJ's docs) ---
     rh = d["rh"]
     for t in range(ntimes):
         for k in range(ptop_idx):
-            if ptot[t, k] < p_top_mb:
+            if ptot[t, k] < p_top_actual:
                 break
             if rh[t, k] > 94:
                 ax.plot(taus[t], ptot[t, k], "x", color="white",
@@ -284,7 +294,7 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     # --- Cloud markers (RH > 99%) ---
     for t in range(ntimes):
         for k in range(ptop_idx):
-            if ptot[t, k] < p_top_mb:
+            if ptot[t, k] < p_top_actual:
                 break
             if rh[t, k] > 99:
                 ax.text(taus[t], ptot[t, k], "\u2601", fontsize=8,
@@ -295,31 +305,35 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     tc = d["tc"]
     tc_f = tc * 9.0/5.0 + 32  # convert to Fahrenheit
     p_levels_full = ptot[0, :ptop_idx]
-    tc_grid = tc_f[:, :ptop_idx].T  # (levels, time)
+    tc_raw = tc_f[:, :ptop_idx].T  # (levels, time)
+    tc_smooth = np.zeros((tc_raw.shape[0], len(t_fine)))
+    for k in range(tc_raw.shape[0]):
+        f = interp1d(taus, tc_raw[k, :], kind="cubic",
+                     bounds_error=False, fill_value="extrapolate")
+        tc_smooth[k, :] = f(t_fine)
     temp_levels = np.arange(-40, 120, 10)
-    cs = ax.contour(taus, p_levels_full, tc_grid, levels=temp_levels,
-                    colors="white", linewidths=0.4, alpha=0.5)
-    ax.clabel(cs, inline=True, fontsize=6, fmt="%d\u00b0F",
+    cs = ax.contour(t_fine, p_levels_full, tc_smooth, levels=temp_levels,
+                    colors="white", linewidths=0.8, alpha=0.7)
+    ax.clabel(cs, inline=True, fontsize=8, fmt="%d\u00b0F",
               colors="white")
 
     # --- Wind barbs (green < 9kts, white >= 9kts per TJ's docs) ---
     wspeed = np.sqrt(d["u_kts"]**2 + d["v_kts"]**2)
     for t in range(ntimes):
         for k in range(ptop_idx):
-            if ptot[t, k] < p_top_mb:
+            if ptot[t, k] < p_top_actual:
                 break
-            c = "limegreen" if wspeed[t, k] < 9 else "white"
+            c = "#00ff55" if wspeed[t, k] < 9 else "white"
             ax.barbs(taus[t], ptot[t, k],
                      d["u_kts"][t, k], d["v_kts"][t, k],
                      length=6, linewidth=0.6, color=c,
                      barb_increments=dict(half=5, full=10, flag=50))
 
-    # --- PBL top line ---
-    ax.plot(taus, d["pbl_p"], color="cyan", linewidth=2.5, alpha=0.9)
+    # PBL top: not drawn — the paraglider markers already show usable ceiling
 
     # --- Freezing level with snowflakes ---
     freeze = d["freeze_p"]
-    valid_f = ~np.isnan(freeze) & (freeze > p_top_mb)
+    valid_f = ~np.isnan(freeze) & (freeze > p_top_actual)
     if np.any(valid_f):
         ax.plot(taus[valid_f], freeze[valid_f], "--",
                 color="lightblue", linewidth=1, alpha=0.5)
@@ -331,19 +345,22 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
 
     # --- Paraglider wing markers (soaring ceiling) ---
     hglider_p = d["hglider_p"]
-    valid_h = hglider_p > p_top_mb
+    valid_h = hglider_p > p_top_actual
     ax.scatter(taus[valid_h], hglider_p[valid_h], s=400, color="blue",
                marker=WING_MARKER, zorder=5, edgecolors="darkblue",
                linewidths=0.8)
 
-    # --- w* labels at top ---
+    # --- w* labels at top (inside chart) ---
     for t in range(ntimes):
         txt = f"{d['wstar'][t]:.1f}" if d["wstar"][t] > 0.1 else ""
-        ax.text(taus[t], p_top_mb + 3, txt, ha="center", va="top",
-                fontsize=7, color="yellow", fontweight="bold")
+        ax.text(taus[t], p_top_actual + 2, txt, ha="center", va="top",
+                fontsize=8, color="yellow", fontweight="bold")
 
     # --- Axis formatting ---
-    ax.set_ylim(ptot[0, 0], p_top_mb)
+    # Set Y limits to actual data extent (avoids lavender gaps)
+    p_bottom = ptot[0, 0]
+    p_top_actual = p_levels_mid[-1]  # last pressure level with lapse data
+    ax.set_ylim(p_bottom, p_top_actual)
     ax.set_xlim(0, ntimes - 1)
     ax.margins(0)
     ax.set_xticks(taus)
@@ -363,25 +380,24 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     # Right Y axis: altitude at round values (feet ASL)
     ax2 = ax.twinx()
     ax2.set_ylim(ax.get_ylim())
-    # Round altitude ticks: every 1000ft from nearest 1000 above terrain
+    # Round altitude ticks: terrain elevation + every 1000ft above
     ter_ft = d["ter_ft"]
     first_tick = int(np.ceil(ter_ft / 1000) * 1000)
     ft_asl = np.arange(first_tick, 18001, 1000)
     # Convert feet ASL to pressure using surface reference
     p_for_ft = d["sfc_p"][0] - (ft_asl - ter_ft) / 32.0
     valid_ft = (p_for_ft >= min(p_ylim)) & (p_for_ft <= max(p_ylim))
-    ax2.set_yticks(p_for_ft[valid_ft])
-    ax2.set_yticklabels([f"{int(f)}'" for f in ft_asl[valid_ft]],
-                        fontsize=10, color="white")
+    # Add terrain as the bottom tick
+    ticks = np.concatenate([[d["sfc_p"][0]], p_for_ft[valid_ft]])
+    labels = [f"{int(ter_ft)}' GND"] + [f"{int(f)}'" for f in ft_asl[valid_ft]]
+    ax2.set_yticks(ticks)
+    ax2.set_yticklabels(labels, fontsize=10, color="white")
     ax2.tick_params(colors="white", labelsize=10)
 
     # Title
     date_str = d["time_strings"][0][:10]
-    ax.set_title(
-        f"{date_str} / {site_name}\n"
-        f"Base: {int(d['ter_ft'])}ft  |  w*(m/s) along top",
-        color="white", fontsize=11, fontweight="bold",
-    )
+    ax.set_title(f"{date_str} / {site_name}",
+                 color="white", fontsize=12, fontweight="bold")
 
     # --- Save ---
     output_dir = FilePath(output_dir)
