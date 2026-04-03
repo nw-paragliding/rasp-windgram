@@ -75,7 +75,8 @@ def calc_hcrit(wstar, ter, pblh):
         hcrit (m ASL), 2D
     """
     sink_rate = 1.14  # m/s — 225 fpm, standard PG sink rate per TJ Olney
-    ratio = np.where(wstar > sink_rate, 1.0 - sink_rate / wstar, 0.0)
+    wstar_safe = np.maximum(wstar, 0.01)
+    ratio = np.where(wstar > sink_rate, 1.0 - sink_rate / wstar_safe, 0.0)
     hcrit = ter + pblh * ratio
     return hcrit.astype(np.float32)
 
@@ -94,7 +95,8 @@ def calc_hlift(sink_rate, wstar, ter, pblh):
     Returns:
         hlift (m ASL), 2D
     """
-    ratio = np.where(wstar > sink_rate, 1.0 - sink_rate / wstar, 0.0)
+    wstar_safe = np.maximum(wstar, 0.01)
+    ratio = np.where(wstar > sink_rate, 1.0 - sink_rate / wstar_safe, 0.0)
     hlift = ter + pblh * ratio
     return hlift.astype(np.float32)
 

@@ -145,7 +145,8 @@ def _extract_site_data(wrfout_path, lat, lon):
 
     # hcrit: max height for a 225 fpm (1.14 m/s) sink rate glider
     SINK_RATE = 1.14  # m/s — 225 fpm, standard PG sink rate per TJ Olney
-    hcrit_ft = (ter + PBLH * np.where(wstar > SINK_RATE, 1 - SINK_RATE/wstar, 0)) * 3.28084
+    wstar_safe = np.maximum(wstar, 0.01)  # avoid divide by zero
+    hcrit_ft = (ter + PBLH * np.where(wstar > SINK_RATE, 1 - SINK_RATE/wstar_safe, 0)) * 3.28084
     spread = np.maximum(tc[:, 0] - td[:, 0], 0)
     lcl_ft = (ter + 125.0 * spread) * 3.28084
     hglider_ft = np.minimum(hcrit_ft, lcl_ft)
@@ -440,21 +441,58 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     return str(out_path)
 
 
+def render_batch(wrfout_path, sites_csv, output_dir=".", **kwargs):
+    """Render windgrams for all sites in a CSV file.
+
+    CSV format: name lat lon (space or comma separated, # for comments)
+    """
+    from pathlib import Path as P
+    sites = P(sites_csv).read_text().strip().splitlines()
+    count = 0
+    for line in sites:
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = line.replace(",", " ").split()
+        if len(parts) >= 3:
+            name, lat, lon = parts[0], float(parts[1]), float(parts[2])
+            try:
+                render_windgram(wrfout_path, lat, lon, name, output_dir, **kwargs)
+                count += 1
+            except Exception as e:
+                print(f"WARNING: {name} failed: {e}")
+    print(f"\nRendered {count} windgrams to {output_dir}/")
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Render a windgram from WRF output")
+    parser = argparse.ArgumentParser(description="Render windgrams from WRF output")
     parser.add_argument("wrfout", help="Path to wrfout NetCDF file")
-    parser.add_argument("--lat", type=float, required=True, help="Site latitude")
-    parser.add_argument("--lon", type=float, required=True, help="Site longitude")
-    parser.add_argument("--site", required=True, help="Site name")
+
+    # Single site mode
+    parser.add_argument("--lat", type=float, help="Site latitude")
+    parser.add_argument("--lon", type=float, help="Site longitude")
+    parser.add_argument("--site", help="Site name")
+
+    # Batch mode
+    parser.add_argument("--sites", help="CSV file with sites (name lat lon)")
+
     parser.add_argument("--output-dir", default=".", help="Output directory")
-    parser.add_argument("--p-top", type=float, default=620.0, help="Top pressure (mb)")
+    parser.add_argument("--p-top", type=float, default=None, help="Top pressure (mb)")
     parser.add_argument("--utc-offset", type=int, default=-7, help="UTC offset for local time")
+    parser.add_argument("--start-hour", type=int, default=8, help="Earliest local hour")
     parser.add_argument("--dpi", type=int, default=100, help="Output DPI")
     args = parser.parse_args()
 
-    render_windgram(args.wrfout, args.lat, args.lon, args.site,
-                    args.output_dir, p_top_mb=args.p_top,
-                    utc_offset=args.utc_offset, dpi=args.dpi)
+    kwargs = dict(p_top_mb=args.p_top, utc_offset=args.utc_offset,
+                  start_hour=args.start_hour, dpi=args.dpi)
+
+    if args.sites:
+        render_batch(args.wrfout, args.sites, args.output_dir, **kwargs)
+    elif args.lat and args.lon and args.site:
+        render_windgram(args.wrfout, args.lat, args.lon, args.site,
+                        args.output_dir, **kwargs)
+    else:
+        parser.error("Provide --sites CSV or --lat/--lon/--site")
 
 
 if __name__ == "__main__":
