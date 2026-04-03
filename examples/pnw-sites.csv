@@ -1,0 +1,9 @@
+# PNW paragliding sites — name lat lon
+# Used by: python -m rasp.pipeline domain.yaml --sites pnw-sites.csv
+Tiger       47.503  -121.975
+Blanchard   48.612  -122.412
+Chelan      47.830  -120.040
+Woodrat     42.162  -122.787
+LarchMtn    45.530  -122.088
+DogMtn      45.699  -121.708
+Ellensburg  46.950  -120.530

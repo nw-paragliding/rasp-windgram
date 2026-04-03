@@ -50,6 +50,9 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     zlib1g-dev \
     libjpeg-dev \
+    # MPI for parallel WRF (dmpar)
+    openmpi-bin \
+    libopenmpi-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # NetCDF: apt puts headers in /usr/include and libs in /usr/lib/<arch>.
@@ -102,13 +105,13 @@ RUN git clone --depth 1 --branch ${WRF_VERSION} \
 
 WORKDIR /build/WRF
 
-# Configure WRF.
+# Configure WRF for distributed-memory parallel (MPI).
 # Option numbers differ by platform:
-#   aarch64: option 1  = serial GNU gfortran
-#   x86_64:  option 32 = serial GNU gfortran (34=dmpar/MPI, requires mpif90)
+#   aarch64: option 3  = dmpar GNU gfortran (1=serial)
+#   x86_64:  option 34 = dmpar GNU gfortran (32=serial)
 RUN ARCH=$(uname -m); \
-    if   [ "$ARCH" = "aarch64" ]; then OPT=1;  \
-    elif [ "$ARCH" = "x86_64"  ]; then OPT=32; \
+    if   [ "$ARCH" = "aarch64" ]; then OPT=3;  \
+    elif [ "$ARCH" = "x86_64"  ]; then OPT=34; \
     else echo "Unknown arch: $ARCH" && exit 1; fi; \
     printf "${OPT}\n1\n" | ./configure 2>&1 | tee /build/configure.log
 
@@ -197,6 +200,9 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     # gfortran needed by wrf-python build
     gfortran \
+    # MPI runtime for parallel WRF
+    openmpi-bin \
+    libopenmpi-dev \
     # X11 libs required by NCL renderer (for future NCL migration)
     libxaw7 \
     libxmu6 \

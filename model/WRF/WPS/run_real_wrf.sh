@@ -103,11 +103,12 @@ done
 ln -sf "${WRF_SRC}/real.exe" real.exe
 ln -sf "${WRF_SRC}/wrf.exe"  wrf.exe
 
-# ── Link met_em files from WPS run dir ───────────────────────────────────────
-ln -sf "${WPS_RUN_DIR}"/met_em.d01.*.nc .
+# ── Link met_em files from WPS run dir (all domains) ────────────────────────
+ln -sf "${WPS_RUN_DIR}"/met_em.d0*.*.nc .
 
-MET_COUNT=$(ls met_em.d01.*.nc 2>/dev/null | wc -l)
-echo "  met_em files linked: ${MET_COUNT}"
+MET_COUNT=$(ls met_em.d0*.*.nc 2>/dev/null | wc -l)
+DOMAIN_COUNT=$(ls met_em.d0*.*.nc 2>/dev/null | sed 's/.*met_em.\(d[0-9]*\).*/\1/' | sort -u | wc -l)
+echo "  met_em files linked: ${MET_COUNT} (${DOMAIN_COUNT} domains)"
 
 # ── Run real.exe ─────────────────────────────────────────────────────────────
 echo "  Running real.exe..."
