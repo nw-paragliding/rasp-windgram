@@ -47,7 +47,7 @@ jobs:
 
       - name: Build and push wrf-compiled (${{ matrix.suffix }})
         run: |
-          WRF_VERSION="${WRF_VERSION:-4.5.2}"
+          WRF_VERSION="${WRF_VERSION:-v4.5.2}"
           docker buildx build \
             --platform ${{ matrix.platform }} \
             -f docker/Dockerfile.wrf \
@@ -70,7 +70,7 @@ jobs:
 
       - name: Create multi-arch manifest
         run: |
-          WRF_VERSION="${WRF_VERSION:-4.5.2}"
+          WRF_VERSION="${WRF_VERSION:-v4.5.2}"
           docker manifest create "${REGISTRY}/wrf-compiled:${WRF_VERSION}" \
             "${REGISTRY}/wrf-compiled:${WRF_VERSION}-amd64" \
             "${REGISTRY}/wrf-compiled:${WRF_VERSION}-arm64"
@@ -110,7 +110,7 @@ jobs:
       - name: Build and push windgram (${{ matrix.suffix }})
         run: |
           VERSION=$(cat VERSION | tr -d '[:space:]')
-          WRF_VERSION="${WRF_VERSION:-4.5.2}"
+          WRF_VERSION="${WRF_VERSION:-v4.5.2}"
           docker buildx build \
             --platform ${{ matrix.platform }} \
             -f docker/Dockerfile.windgram \
