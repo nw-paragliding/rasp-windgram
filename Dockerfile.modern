@@ -187,12 +187,16 @@ RUN apt-get update && apt-get install -y \
     netcdf-bin \
     cron \
     locales \
+    python3 \
+    python3-pip \
     # NetCDF runtime (linked by wrf.exe, real.exe)
     libnetcdf-dev \
     libnetcdff-dev \
     libhdf5-dev \
     libpng-dev \
     zlib1g-dev \
+    # gfortran needed by wrf-python build
+    gfortran \
     # X11 libs required by NCL renderer (for future NCL migration)
     libxaw7 \
     libxmu6 \
@@ -200,6 +204,16 @@ RUN apt-get update && apt-get install -y \
     libsm6 \
     libice6 \
     && rm -rf /var/lib/apt/lists/*
+
+# Python packages for windgram rendering
+RUN pip3 install --no-cache-dir numpy && \
+    pip3 install --no-cache-dir --no-deps wrf-python && \
+    pip3 install --no-cache-dir \
+    netCDF4 \
+    matplotlib \
+    scipy \
+    pyyaml \
+    xarray
 
 RUN locale-gen en_US.UTF-8
 ENV LANG=en_US.UTF-8
@@ -215,6 +229,10 @@ ENV NETCDF=/usr/local/netcdf
 COPY model/ $BASEDIR/
 COPY docker-run.sh $BASEDIR/docker-run.sh
 RUN chmod +x $BASEDIR/docker-run.sh
+
+# ── Copy rasp Python package (soaring indices, windgram renderer) ───────────
+COPY rasp/ $BASEDIR/rasp/
+COPY examples/ $BASEDIR/examples/
 
 # ── Copy jasper shared library from builder ───────────────────────────────────
 # jasper was built from source in the builder (not in ubuntu 22.04 repos).
