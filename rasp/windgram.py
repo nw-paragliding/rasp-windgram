@@ -293,15 +293,31 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
                 ax.plot(taus[t], ptot[t, k], "x", color="white",
                         markersize=3, alpha=0.4, zorder=2)
 
-    # --- Cloud markers (RH > 99%) ---
+    # --- Actual cloud markers (RH > 97%) — smaller grey clouds ---
     for t in range(ntimes):
         for k in range(ptop_idx):
             if ptot[t, k] < p_top_actual:
                 break
-            if rh[t, k] > 99:
-                ax.text(taus[t], ptot[t, k], "\u2601", fontsize=14,
-                        ha="center", va="center", color="white",
-                        alpha=0.5, zorder=2)
+            if rh[t, k] > 97:
+                ax.text(taus[t], ptot[t, k], "\u2601", fontsize=16,
+                        ha="center", va="center",
+                        color="darkgrey", alpha=0.7, zorder=3)
+
+    # --- Cloud markers at LCL height (where cumulus would form) ---
+    # Per TJ Olney: "Small clouds represent the expected LCL (lowest
+    # cloudbase), but do not mean that there will be clouds."
+    lcl_p = d["sfc_p"] - (d["ter_ft"] + 125.0 * np.maximum(
+        d["tc"][:, 0] - d["td"][:, 0], 0)) * 3.28084 / 32.0
+    for t in range(ntimes):
+        if lcl_p[t] > p_top_actual and lcl_p[t] < d["sfc_p"][t]:
+            # Grey shadow
+            ax.text(taus[t] + 0.04, lcl_p[t] - 0.8, "\u2601",
+                    fontsize=28, ha="center", va="center",
+                    color="grey", alpha=0.5, zorder=3)
+            # White cloud
+            ax.text(taus[t], lcl_p[t], "\u2601",
+                    fontsize=28, ha="center", va="center",
+                    color="white", alpha=0.85, zorder=3)
 
     # --- Temperature contour lines (isotherms in F) ---
     tc = d["tc"]
@@ -333,17 +349,13 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
 
     # PBL top: not drawn — the paraglider markers already show usable ceiling
 
-    # --- Freezing level with snowflakes ---
-    freeze = d["freeze_p"]
-    valid_f = ~np.isnan(freeze) & (freeze > p_top_actual)
-    if np.any(valid_f):
-        ax.plot(taus[valid_f], freeze[valid_f], "--",
-                color="lightblue", linewidth=1, alpha=0.5)
-        for t in range(ntimes):
-            if valid_f[t]:
-                ax.text(taus[t], freeze[t], "\u2744", fontsize=16,
-                        ha="center", va="center", color="lightblue",
-                        alpha=0.8, zorder=4)
+    # --- Freezing level: prominent 32°F isotherm ---
+    # Already drawn as part of the temperature contours, but make the
+    # 32°F line stand out with a thicker, labeled line
+    cs_freeze = ax.contour(t_fine, p_levels_full, tc_smooth, levels=[32],
+                           colors="cyan", linewidths=1.5, alpha=0.8)
+    ax.clabel(cs_freeze, inline=True, fontsize=9, fmt="32\u00b0F",
+              colors="cyan")
 
     # --- Paraglider wing markers (soaring ceiling) ---
     hglider_p = d["hglider_p"]
@@ -353,7 +365,7 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
                linewidths=0.8)
 
     # --- w* labels above chart, below title (include zeros) ---
-    ax.text(-0.02, 1.02, "Climb\nm/s", ha="right", va="bottom",
+    ax.text(-0.06, 1.02, "Climb\nm/s", ha="right", va="bottom",
             transform=ax.transAxes, fontsize=8, color="yellow")
     for t in range(ntimes):
         txt = f"{d['wstar'][t]:.1f}"
