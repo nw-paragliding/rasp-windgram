@@ -1,0 +1,144 @@
+# syntax=docker/dockerfile:1
+# =============================================================================
+# rasp/wrf-compiled — WRF 4.5.2 + WPS 4.5 compiled binaries
+# =============================================================================
+#
+# Heavy build layer. Rarely changes (only when WRF/WPS version bumps).
+# Published to GHCR as ghcr.io/nw-paragliding/wrf-compiled:<version>
+#
+# Build:
+#   docker buildx build --platform linux/arm64,linux/amd64 \
+#     -f docker/Dockerfile.wrf -t ghcr.io/nw-paragliding/wrf-compiled:4.5.2 --push .
+
+FROM ubuntu:22.04 AS wrf-builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
+RUN apt-get update && apt-get install -y \
+    gfortran gcc g++ cpp m4 make perl csh git wget python3 cmake \
+    libnetcdf-dev libnetcdff-dev libhdf5-dev libpng-dev zlib1g-dev libjpeg-dev \
+    openmpi-bin libopenmpi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# NetCDF symlink for WRF configure
+RUN ln -sf /usr /usr/local/netcdf
+ENV NETCDF=/usr/local/netcdf
+
+# HDF5 symlink fix (ubuntu 22.04 naming mismatch)
+RUN ARCH_TRIPLE=$(gcc -print-multiarch) && \
+    HDF5_LIB=/usr/lib/${ARCH_TRIPLE}/hdf5/serial && \
+    mkdir -p /usr/local/hdf5 && \
+    ln -sf /usr/include/hdf5/serial /usr/local/hdf5/include && \
+    ln -sf ${HDF5_LIB}              /usr/local/hdf5/lib && \
+    ln -sf ${HDF5_LIB}/libhdf5hl_fortran.so ${HDF5_LIB}/libhdf5_hl_fortran.so && \
+    ln -sf ${HDF5_LIB}/libhdf5hl_fortran.a  ${HDF5_LIB}/libhdf5_hl_fortran.a
+ENV HDF5=/usr/local/hdf5
+
+# Jasper from source (GRIB2 JPEG2000, removed from ubuntu 22.04 repos)
+ARG JASPER_VERSION=2.0.33
+RUN wget -q https://github.com/jasper-software/jasper/releases/download/version-${JASPER_VERSION}/jasper-${JASPER_VERSION}.tar.gz \
+        -O /tmp/jasper.tar.gz && \
+    cd /tmp && tar xzf jasper.tar.gz && cd jasper-${JASPER_VERSION} && \
+    mkdir build_cmake && cd build_cmake && \
+    cmake -DCMAKE_INSTALL_PREFIX=/usr/local \
+          -DJAS_ENABLE_SHARED=ON -DJAS_ENABLE_LIBJPEG=ON \
+          -DJAS_ENABLE_OPENGL=OFF -DJAS_ENABLE_DOC=OFF -DJAS_ENABLE_PROGRAMS=OFF \
+          .. && \
+    make -j$(nproc) && make install && rm -rf /tmp/jasper* && ldconfig
+ENV JASPER_DIR=/usr/local
+
+# ── WRF 4.5.2 ───────────────────────────────────────────────────────────────
+ARG WRF_VERSION=v4.5.2
+RUN git clone --depth 1 --branch ${WRF_VERSION} https://github.com/wrf-model/WRF /build/WRF
+WORKDIR /build/WRF
+
+# Configure for dmpar (MPI parallel)
+#   aarch64: option 3, x86_64: option 34
+RUN ARCH=$(uname -m); \
+    if   [ "$ARCH" = "aarch64" ]; then OPT=3;  \
+    elif [ "$ARCH" = "x86_64"  ]; then OPT=34; \
+    else echo "Unknown arch: $ARCH" && exit 1; fi; \
+    printf "${OPT}\n1\n" | ./configure 2>&1 | tee /build/configure.log
+
+RUN sed -i \
+    -e 's/-ffree-form/-ffree-form -fallow-argument-mismatch -fallow-invalid-boz/g' \
+    -e 's/-ffixed-form/-ffixed-form -fallow-argument-mismatch -fallow-invalid-boz/g' \
+    configure.wrf
+
+RUN ./compile em_real 2>&1 | tee /build/compile.log && \
+    test -f main/wrf.exe && test -f main/real.exe && test -f main/ndown.exe
+
+# ── WPS 4.5 ──────────────────────────────────────────────────────────────────
+ARG WPS_VERSION=v4.5
+RUN git clone --depth 1 --branch ${WPS_VERSION} https://github.com/wrf-model/WPS /build/WPS
+WORKDIR /build/WPS
+
+ENV WRF_DIR=/build/WRF
+ENV WPS_NETCDF=/usr/local/netcdf
+ENV WPS_HDF5=/usr/local/hdf5
+ENV JASPER=/usr/local
+ENV JASPERLIB=/usr/local/lib
+ENV JASPERINC=/usr/local/include/jasper
+
+# WPS configure: spoof uname for aarch64 (no aarch64 entry in configure.defaults)
+RUN printf '#!/bin/sh\n[ "$1" = "-m" ] && echo x86_64 || exec /bin/uname "$@"\n' \
+        > /usr/local/bin/uname && chmod +x /usr/local/bin/uname && \
+    printf "1\n" | ./configure 2>&1 | tee /build/wps_configure.log && \
+    rm /usr/local/bin/uname
+
+RUN sed -i \
+    -e 's/-ffree-form/-ffree-form -fallow-argument-mismatch -fallow-invalid-boz/g' \
+    -e 's/-ffixed-form/-ffixed-form -fallow-argument-mismatch -fallow-invalid-boz/g' \
+    -e 's/-lnetcdf\b/-lnetcdf -lnetcdff/g' \
+    configure.wps
+
+RUN ./compile 2>&1 | tee /build/wps_compile.log && \
+    test -f ungrib/src/ungrib.exe && test -f metgrid/src/metgrid.exe && test -f geogrid/src/geogrid.exe
+
+RUN echo "=== WRF + WPS build OK ===" && \
+    ls -lh /build/WRF/main/wrf.exe /build/WRF/main/real.exe /build/WRF/main/ndown.exe && \
+    ls -lh /build/WPS/ungrib/src/ungrib.exe /build/WPS/metgrid/src/metgrid.exe /build/WPS/geogrid/src/geogrid.exe
+
+# ── Export stage — just the binaries + support files ─────────────────────────
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Runtime libs only (what the binaries link against)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libnetcdf19 libnetcdff7 libhdf5-103-1 libhdf5-hl-100 \
+    libpng16-16 zlib1g libgomp1 \
+    openmpi-bin libopenmpi3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy compiled binaries
+COPY --from=wrf-builder /build/WRF/main/wrf.exe   /opt/wrf/bin/wrf.exe
+COPY --from=wrf-builder /build/WRF/main/real.exe  /opt/wrf/bin/real.exe
+COPY --from=wrf-builder /build/WRF/main/ndown.exe /opt/wrf/bin/ndown.exe
+COPY --from=wrf-builder /build/WRF/run/            /opt/wrf/run/
+
+COPY --from=wrf-builder /build/WPS/ungrib/src/ungrib.exe    /opt/wrf/wps/ungrib.exe
+COPY --from=wrf-builder /build/WPS/metgrid/src/metgrid.exe  /opt/wrf/wps/metgrid.exe
+COPY --from=wrf-builder /build/WPS/geogrid/src/geogrid.exe  /opt/wrf/wps/geogrid.exe
+COPY --from=wrf-builder /build/WPS/geogrid/GEOGRID.TBL.ARW  /opt/wrf/wps/geogrid/GEOGRID.TBL
+COPY --from=wrf-builder /build/WPS/metgrid/METGRID.TBL.ARW  /opt/wrf/wps/metgrid/METGRID.TBL
+COPY --from=wrf-builder /build/WPS/ungrib/Variable_Tables/   /opt/wrf/wps/Variable_Tables/
+COPY --from=wrf-builder /build/WPS/link_grib.csh             /opt/wrf/wps/link_grib.csh
+
+# Jasper shared library
+COPY --from=wrf-builder /usr/local/lib/libjasper.so.4 /usr/local/lib/libjasper.so.4
+COPY --from=wrf-builder /usr/local/lib/libjasper.so   /usr/local/lib/libjasper.so
+
+# NetCDF/HDF5 symlinks for runtime
+RUN ln -sf /usr /usr/local/netcdf && ldconfig
+
+RUN chmod +x /opt/wrf/bin/* /opt/wrf/wps/*.exe
+
+# Metadata
+ARG WRF_VERSION=v4.5.2
+ARG WPS_VERSION=v4.5
+LABEL org.opencontainers.image.title="WRF Compiled" \
+      org.opencontainers.image.description="WRF ${WRF_VERSION} + WPS ${WPS_VERSION} compiled for MPI" \
+      wrf.version="${WRF_VERSION}" \
+      wps.version="${WPS_VERSION}"
