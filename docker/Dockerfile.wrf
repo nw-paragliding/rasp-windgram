@@ -49,6 +49,7 @@ RUN wget -q https://github.com/jasper-software/jasper/releases/download/version-
 ENV JASPER_DIR=/usr/local
 
 # ── WRF 4.5.2 ───────────────────────────────────────────────────────────────
+WORKDIR /build
 ARG WRF_VERSION=v4.5.2
 RUN git clone --depth 1 --branch ${WRF_VERSION} https://github.com/wrf-model/WRF /build/WRF
 WORKDIR /build/WRF
