@@ -142,8 +142,9 @@ def _extract_site_data(wrfout_path, lat, lon):
     buoy = (9.81 / T2) * (vhf / 1200.0)
     wstar = np.where(buoy > 0, (buoy * PBLH) ** (1.0 / 3.0), 0.0)
 
-    # hcrit and LCL
-    hcrit_ft = (ter + PBLH * np.where(wstar > 1, 1 - 1/wstar, 0)) * 3.28084
+    # hcrit: max height for a 225 fpm (1.14 m/s) sink rate glider
+    SINK_RATE = 1.14  # m/s — 225 fpm, standard PG sink rate per TJ Olney
+    hcrit_ft = (ter + PBLH * np.where(wstar > SINK_RATE, 1 - SINK_RATE/wstar, 0)) * 3.28084
     spread = np.maximum(tc[:, 0] - td[:, 0], 0)
     lcl_ft = (ter + 125.0 * spread) * 3.28084
     hglider_ft = np.minimum(hcrit_ft, lcl_ft)
@@ -248,13 +249,13 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     ax.contourf(t_fine, p_fine, lapse_interp,
                 levels=LAPSE_LEVELS, colors=LAPSE_COLORS, extend="both")
 
-    # --- Condensation cross-hatching (RH > 95%) ---
+    # --- Condensation cross-hatching (RH > 94% per TJ's docs) ---
     rh = d["rh"]
     for t in range(ntimes):
         for k in range(ptop_idx):
             if ptot[t, k] < p_top_mb:
                 break
-            if rh[t, k] > 95:
+            if rh[t, k] > 94:
                 ax.plot(taus[t], ptot[t, k], "x", color="white",
                         markersize=3, alpha=0.4, zorder=2)
 
@@ -268,13 +269,32 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
                         ha="center", va="center", color="white",
                         alpha=0.5, zorder=2)
 
-    # --- Wind barbs ---
+    # --- Temperature contour lines (isotherms in F) ---
+    tc = d["tc"]
+    tc_f = tc * 9.0/5.0 + 32  # convert to Fahrenheit
+    # Interpolate temperature onto fine grid
+    tc_pts, tc_vals = [], []
+    for t in range(ntimes):
+        for k in range(min(ptop_idx, tc.shape[1])):
+            tc_pts.append([taus[t], ptot[t, k]])
+            tc_vals.append(tc_f[t, k])
+    tc_interp = griddata(np.array(tc_pts), np.array(tc_vals),
+                         (T_grid, P_grid), method="linear")
+    tc_interp = np.where(np.isnan(tc_interp), 0, tc_interp)
+    # Draw isotherms every 10F
+    temp_levels = np.arange(-40, 120, 10)
+    cs = ax.contour(t_fine, p_fine, tc_interp, levels=temp_levels,
+                    colors="white", linewidths=0.4, alpha=0.5)
+    ax.clabel(cs, inline=True, fontsize=6, fmt="%d\u00b0F",
+              colors="white")
+
+    # --- Wind barbs (green < 9kts, white >= 9kts per TJ's docs) ---
     wspeed = np.sqrt(d["u_kts"]**2 + d["v_kts"]**2)
     for t in range(ntimes):
         for k in range(ptop_idx):
             if ptot[t, k] < p_top_mb:
                 break
-            c = plt.cm.cool_r(min(wspeed[t, k] / 50.0, 1.0))
+            c = "green" if wspeed[t, k] < 9 else "white"
             ax.barbs(taus[t], ptot[t, k],
                      d["u_kts"][t, k], d["v_kts"][t, k],
                      length=5, linewidth=0.5, color=c,

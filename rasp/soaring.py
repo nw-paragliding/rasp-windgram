@@ -74,7 +74,7 @@ def calc_hcrit(wstar, ter, pblh):
     Returns:
         hcrit (m ASL), 2D
     """
-    sink_rate = 1.0  # m/s, typical PG sink rate
+    sink_rate = 1.14  # m/s — 225 fpm, standard PG sink rate per TJ Olney
     ratio = np.where(wstar > sink_rate, 1.0 - sink_rate / wstar, 0.0)
     hcrit = ter + pblh * ratio
     return hcrit.astype(np.float32)
