@@ -297,15 +297,19 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
         rh_smooth[k, :] = f(t_fine)
 
     # Light hatching at RH > 94%
+    n_before = len(ax.collections)
     ax.contourf(t_fine, p_levels_full, rh_smooth, levels=[94, 100],
                 colors="none", hatches=["//"], alpha=0)
+    for c in ax.collections[n_before:]:
+        c.set_edgecolor("white")
+        c.set_linewidth(0.3)
     # Dense hatching at RH > 97%
+    n_before2 = len(ax.collections)
     ax.contourf(t_fine, p_levels_full, rh_smooth, levels=[97, 100],
                 colors="none", hatches=["////"], alpha=0)
-    # Make hatch lines white
-    for collection in ax.collections:
-        collection.set_edgecolor("white")
-        collection.set_linewidth(0.5)
+    for c in ax.collections[n_before2:]:
+        c.set_edgecolor("white")
+        c.set_linewidth(0.5)
 
     # --- Cloud markers at LCL height (where cumulus would form) ---
     # Per TJ Olney: "Small clouds represent the expected LCL (lowest
