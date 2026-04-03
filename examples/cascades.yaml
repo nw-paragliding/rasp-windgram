@@ -1,0 +1,21 @@
+# Example domain config: Cascades (PNW soaring region)
+name: cascades
+model: nam
+
+center_lat: 47.6
+center_lon: -121.4
+
+# Finest resolution — system builds nest chain automatically
+# NAM 12km → 4km → 1.33km
+target_dx_km: 1.33
+
+# Physical extent at finest resolution (km)
+inner_extent_km: 150
+
+# Nesting ratio (default 3)
+nest_ratio: 3
+
+# Physics overrides (optional — auto-selected by resolution if omitted)
+# physics:
+#   cu_physics: 0
+#   bl_pbl_physics: 2

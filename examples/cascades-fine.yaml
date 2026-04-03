@@ -1,0 +1,8 @@
+# Example: experimental 444m resolution over the Cascades
+name: cascades-fine
+model: nam
+center_lat: 47.6
+center_lon: -121.4
+target_dx_km: 0.444
+inner_extent_km: 40
+nest_ratio: 3
