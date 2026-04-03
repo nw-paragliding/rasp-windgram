@@ -250,11 +250,13 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     p_top_actual = 0.5 * (ptot[0, ptop_idx - 2] + ptot[0, ptop_idx - 1])
     taus = np.arange(ntimes)
 
-    # Local time labels (12-hour)
+    # Local time labels (12-hour with am/pm)
     local = (d["hours_utc"] + utc_offset) % 24
     l12 = local.copy()
+    ampm = np.where(local < 12, "a", "p")
     l12[l12 > 12] -= 12
     l12[l12 == 0] = 12
+    time_labels = [f"{h}{ap}" for h, ap in zip(l12, ampm)]
 
     # --- Figure setup ---
     fig, ax = plt.subplots(figsize=(8, 8))
@@ -297,7 +299,7 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
             if ptot[t, k] < p_top_actual:
                 break
             if rh[t, k] > 99:
-                ax.text(taus[t], ptot[t, k], "\u2601", fontsize=8,
+                ax.text(taus[t], ptot[t, k], "\u2601", fontsize=14,
                         ha="center", va="center", color="white",
                         alpha=0.5, zorder=2)
 
@@ -339,7 +341,7 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
                 color="lightblue", linewidth=1, alpha=0.5)
         for t in range(ntimes):
             if valid_f[t]:
-                ax.text(taus[t], freeze[t], "\u2744", fontsize=12,
+                ax.text(taus[t], freeze[t], "\u2744", fontsize=16,
                         ha="center", va="center", color="lightblue",
                         alpha=0.8, zorder=4)
 
@@ -350,11 +352,15 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
                marker=WING_MARKER, zorder=5, edgecolors="darkblue",
                linewidths=0.8)
 
-    # --- w* labels at top (inside chart) ---
+    # --- w* labels above chart, below title (include zeros) ---
+    ax.text(-0.02, 1.02, "Climb\nm/s", ha="right", va="bottom",
+            transform=ax.transAxes, fontsize=8, color="yellow")
     for t in range(ntimes):
-        txt = f"{d['wstar'][t]:.1f}" if d["wstar"][t] > 0.1 else ""
-        ax.text(taus[t], p_top_actual + 2, txt, ha="center", va="top",
-                fontsize=8, color="yellow", fontweight="bold")
+        txt = f"{d['wstar'][t]:.1f}"
+        x_frac = t / max(ntimes - 1, 1)
+        ax.text(x_frac, 1.02, txt, ha="center", va="bottom",
+                transform=ax.transAxes,
+                fontsize=10, color="yellow", fontweight="bold")
 
     # --- Axis formatting ---
     # Set Y limits to actual data extent (avoids lavender gaps)
@@ -364,7 +370,7 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     ax.set_xlim(0, ntimes - 1)
     ax.margins(0)
     ax.set_xticks(taus)
-    ax.set_xticklabels([str(h) for h in l12], fontsize=11, color="white")
+    ax.set_xticklabels(time_labels, fontsize=10, color="white")
     ax.set_xlabel("Time", color="white", fontsize=11)
 
     # Left Y axis: pressure at round values (mb)
@@ -389,15 +395,17 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     valid_ft = (p_for_ft >= min(p_ylim)) & (p_for_ft <= max(p_ylim))
     # Add terrain as the bottom tick
     ticks = np.concatenate([[d["sfc_p"][0]], p_for_ft[valid_ft]])
-    labels = [f"{int(ter_ft)}' GND"] + [f"{int(f)}'" for f in ft_asl[valid_ft]]
+    labels = [f"{int(ter_ft)}'"] + [f"{int(f)}'" for f in ft_asl[valid_ft]]
     ax2.set_yticks(ticks)
     ax2.set_yticklabels(labels, fontsize=10, color="white")
     ax2.tick_params(colors="white", labelsize=10)
 
     # Title
     date_str = d["time_strings"][0][:10]
-    ax.set_title(f"{date_str} / {site_name}",
-                 color="white", fontsize=12, fontweight="bold")
+    from datetime import datetime as dt
+    day_of_week = dt.strptime(date_str, "%Y-%m-%d").strftime("%a")
+    ax.set_title(f"{day_of_week} {date_str} / {site_name}",
+                 color="white", fontsize=12, fontweight="bold", pad=35)
 
     # --- Save ---
     output_dir = FilePath(output_dir)
