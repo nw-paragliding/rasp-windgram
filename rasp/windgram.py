@@ -33,17 +33,18 @@ from pathlib import Path as FilePath
 
 
 # ---------------------------------------------------------------------------
-# Custom paraglider wing marker
+# Paraglider crescent marker — simple wing shape like the NCL prod version
 # ---------------------------------------------------------------------------
+# Wide flat crescent — like a paraglider wing seen from below
 _WING_VERTS = [
-    (-1.0, 0.0), (-0.7, 0.6), (-0.3, 0.85), (0.0, 0.9),
-    (0.3, 0.85), (0.7, 0.6), (1.0, 0.0),
-    (0.7, 0.2), (0.3, 0.35), (0.0, 0.38),
-    (-0.3, 0.35), (-0.7, 0.2), (-1.0, 0.0),
+    (-1.2, -0.1),                       # left tip
+    (-0.6, 0.7), (0.6, 0.7),           # top arc (high, wide)
+    (1.2, -0.1),                        # right tip
+    (0.6, 0.25), (-0.6, 0.25),         # bottom arc (shallower)
+    (-1.2, -0.1),                       # close
 ]
 _WING_CODES = [
-    Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4,
-    Path.CURVE4, Path.CURVE4, Path.CURVE4,
+    Path.MOVETO,
     Path.CURVE4, Path.CURVE4, Path.CURVE4,
     Path.CURVE4, Path.CURVE4, Path.CLOSEPOLY,
 ]
@@ -247,8 +248,9 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
         p_top_mb = round(p_top_mb / 10) * 10
 
     ptop_idx = max(np.searchsorted(-ptot[0, :], -p_top_mb), 10)
-    # Actual top pressure from data (last midpoint level with lapse data)
+    # Actual pressure bounds from data (midpoints where lapse data exists)
     p_top_actual = 0.5 * (ptot[0, ptop_idx - 2] + ptot[0, ptop_idx - 1])
+    p_bottom = 0.5 * (ptot[0, 0] + ptot[0, 1])
     taus = np.arange(ntimes)
 
     # Local time labels (12-hour with am/pm)
@@ -365,14 +367,14 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     ax.clabel(cs_freeze, inline=True, fontsize=9, fmt="32\u00b0F",
               colors="cyan")
 
-    # --- Paraglider wing markers (soaring ceiling) ---
+    # --- Paraglider crescent markers (soaring ceiling) ---
     hglider_p = d["hglider_p"]
-    valid_h = hglider_p > p_top_actual
-    ax.scatter(taus[valid_h], hglider_p[valid_h], s=400, color="blue",
+    valid_h = (hglider_p > p_top_actual) & (hglider_p < p_bottom)
+    ax.scatter(taus[valid_h], hglider_p[valid_h], s=500, color="blue",
                marker=WING_MARKER, zorder=5, edgecolors="darkblue",
                linewidths=0.8)
 
-    # --- w* labels above chart, below title (include zeros) ---
+    # --- w* labels above chart, below title ---
     ax.text(-0.06, 1.02, "Climb\nm/s", ha="right", va="bottom",
             transform=ax.transAxes, fontsize=9, color="yellow",
             fontweight="bold")
@@ -381,20 +383,13 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
         x_frac = t / max(ntimes - 1, 1)
         ax.text(x_frac, 1.02, txt, ha="center", va="bottom",
                 transform=ax.transAxes,
-                fontsize=12, color="yellow", fontweight="bold",
-                path_effects=[matplotlib.patheffects.withStroke(
-                    linewidth=2, foreground="black")])
+                fontsize=13, color="yellow", fontweight="bold")
 
     # --- Axis formatting ---
     # Set Y limits to actual data extent (avoids lavender gaps)
-    p_bottom = p_levels_mid[0]   # first midpoint with lapse data
-    p_top_actual = p_levels_mid[-1]  # last midpoint with lapse data
     ax.set_ylim(p_bottom, p_top_actual)
     ax.set_xlim(0, ntimes - 1)
     ax.margins(0)
-    ax.set_clip_on(True)
-    for child in ax.get_children():
-        child.set_clip_on(True)
     ax.set_xticks(taus)
     ax.set_xticklabels(time_labels, fontsize=10, color="white")
     ax.set_xlabel("Time", color="white", fontsize=11)
