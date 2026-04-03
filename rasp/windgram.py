@@ -321,11 +321,11 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
             # Grey shadow
             ax.text(taus[t] + 0.05, lcl_p[t] - 1.0, "\u2601",
                     fontsize=48, ha="center", va="center",
-                    color="grey", alpha=0.5, zorder=3)
+                    color="grey", alpha=0.5, zorder=3, clip_on=True)
             # White cloud
             ax.text(taus[t], lcl_p[t], "\u2601",
                     fontsize=48, ha="center", va="center",
-                    color="white", alpha=0.85, zorder=3)
+                    color="white", alpha=0.85, zorder=3, clip_on=True)
 
     # --- Temperature contour lines (isotherms in F) ---
     tc = d["tc"]
@@ -374,21 +374,27 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
 
     # --- w* labels above chart, below title (include zeros) ---
     ax.text(-0.06, 1.02, "Climb\nm/s", ha="right", va="bottom",
-            transform=ax.transAxes, fontsize=8, color="yellow")
+            transform=ax.transAxes, fontsize=9, color="yellow",
+            fontweight="bold")
     for t in range(ntimes):
         txt = f"{d['wstar'][t]:.1f}"
         x_frac = t / max(ntimes - 1, 1)
         ax.text(x_frac, 1.02, txt, ha="center", va="bottom",
                 transform=ax.transAxes,
-                fontsize=10, color="yellow", fontweight="bold")
+                fontsize=12, color="yellow", fontweight="bold",
+                path_effects=[matplotlib.patheffects.withStroke(
+                    linewidth=2, foreground="black")])
 
     # --- Axis formatting ---
     # Set Y limits to actual data extent (avoids lavender gaps)
-    p_bottom = ptot[0, 0]
-    p_top_actual = p_levels_mid[-1]  # last pressure level with lapse data
+    p_bottom = p_levels_mid[0]   # first midpoint with lapse data
+    p_top_actual = p_levels_mid[-1]  # last midpoint with lapse data
     ax.set_ylim(p_bottom, p_top_actual)
     ax.set_xlim(0, ntimes - 1)
     ax.margins(0)
+    ax.set_clip_on(True)
+    for child in ax.get_children():
+        child.set_clip_on(True)
     ax.set_xticks(taus)
     ax.set_xticklabels(time_labels, fontsize=10, color="white")
     ax.set_xlabel("Time", color="white", fontsize=11)
