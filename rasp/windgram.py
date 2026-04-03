@@ -25,6 +25,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.patheffects
 from matplotlib.colors import ListedColormap, BoundaryNorm
 from matplotlib.path import Path
 from matplotlib.markers import MarkerStyle
@@ -283,25 +284,28 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     ax.contourf(t_fine, p_levels_mid, lapse_smooth,
                 levels=LAPSE_LEVELS, colors=LAPSE_COLORS, extend="both")
 
-    # --- Condensation cross-hatching (RH > 94% per TJ's docs) ---
+    # --- Condensation hatching (RH > 94%) — diagonal white lines ---
     rh = d["rh"]
-    for t in range(ntimes):
-        for k in range(ptop_idx):
-            if ptot[t, k] < p_top_actual:
-                break
-            if rh[t, k] > 94:
-                ax.plot(taus[t], ptot[t, k], "x", color="white",
-                        markersize=3, alpha=0.4, zorder=2)
+    rh_grid = rh[:, :ptop_idx].T  # (levels, time)
+    p_levels_full = ptot[0, :ptop_idx]
 
-    # --- Actual cloud markers (RH > 97%) — smaller grey clouds ---
-    for t in range(ntimes):
-        for k in range(ptop_idx):
-            if ptot[t, k] < p_top_actual:
-                break
-            if rh[t, k] > 97:
-                ax.text(taus[t], ptot[t, k], "\u2601", fontsize=16,
-                        ha="center", va="center",
-                        color="darkgrey", alpha=0.7, zorder=3)
+    # Smooth RH along time axis like lapse rate
+    rh_smooth = np.zeros((rh_grid.shape[0], len(t_fine)))
+    for k in range(rh_grid.shape[0]):
+        f = interp1d(taus, rh_grid[k, :], kind="cubic",
+                     bounds_error=False, fill_value="extrapolate")
+        rh_smooth[k, :] = f(t_fine)
+
+    # Light hatching at RH > 94%
+    ax.contourf(t_fine, p_levels_full, rh_smooth, levels=[94, 100],
+                colors="none", hatches=["//"], alpha=0)
+    # Dense hatching at RH > 97%
+    ax.contourf(t_fine, p_levels_full, rh_smooth, levels=[97, 100],
+                colors="none", hatches=["////"], alpha=0)
+    # Make hatch lines white
+    for collection in ax.collections:
+        collection.set_edgecolor("white")
+        collection.set_linewidth(0.5)
 
     # --- Cloud markers at LCL height (where cumulus would form) ---
     # Per TJ Olney: "Small clouds represent the expected LCL (lowest
@@ -311,12 +315,12 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     for t in range(ntimes):
         if lcl_p[t] > p_top_actual and lcl_p[t] < d["sfc_p"][t]:
             # Grey shadow
-            ax.text(taus[t] + 0.04, lcl_p[t] - 0.8, "\u2601",
-                    fontsize=28, ha="center", va="center",
+            ax.text(taus[t] + 0.05, lcl_p[t] - 1.0, "\u2601",
+                    fontsize=48, ha="center", va="center",
                     color="grey", alpha=0.5, zorder=3)
             # White cloud
             ax.text(taus[t], lcl_p[t], "\u2601",
-                    fontsize=28, ha="center", va="center",
+                    fontsize=48, ha="center", va="center",
                     color="white", alpha=0.85, zorder=3)
 
     # --- Temperature contour lines (isotherms in F) ---
