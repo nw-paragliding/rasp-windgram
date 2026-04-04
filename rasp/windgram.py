@@ -158,9 +158,11 @@ def _extract_site_data(wrfout_path, lat, lon):
     hglider_ft = np.minimum(hcrit_ft, lcl_ft)
 
     # Pressure coordinates for markers
+    # Convert feet ASL to pressure using: p = sfc_p - (ft_AGL / 32)
+    ter_ft = ter * 3.28084
     sfc_p = ptot[:, 0]
-    pbl_p = sfc_p - (PBLH * 3.28084) / 32.0
-    hglider_p = sfc_p - hglider_ft / 32.0
+    pbl_p = sfc_p - (PBLH * 3.28084) / 32.0  # PBLH is already AGL
+    hglider_p = sfc_p - (hglider_ft - ter_ft) / 32.0  # convert ASL to AGL first
 
     # Lapse rate: (T_above - T_below) / (dz in 1000ft)
     dz = np.maximum(np.diff(z_ft, axis=1) / 1000.0, 0.01)
@@ -323,8 +325,8 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     # --- Cloud markers at LCL height (where cumulus would form) ---
     # Per TJ Olney: "Small clouds represent the expected LCL (lowest
     # cloudbase), but do not mean that there will be clouds."
-    lcl_p = d["sfc_p"] - (d["ter_ft"] + 125.0 * np.maximum(
-        d["tc"][:, 0] - d["td"][:, 0], 0)) * 3.28084 / 32.0
+    lcl_agl_ft = 125.0 * np.maximum(d["tc"][:, 0] - d["td"][:, 0], 0) * 3.28084
+    lcl_p = d["sfc_p"] - lcl_agl_ft / 32.0
     for t in range(ntimes):
         if lcl_p[t] > p_top_actual and lcl_p[t] < d["sfc_p"][t]:
             # Grey shadow
