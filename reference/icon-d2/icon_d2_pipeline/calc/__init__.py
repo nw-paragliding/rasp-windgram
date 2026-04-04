@@ -1,1 +1,0 @@
-# Soaring parameter calculations
