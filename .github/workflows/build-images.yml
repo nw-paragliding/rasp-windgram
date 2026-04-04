@@ -139,6 +139,7 @@ jobs:
   # Create multi-arch manifest for windgram
   manifest-windgram:
     needs: [build-windgram]
+    if: always() && !contains(needs.build-windgram.result, 'failure')
     runs-on: ubuntu-24.04
     permissions:
       contents: read
