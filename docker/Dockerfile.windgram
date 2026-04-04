@@ -37,12 +37,12 @@ COPY pyproject.toml ${BASEDIR}/pyproject.toml
 COPY rasp/ ${BASEDIR}/rasp/
 RUN pip3 install --no-cache-dir ${BASEDIR}/[all]
 
-# ── WRF/WPS run scripts and namelist templates ─────────────────────────────
-COPY wrf/run_wps.sh          ${BASEDIR}/wrf/run_wps.sh
-COPY wrf/run_real_wrf.sh     ${BASEDIR}/wrf/run_real_wrf.sh
-COPY wrf/namelist.wps.PNW    ${BASEDIR}/wrf/namelist.wps.PNW
-COPY wrf/namelist.input.PNW  ${BASEDIR}/wrf/namelist.input.PNW
-RUN chmod +x ${BASEDIR}/wrf/run_wps.sh ${BASEDIR}/wrf/run_real_wrf.sh
+# ── Scripts, templates, examples ────────────────────────────────────────────
+COPY scripts/run_wps.sh        ${BASEDIR}/scripts/run_wps.sh
+COPY scripts/run_real_wrf.sh   ${BASEDIR}/scripts/run_real_wrf.sh
+COPY scripts/get_nam_grib.sh   ${BASEDIR}/scripts/get_nam_grib.sh
+COPY templates/                ${BASEDIR}/templates/
+RUN chmod +x ${BASEDIR}/scripts/*.sh
 
 # Symlink WRF binaries into a standard location
 RUN mkdir -p ${BASEDIR}/bin && \
@@ -65,12 +65,8 @@ COPY examples/ ${BASEDIR}/examples/
 COPY VERSION ${BASEDIR}/VERSION
 
 # Entrypoint
-COPY entrypoint.sh ${BASEDIR}/entrypoint.sh
+COPY scripts/entrypoint.sh ${BASEDIR}/entrypoint.sh
 RUN chmod +x ${BASEDIR}/entrypoint.sh
-
-# GRIB download script
-COPY get_nam_grib.sh ${BASEDIR}/get_nam_grib.sh
-RUN chmod +x ${BASEDIR}/get_nam_grib.sh
 
 ENV NETCDF=/usr/local/netcdf
 ENV PATH=${BASEDIR}/bin:${BASEDIR}:${PATH}

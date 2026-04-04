@@ -77,9 +77,8 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
 
     run_hours = fhours[-1] - fhours[0]
 
-    wps_dir = f"{basedir}/WRF/WPS"
-    wrf_dir = f"{basedir}/WRF/WRFV2"
-    run_dir = f"{wrf_dir}/RASP/{config['name']}"
+    scripts_dir = f"{basedir}/scripts"
+    run_dir = f"{basedir}/runs/{config['name']}"
 
     print(f"\n  Pipeline: {config['name']}")
     print(f"  Model: {model.upper()}, Date: {date} {cycle}z")
@@ -88,7 +87,7 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
     # --- Step 1: Generate namelists ---
     result = generate_namelists(
         config_path, date, cycle,
-        output_dir=wps_dir,
+        output_dir=run_dir,
         geog_path=geog_path,
     )
 
@@ -99,11 +98,11 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
              "Downloading GRIB data")
 
     # --- Step 3: Run WPS ---
-    _run(f"bash {wps_dir}/run_wps.sh {grib_dir} {start_valid} {end_valid}",
+    _run(f"bash {scripts_dir}/run_wps.sh {grib_dir} {start_valid} {end_valid}",
          "Running WPS (ungrib + geogrid + metgrid)")
 
     # --- Step 4: Run WRF ---
-    _run(f"bash {wps_dir}/run_real_wrf.sh {wps_dir} {start_valid} {end_valid} {run_hours}",
+    _run(f"bash {scripts_dir}/run_real_wrf.sh {run_dir} {start_valid} {end_valid} {run_hours}",
          f"Running real.exe + wrf.exe ({run_hours}h, {num_procs} procs)")
 
     # --- Step 5: Render windgrams ---
@@ -112,7 +111,7 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
     wrfout_files = sorted(run_path.glob("wrfout_d*"))
     if not wrfout_files:
         # Check WPS dir as fallback
-        wrfout_files = sorted(Path(wps_dir).parent.glob("**/wrfout_d*"))
+        wrfout_files = sorted(Path(run_dir).parent.glob("**/wrfout_d*"))
 
     if not wrfout_files:
         print("WARNING: No wrfout files found — skipping windgram rendering")
