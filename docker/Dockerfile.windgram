@@ -9,10 +9,10 @@
 # Build:
 #   docker buildx build --platform linux/arm64,linux/amd64 \
 #     -f docker/Dockerfile.windgram \
-#     --build-arg WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:4.5.2 \
+#     --build-arg WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2 \
 #     -t ghcr.io/nw-paragliding/windgram:0.1.0 --push .
 
-ARG WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:4.5.2
+ARG WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2
 FROM ${WRF_IMAGE}
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -37,30 +37,29 @@ COPY pyproject.toml ${BASEDIR}/pyproject.toml
 COPY rasp/ ${BASEDIR}/rasp/
 RUN pip3 install --no-cache-dir ${BASEDIR}/[all]
 
-# ── RASP application code ───────────────────────────────────────────────────
-# WRF/WPS support scripts
-COPY model/WRF/WPS/run_wps.sh       ${BASEDIR}/WRF/WPS/run_wps.sh
-COPY model/WRF/WPS/run_real_wrf.sh  ${BASEDIR}/WRF/WPS/run_real_wrf.sh
-COPY model/WRF/WPS/namelist.wps.PNW ${BASEDIR}/WRF/WPS/namelist.wps.PNW
-COPY model/WRF/WPS/namelist.input.PNW ${BASEDIR}/WRF/WPS/namelist.input.PNW
-RUN chmod +x ${BASEDIR}/WRF/WPS/run_wps.sh ${BASEDIR}/WRF/WPS/run_real_wrf.sh
+# ── WRF/WPS run scripts and namelist templates ─────────────────────────────
+COPY wrf/run_wps.sh          ${BASEDIR}/wrf/run_wps.sh
+COPY wrf/run_real_wrf.sh     ${BASEDIR}/wrf/run_real_wrf.sh
+COPY wrf/namelist.wps.PNW    ${BASEDIR}/wrf/namelist.wps.PNW
+COPY wrf/namelist.input.PNW  ${BASEDIR}/wrf/namelist.input.PNW
+RUN chmod +x ${BASEDIR}/wrf/run_wps.sh ${BASEDIR}/wrf/run_real_wrf.sh
 
-# Symlink WRF binaries into expected locations
-RUN mkdir -p ${BASEDIR}/WRF/WRFV2/main ${BASEDIR}/WRF/WRFV2/run && \
-    ln -sf /opt/wrf/bin/wrf.exe   ${BASEDIR}/WRF/WRFV2/main/wrf.exe && \
-    ln -sf /opt/wrf/bin/real.exe  ${BASEDIR}/WRF/WRFV2/main/real.exe && \
-    ln -sf /opt/wrf/bin/ndown.exe ${BASEDIR}/WRF/WRFV2/main/ndown.exe && \
-    ln -sf /opt/wrf/run/*         ${BASEDIR}/WRF/WRFV2/run/
+# Symlink WRF binaries into a standard location
+RUN mkdir -p ${BASEDIR}/bin && \
+    ln -sf /opt/wrf/bin/wrf.exe   ${BASEDIR}/bin/wrf.exe && \
+    ln -sf /opt/wrf/bin/real.exe  ${BASEDIR}/bin/real.exe && \
+    ln -sf /opt/wrf/bin/ndown.exe ${BASEDIR}/bin/ndown.exe && \
+    ln -sf /opt/wrf/run           ${BASEDIR}/run
 
 # Symlink WPS binaries + support files
-RUN mkdir -p ${BASEDIR}/WRF/WPS/geogrid ${BASEDIR}/WRF/WPS/metgrid && \
-    ln -sf /opt/wrf/wps/ungrib.exe      ${BASEDIR}/WRF/WPS/ungrib.exe && \
-    ln -sf /opt/wrf/wps/metgrid.exe     ${BASEDIR}/WRF/WPS/metgrid.exe && \
-    ln -sf /opt/wrf/wps/geogrid.exe     ${BASEDIR}/WRF/WPS/geogrid.exe && \
-    ln -sf /opt/wrf/wps/geogrid/GEOGRID.TBL ${BASEDIR}/WRF/WPS/geogrid/GEOGRID.TBL && \
-    ln -sf /opt/wrf/wps/metgrid/METGRID.TBL ${BASEDIR}/WRF/WPS/metgrid/METGRID.TBL && \
-    ln -sf /opt/wrf/wps/link_grib.csh       ${BASEDIR}/WRF/WPS/link_grib.csh && \
-    ln -sf /opt/wrf/wps/Variable_Tables     ${BASEDIR}/WRF/WPS/Variable_Tables
+RUN mkdir -p ${BASEDIR}/wps/geogrid ${BASEDIR}/wps/metgrid && \
+    ln -sf /opt/wrf/wps/ungrib.exe            ${BASEDIR}/wps/ungrib.exe && \
+    ln -sf /opt/wrf/wps/metgrid.exe           ${BASEDIR}/wps/metgrid.exe && \
+    ln -sf /opt/wrf/wps/geogrid.exe           ${BASEDIR}/wps/geogrid.exe && \
+    ln -sf /opt/wrf/wps/geogrid/GEOGRID.TBL   ${BASEDIR}/wps/geogrid/GEOGRID.TBL && \
+    ln -sf /opt/wrf/wps/metgrid/METGRID.TBL   ${BASEDIR}/wps/metgrid/METGRID.TBL && \
+    ln -sf /opt/wrf/wps/link_grib.csh         ${BASEDIR}/wps/link_grib.csh && \
+    ln -sf /opt/wrf/wps/Variable_Tables       ${BASEDIR}/wps/Variable_Tables
 
 COPY examples/ ${BASEDIR}/examples/
 COPY VERSION ${BASEDIR}/VERSION
@@ -74,7 +73,7 @@ COPY get_nam_grib.sh ${BASEDIR}/get_nam_grib.sh
 RUN chmod +x ${BASEDIR}/get_nam_grib.sh
 
 ENV NETCDF=/usr/local/netcdf
-ENV PATH=${BASEDIR}:${PATH}
+ENV PATH=${BASEDIR}/bin:${BASEDIR}:${PATH}
 
 WORKDIR ${BASEDIR}
 ENTRYPOINT ["/opt/rasp/entrypoint.sh"]
