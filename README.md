@@ -1,41 +1,92 @@
-# raspnw - v2
+# RASP Windgram
 
-This repo contains files for RASP based soaring forecasting for PNW. This is the 2nd version which runs old WRF 2.0 and covers Washington, northern Oregon and southern British Columbia. The model runs are initiated from NAM with 32km resolution and produce forecast down to 1.3 km for certain regions.
+Generate paragliding soaring forecasts from WRF weather model output.
 
-# File structure
-- model 
-    - RASP files which are installed on a Linux machine
-    - Installation instruction can be found on http://wxtofly.net/v2/install.html
+Produces windgrams — vertical time-series charts showing thermal strength,
+wind, lapse rates, cloud base, and soaring ceiling for specific flying sites.
 
-- docs
-    - Site documentation
+## Quick Start (pip)
 
-- ps
-    - PowerShell utilities mostly for content under http://wxtofly.net/v2
+```bash
+pip install rasp-windgram
 
-- py
-    - Python utilities for updating web content under http://wxtofly.net/v2
+# Render a windgram from any WRF output file
+rasp-windgram wrfout_d03_2026-04-04_12:00:00 \
+  --lat 47.503 --lon -121.975 --site Tiger --output-dir ./output
 
-- wwwroot
-    - Web content related to V2
-    - The file structure corresponds to file structure on the web server
+# Batch render for multiple sites
+rasp-windgram wrfout_d03_2026-04-04_12:00:00 \
+  --sites examples/pnw-sites.csv --output-dir ./output
+```
 
+## Quick Start (Docker)
 
-# Update web site
-After making changes follow this sequence to upload updated files to web host
+Run the full forecast pipeline — downloads weather data, runs WRF, renders windgrams:
 
-1. Publish new files
+```bash
+docker pull ghcr.io/nw-paragliding/windgram:latest
 
-    In VS Code terminat run ``grunt``. This will update and copy HTML files to the publish folder
+# Define your region
+cat > domain.yaml <<EOF
+name: cascades
+model: nam
+center_lat: 47.6
+center_lon: -121.4
+target_dx_km: 1.33
+inner_extent_km: 150
+EOF
 
-2. Upload HTML files to web host
+# Run forecast
+docker run \
+  -v ~/rasp-data/geog:/mnt/geog:ro \
+  -v ~/output:/mnt/output \
+  ghcr.io/nw-paragliding/windgram run domain.yaml \
+    --date 2026-04-04 --cycle 06 --sites examples/pnw-sites.csv
+```
 
-    Run ``upload-website.py -w [V2_PUBLISH_PATH] -u [USENAME] -p [PASSWORD] -f v2``
+First run requires a one-time GEOG data download (~3GB):
+```bash
+./scripts/setup_geog.sh ~/rasp-data/geog
+```
 
-    For example: Run ``upload-website.py -w C:\\Code\\Repos\\raspnw-v2\\publish\\wwwroot\\v2 -u [USENAME] -p [PASSWORD] -f v2``
+## What's in a Windgram
 
-3. Upload status files to web host
+| Element | Meaning |
+|---|---|
+| Background colors | Lapse rate (red/orange = unstable thermals, purple = moderate, grey = inversion) |
+| Wind barbs | Wind speed and direction (green < 9kts, white >= 9kts) |
+| Paraglider crescents | Max soaring height (225 fpm sink rate) |
+| Cloud symbols | Potential cloud base (LCL) |
+| Diagonal hatching | High humidity / actual clouds |
+| Numbers at top | Thermal climb rate (m/s) |
+| Cyan 32°F line | Freezing level |
 
-    Run ``upload-website.py -w [STATUS_PUBLISH_PATH] -u [USENAME] -p [PASSWORD] -f status``
-    
-    For example: Run ``upload-website.py -w C:\\Code\\Repos\\raspnw-v2\\publish\\wwwroot\\status -u [USENAME] -p [PASSWORD] -f status``
+## Domain Configuration
+
+Specify a center point and target resolution. The system auto-generates the
+WRF nesting chain:
+
+```yaml
+name: cascades
+model: nam              # NAM, GFS, or HRRR
+center_lat: 47.6
+center_lon: -121.4
+target_dx_km: 1.33      # 12km → 4km → 1.33km (auto)
+inner_extent_km: 150
+```
+
+See [examples/](examples/) for sample configs and site lists.
+
+## Architecture
+
+See [docs/architecture.md](docs/architecture.md) for:
+- Repository structure
+- Docker image layers
+- Supported weather models
+- Soaring index function reference
+- Windgram rendering details
+- Future work
+
+## License
+
+MIT
