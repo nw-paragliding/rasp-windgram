@@ -87,6 +87,20 @@ See [docs/architecture.md](docs/architecture.md) for:
 - Windgram rendering details
 - Future work
 
+## Acknowledgments
+
+Soaring parameter calculations in `rasp/soaring.py` are Python reimplementations
+of Dr. Jack Glendening's Fortran routines (`ncl_jack_fortran.so`). The nonlinear
+thermal penetration model constants and cloud fraction formula were decoded from the
+compiled Fortran binary by the
+[simonbesters/icon-d2-pipeline](https://github.com/simonbesters/icon-d2-pipeline)
+project — without that reverse-engineering work, faithful reproduction of DrJack's
+algorithms would not have been possible.
+
+Windgram design follows TJ Olney's original NCL implementation
+([windgramtj.ncl](http://wxtofly.net/rasp_scripts/windgramtj.ncl),
+[documentation](http://wxtofly.net/windgramexplain.html)).
+
 ## License
 
 MIT

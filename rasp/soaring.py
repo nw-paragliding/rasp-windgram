@@ -10,6 +10,7 @@ References:
     Bolton (1980) — lifted condensation level
     Stull, "Meteorology for Scientists and Engineers" — BL diagnostics
     DrJack BLIPMAP documentation (drjack.info) — soaring parameter definitions
+    simonbesters/icon-d2-pipeline — reverse-engineered Fortran constants
 """
 
 import numpy as np
@@ -24,6 +25,17 @@ RD = 287.05        # dry air gas constant (J/kg/K)
 CP = 1004.0        # specific heat at constant pressure (J/kg/K)
 LV = 2.501e6       # latent heat of vaporization (J/kg)
 EPS = 0.622        # Rd/Rv
+RDCP = 0.286       # Rd/Cp (Poisson constant)
+
+# DrJack's empirical thermal penetration model coefficients
+# (from .rodata section of libncl_drjack.avx512.nocuda.so)
+_MS_TO_FPM = 196.85       # m/s to ft/min conversion
+_HCRIT_THRESHOLD = 225.0   # ft/min threshold for hcrit
+_ALPHA1 = 0.463            # ratio scaling coefficient
+_ALPHA2 = 0.4549           # linear offset
+_ALPHA3 = 1.3674           # quadratic scaling
+_ALPHA4 = 0.01267          # sqrt argument offset
+_ALPHA5 = 0.1126           # base height fraction offset
 
 
 # ---------------------------------------------------------------------------
@@ -47,24 +59,40 @@ def calc_wstar(hfx, lh, pblh, t2):
     """
     # Virtual heat flux (sensible + moisture buoyancy contribution)
     vhf = np.maximum(hfx + 0.000245268 * t2 * np.maximum(lh, 0.0), 0.0)
-    buoyancy_flux = (G / t2) * (vhf / RHO_CP)
+    arg = (G / t2) * pblh * (vhf / RHO_CP)
     wstar = np.where(
-        buoyancy_flux > 0,
-        (buoyancy_flux * pblh) ** (1.0 / 3.0),
+        arg > 0,
+        np.cbrt(arg),
         0.0,
     )
     return wstar.astype(np.float32)
 
 
+def _drjack_height_frac(threshold_fpm, wstar_fpm):
+    """DrJack's empirical nonlinear thermal penetration model.
+
+    Reconstructed from calc_hcrit_/calc_hlift_ in libncl_drjack.so.
+    Returns the fraction of BL depth that thermals can usefully penetrate.
+
+    The model:
+        ratio = threshold / wstar_fpm
+        height_frac = sqrt(alpha3 * (alpha2 - alpha1 * ratio) + alpha4) + alpha5
+    """
+    ratio = threshold_fpm / wstar_fpm
+    inner = _ALPHA3 * (_ALPHA2 - _ALPHA1 * ratio) + _ALPHA4
+    height_frac = np.sqrt(np.maximum(inner, 0.0)) + _ALPHA5
+    return height_frac
+
+
 def calc_hcrit(wstar, ter, pblh):
     """Critical height for soaring (m ASL).
 
-    Height at which the expected thermal updraft velocity equals a
-    typical paraglider sink rate (~1 m/s). Below this height a pilot
+    Height at which the expected thermal updraft velocity equals 225 fpm
+    (~1.14 m/s, a typical paraglider sink rate). Below this height a pilot
     can sustain flight in thermals; above it thermals are too weak.
 
-    Approximation: hcrit = ter + pblh * (1 - sink_rate / wstar)
-    Clamped to terrain height when wstar <= sink_rate.
+    Uses DrJack's empirical nonlinear thermal penetration model
+    (reconstructed from Fortran binary).
 
     Args:
         wstar: convective velocity scale (m/s), 2D
@@ -74,20 +102,22 @@ def calc_hcrit(wstar, ter, pblh):
     Returns:
         hcrit (m ASL), 2D
     """
-    sink_rate = 1.14  # m/s — 225 fpm, standard PG sink rate per TJ Olney
-    wstar_safe = np.maximum(wstar, 0.01)
-    ratio = np.where(wstar > sink_rate, 1.0 - sink_rate / wstar_safe, 0.0)
-    hcrit = ter + pblh * ratio
-    return hcrit.astype(np.float32)
+    wstar_fpm = wstar * _MS_TO_FPM
+    valid = wstar_fpm > _HCRIT_THRESHOLD
+    height_frac = np.where(
+        valid, _drjack_height_frac(_HCRIT_THRESHOLD, wstar_fpm), 0.0
+    )
+    hcrit = np.where(valid, ter + height_frac * pblh, ter)
+    return np.maximum(hcrit, 0.0).astype(np.float32)
 
 
-def calc_hlift(sink_rate, wstar, ter, pblh):
+def calc_hlift(criteria_fpm, wstar, ter, pblh):
     """Max soaring height for a given sink rate (m ASL).
 
-    Same as hcrit but with an arbitrary sink rate threshold.
+    Same model as hcrit but with a variable threshold.
 
     Args:
-        sink_rate: aircraft/glider sink rate (m/s), scalar
+        criteria_fpm: updraft criteria (ft/min), scalar
         wstar: convective velocity scale (m/s), 2D
         ter:   terrain height (m ASL), 2D
         pblh:  PBL height (m AGL), 2D
@@ -95,10 +125,13 @@ def calc_hlift(sink_rate, wstar, ter, pblh):
     Returns:
         hlift (m ASL), 2D
     """
-    wstar_safe = np.maximum(wstar, 0.01)
-    ratio = np.where(wstar > sink_rate, 1.0 - sink_rate / wstar_safe, 0.0)
-    hlift = ter + pblh * ratio
-    return hlift.astype(np.float32)
+    wstar_fpm = wstar * _MS_TO_FPM
+    valid = wstar_fpm > criteria_fpm
+    height_frac = np.where(
+        valid, _drjack_height_frac(criteria_fpm, wstar_fpm), 0.0
+    )
+    hlift = np.where(valid, ter + height_frac * pblh, ter)
+    return np.maximum(hlift, 0.0).astype(np.float32)
 
 
 def calc_blavg(field3d, z, ter, pblh):
@@ -109,7 +142,7 @@ def calc_blavg(field3d, z, ter, pblh):
 
     Args:
         field3d: 3D field (bottom_top, south_north, west_east)
-        z:       height AGL or ASL (same shape as field3d)
+        z:       height ASL (same shape as field3d)
         ter:     terrain height (m ASL), 2D
         pblh:    PBL height (m AGL), 2D
 
@@ -124,8 +157,7 @@ def calc_blavg(field3d, z, ter, pblh):
     for k in range(nz - 1):
         z_lo = z[k]
         z_hi = z[k + 1]
-        # Skip levels entirely above BL top or below terrain
-        in_bl = (z_lo < bl_top) & (z_lo >= ter)
+        in_bl = z_lo < bl_top
         if not np.any(in_bl):
             continue
         # Clamp top of layer to BL top
@@ -135,8 +167,9 @@ def calc_blavg(field3d, z, ter, pblh):
         result += np.where(in_bl, avg_val * dz, 0.0)
         total_dz += np.where(in_bl, dz, 0.0)
 
-    total_dz = np.maximum(total_dz, 1.0)  # avoid division by zero
-    return (result / total_dz).astype(np.float32)
+    valid = total_dz > 0.0
+    out = np.where(valid, result / np.maximum(total_dz, 1.0), field3d[0])
+    return out.astype(np.float32)
 
 
 def calc_blmax(field3d, z, ter, pblh):
@@ -156,19 +189,20 @@ def calc_blmax(field3d, z, ter, pblh):
     result = np.full_like(ter, -np.inf, dtype=np.float64)
 
     for k in range(nz):
-        in_bl = (z[k] >= ter) & (z[k] <= bl_top)
+        in_bl = z[k] <= bl_top
         result = np.where(in_bl, np.maximum(result, field3d[k]), result)
 
-    result = np.where(np.isinf(result), 0.0, result)
+    # Fallback to surface value where no valid data
+    no_data = np.isinf(result)
+    result = np.where(no_data, field3d[0], result)
     return result.astype(np.float32)
 
 
 def calc_wblmaxmin(mode, wa, z, ter, pblh):
-    """BL max/min vertical velocity.
+    """BL max vertical velocity or its height.
 
     Args:
-        mode: 0 = BL max updraft, 1 = BL min (max downdraft),
-              2 = BL max absolute, 3 = BL average vertical velocity
+        mode: 0 = max |W| in cm/s, 1 = height MSL of max |W| in m
         wa:   vertical velocity (m/s), 3D
         z:    height ASL (m), 3D
         ter:  terrain height ASL, 2D
@@ -177,14 +211,23 @@ def calc_wblmaxmin(mode, wa, z, ter, pblh):
     Returns:
         Result field, 2D
     """
+    nz = wa.shape[0]
+    bl_top = ter + pblh
+
+    max_w = np.zeros_like(ter, dtype=np.float32)
+    z_maxw = np.copy(ter).astype(np.float32)
+
+    for k in range(nz):
+        in_bl = z[k] <= bl_top
+        abs_w = np.abs(wa[k])
+        update = in_bl & (abs_w > np.abs(max_w))
+        max_w = np.where(update, wa[k], max_w)
+        z_maxw = np.where(update, z[k], z_maxw)
+
     if mode == 0:
-        return calc_blmax(wa, z, ter, pblh)
+        return (max_w * 100.0).astype(np.float32)  # m/s -> cm/s
     elif mode == 1:
-        return -calc_blmax(-wa, z, ter, pblh)
-    elif mode == 2:
-        return calc_blmax(np.abs(wa), z, ter, pblh)
-    elif mode == 3:
-        return calc_blavg(wa, z, ter, pblh)
+        return z_maxw
     else:
         raise ValueError(f"Unknown mode: {mode}")
 
@@ -192,12 +235,9 @@ def calc_wblmaxmin(mode, wa, z, ter, pblh):
 def calc_sfclclheight(pmb, tc, td, z, ter, pblh):
     """Surface-based lifted condensation level height (m ASL).
 
-    Uses Bolton (1980) formula for LCL temperature, then finds the
-    height where the parcel temperature profile crosses the LCL
-    temperature.
-
-    Simplified approach: uses the surface T-Td spread.
-        LCL_height_AGL ≈ 125 * (T_sfc - Td_sfc)   [Bolton approximation]
+    Lifts a surface parcel dry-adiabatically and conserves mixing ratio
+    to find the height where T_parcel <= Td_parcel. Falls back to the
+    Espy/Bolton approximation (125 m/K) if no condensation found in profile.
 
     Args:
         pmb:  pressure (mb), 3D
@@ -210,23 +250,46 @@ def calc_sfclclheight(pmb, tc, td, z, ter, pblh):
     Returns:
         LCL height (m ASL), 2D
     """
+    nz = pmb.shape[0]
+
     # Surface values (lowest model level)
-    t_sfc = tc[0]   # C
-    td_sfc = td[0]  # C
-    spread = np.maximum(t_sfc - td_sfc, 0.0)
-    lcl_agl = 125.0 * spread  # meters AGL (Bolton approximation)
-    lcl_asl = ter + lcl_agl
-    return lcl_asl.astype(np.float32)
+    t_sfc_k = tc[0] + 273.15
+    td_sfc = td[0]
+    p_sfc = pmb[0]
+
+    # Mixing ratio at surface (conserved during dry ascent)
+    e_sfc = 6.112 * np.exp(17.67 * td_sfc / (td_sfc + 243.5))
+    w_sfc = EPS * e_sfc / np.maximum(p_sfc - e_sfc, 0.1)
+
+    result = np.full_like(ter, np.nan, dtype=np.float32)
+    found = np.zeros_like(ter, dtype=bool)
+
+    for k in range(1, nz):
+        # Parcel T at this level (dry adiabat): T = T_sfc * (p/p_sfc)^(Rd/Cp)
+        t_parcel_k = t_sfc_k * (pmb[k] / np.maximum(p_sfc, 0.1)) ** RDCP
+        # Parcel dewpoint from conserved mixing ratio at this pressure
+        e_parcel = w_sfc * pmb[k] / (EPS + w_sfc)
+        e_parcel = np.maximum(e_parcel, 0.001)
+        log_e = np.log(e_parcel / 6.112)
+        td_parcel = 243.5 * log_e / (17.67 - log_e)
+        t_parcel_c = t_parcel_k - 273.15
+
+        condensed = (~found) & (t_parcel_c <= td_parcel)
+        result = np.where(condensed, z[k], result)
+        found = found | condensed
+
+    # Espy/Bolton fallback where no condensation found in profile
+    espy_lcl = ter + 125.0 * np.maximum(tc[0] - td[0], 0.0)
+    result = np.where(found, result, espy_lcl)
+    return result.astype(np.float32)
 
 
 def calc_blclheight(pmb, tc, qvapor_blavg, z, ter, pblh):
     """BL cloud layer height (m ASL).
 
     Height at which the BL-averaged mixing ratio would produce
-    saturation, accounting for the temperature lapse within the BL.
-
-    Simplified: uses the BL-averaged dewpoint depression to estimate
-    the height at which condensation occurs within the BL.
+    saturation. Computes dewpoint from BL-average qvapor at each
+    level's pressure, then finds where environmental T drops below it.
 
     Args:
         pmb:           pressure (mb), 3D
@@ -239,26 +302,26 @@ def calc_blclheight(pmb, tc, qvapor_blavg, z, ter, pblh):
     Returns:
         BL cloud layer height (m ASL), 2D
     """
-    bl_top = ter + pblh
     nz = tc.shape[0]
     result = np.full_like(ter, np.nan, dtype=np.float32)
+    found = np.zeros_like(ter, dtype=bool)
 
     for k in range(nz):
-        in_bl = (z[k] >= ter) & (z[k] <= bl_top) & np.isnan(result)
-        if not np.any(in_bl):
-            continue
-        # Saturation mixing ratio at this level
-        t_k = tc[k] + 273.15
-        p_pa = pmb[k] * 100.0
-        es = 611.2 * np.exp(17.67 * tc[k] / (tc[k] + 243.5))
-        qsat = EPS * es / (p_pa - es)
-        # Where BL-averaged qvapor >= saturation, cloud forms
-        cloud_here = in_bl & (qvapor_blavg >= qsat)
-        result = np.where(cloud_here, z[k], result)
+        # Dewpoint from BL-average qvapor at this level's pressure
+        e = qvapor_blavg * pmb[k] / (EPS + qvapor_blavg)
+        e = np.maximum(e, 0.001)
+        log_e = np.log(e / 6.112)
+        td_bl = 243.5 * log_e / (17.67 - log_e)
 
-    # Where no cloud found, return BL top (no cloud)
-    result = np.where(np.isnan(result), bl_top, result)
-    return result
+        # Where environmental temp drops below this dewpoint = condensation
+        condenses = (~found) & (tc[k] <= td_bl)
+        result = np.where(condenses, z[k], result)
+        found = found | condenses
+
+    # Where no cloud found, set to BL top
+    bl_top = ter + pblh
+    result = np.where(found, result, bl_top)
+    return result.astype(np.float32)
 
 
 def calc_cloudbase(qcloud, z, ter, crit, max_ht, lag):
@@ -318,8 +381,7 @@ def calc_blcloudbase(qcloud, z, ter, pblh, crit, max_ht, lag):
 def calc_blwinddiff(ua, va, z, ter, pblh):
     """Wind speed difference between BL top and surface.
 
-    Magnitude of the vector wind difference between the wind at the
-    top of the BL and the surface wind.
+    Scalar speed difference: |speed_top - speed_sfc|.
 
     Args:
         ua, va: u and v wind components (m/s), 3D
@@ -330,68 +392,77 @@ def calc_blwinddiff(ua, va, z, ter, pblh):
     Returns:
         Wind speed difference (m/s), 2D
     """
-    # Surface wind (lowest level)
-    u_sfc = ua[0]
-    v_sfc = va[0]
+    # Surface wind speed (lowest level)
+    spd_sfc = np.sqrt(ua[0] ** 2 + va[0] ** 2)
 
     # Find wind at BL top by interpolation
     bl_top = ter + pblh
     nz = ua.shape[0]
     u_bltop = np.copy(ua[0])
     v_bltop = np.copy(va[0])
+    found = np.zeros_like(ter, dtype=bool)
 
     for k in range(nz - 1):
-        crosses = (z[k] <= bl_top) & (z[k + 1] > bl_top)
+        crosses = (~found) & (z[k] <= bl_top) & (z[k + 1] > bl_top)
         if not np.any(crosses):
             continue
         # Linear interpolation weight
-        dz = z[k + 1] - z[k]
-        dz = np.maximum(dz, 1.0)
-        w = (bl_top - z[k]) / dz
-        w = np.clip(w, 0.0, 1.0)
+        dz = np.maximum(z[k + 1] - z[k], 1.0)
+        w = np.clip((bl_top - z[k]) / dz, 0.0, 1.0)
         u_bltop = np.where(crosses, ua[k] + w * (ua[k + 1] - ua[k]), u_bltop)
         v_bltop = np.where(crosses, va[k] + w * (va[k + 1] - va[k]), v_bltop)
+        found = found | crosses
 
-    du = u_bltop - u_sfc
-    dv = v_bltop - v_sfc
-    return np.sqrt(du**2 + dv**2).astype(np.float32)
+    spd_top = np.sqrt(u_bltop ** 2 + v_bltop ** 2)
+    return np.abs(spd_top - spd_sfc).astype(np.float32)
 
 
 def calc_bltop_pottemp_variability(theta, z, ter, pblh, criterion_degc):
     """Potential temperature variability near BL top.
 
-    Measures the temperature difference across the BL top — an
-    indicator of inversion strength. Stronger inversions produce
-    sharper BL tops with less overshooting.
+    Finds the height range around BL top where theta stays within
+    +/- criterion of the BL-top theta value. Returns the depth of
+    this zone in meters — an indicator of inversion sharpness.
+    Thinner zones = sharper inversions = less overshooting.
 
     Args:
         theta:          potential temperature (K), 3D
         z:              height ASL (m), 3D
         ter:            terrain height ASL (m), 2D
         pblh:           PBL height AGL (m), 2D
-        criterion_degc: thickness of layer to sample (degrees C/K)
+        criterion_degc: temperature range to sample (K)
 
     Returns:
-        BL top potential temperature variability (K), 2D
+        BL top potential temperature variability depth (m), 2D
     """
     bl_top = ter + pblh
     nz = theta.shape[0]
 
-    # Find theta at BL top and just above
-    theta_bl = np.copy(theta[0])
-    theta_above = np.copy(theta[0])
-
+    # Interpolate theta to exact BL top
+    theta_bltop = np.copy(theta[0]).astype(np.float64)
     for k in range(nz - 1):
-        crosses = (z[k] <= bl_top) & (z[k + 1] > bl_top)
-        if not np.any(crosses):
+        at_bltop = (z[k] <= bl_top) & (z[k + 1] > bl_top)
+        if not np.any(at_bltop):
             continue
-        theta_bl = np.where(crosses, theta[k], theta_bl)
-        if k + 2 < nz:
-            theta_above = np.where(crosses, theta[k + 2], theta_above)
-        else:
-            theta_above = np.where(crosses, theta[k + 1], theta_above)
+        frac = np.clip(
+            (bl_top - z[k]) / np.maximum(z[k + 1] - z[k], 1.0), 0.0, 1.0
+        )
+        theta_bltop = np.where(
+            at_bltop, theta[k] + frac * (theta[k + 1] - theta[k]), theta_bltop
+        )
 
-    variability = theta_above - theta_bl
+    # Find height range where theta is within +/- criterion of BL top theta
+    z_low = np.copy(bl_top).astype(np.float64)
+    z_high = np.copy(bl_top).astype(np.float64)
+
+    for k in range(nz):
+        in_range = np.abs(theta[k] - theta_bltop) < criterion_degc
+        near_bltop = np.abs(z[k] - bl_top) < pblh
+        update = in_range & near_bltop
+        z_low = np.where(update & (z[k] < z_low), z[k], z_low)
+        z_high = np.where(update & (z[k] > z_high), z[k], z_high)
+
+    variability = z_high - z_low
     return np.maximum(variability, 0.0).astype(np.float32)
 
 
@@ -454,17 +525,15 @@ def calc_aboveblinteg_mixratio(qfield, ptot, z, ter, pblh):
     return result.astype(np.float32)
 
 
-def calc_sfcsunpct(jday, gmthr, alat, alon, ter, z, pmb, tc, qvapor):
+def calc_sfcsunpct(swdown, jday, gmthr, alat, alon, ter, z, pmb, tc, qvapor):
     """Surface sunshine percentage.
 
-    Estimates the fraction of direct solar radiation reaching the
-    surface based on solar zenith angle, atmospheric absorption
-    (pressure, temperature, humidity path), and terrain shadowing.
-
-    Simplified implementation: computes solar zenith angle and
-    estimates attenuation from total column water vapor.
+    Ratio of actual downward shortwave (from WRF) to computed clear-sky
+    maximum. Solar geometry matches DrJack's radconst_ routine (solar
+    constant 1370, axial tilt 23.5 deg, equinox offset day 80).
 
     Args:
+        swdown:  actual downward shortwave radiation (W/m^2), 2D
         jday:    Julian day of year (scalar)
         gmthr:   GMT hour (scalar)
         alat:    latitude (degrees), 2D
@@ -476,43 +545,59 @@ def calc_sfcsunpct(jday, gmthr, alat, alon, ter, z, pmb, tc, qvapor):
         qvapor:  water vapor mixing ratio (kg/kg), 3D
 
     Returns:
-        Sunshine percentage (0-100), 2D
+        Sunshine percentage (0-100), 2D. -999 where sun is below horizon.
     """
-    # Solar declination angle
-    decl = 23.45 * np.sin(np.radians((284 + jday) * 360.0 / 365.0))
-    decl_rad = np.radians(decl)
+    # Solar declination (DrJack radconst_ constants)
+    day_angle = 2.0 * np.pi * (jday - 80) / 365.0
+    declination = 23.5 * np.sin(day_angle)
+    decl_rad = np.radians(declination)
 
     # Hour angle
-    solar_hour = gmthr + alon / 15.0  # approximate solar time
-    ha_rad = np.radians((solar_hour - 12.0) * 15.0)
+    solar_hour = gmthr + alon / 15.0
+    ha_rad = np.radians(15.0 * (solar_hour - 12.0))
 
     # Solar zenith angle
     lat_rad = np.radians(alat)
     cos_zenith = (np.sin(lat_rad) * np.sin(decl_rad) +
                   np.cos(lat_rad) * np.cos(decl_rad) * np.cos(ha_rad))
-    cos_zenith = np.clip(cos_zenith, 0.0, 1.0)
+    sun_up = cos_zenith > 1e-9
+    cos_z = np.maximum(cos_zenith, 1e-9)
 
-    # Simple attenuation from column water vapor
+    # Air mass
+    airmass = np.where(sun_up, 1.0 / cos_z, 40.0)
+    airmass = np.minimum(airmass, 40.0)
+
+    # Precipitable water from column qvapor
     nz = qvapor.shape[0]
-    col_water = np.zeros_like(ter, dtype=np.float64)
-    for k in range(nz - 1):
-        dp = np.abs(pmb[k + 1] - pmb[k]) * 100.0  # Pa
-        col_water += 0.5 * (qvapor[k] + qvapor[k + 1]) * dp / G
+    pw = np.zeros_like(ter, dtype=np.float64)
+    for k in range(1, nz):
+        dp = np.abs(pmb[k - 1] - pmb[k]) * 100.0  # mb -> Pa
+        qv_avg = 0.5 * (qvapor[k - 1] + qvapor[k])
+        pw += qv_avg * dp / G
 
-    # Transmittance (simple Beer-Lambert-ish)
-    tau = np.exp(-0.1 * col_water)
-    sunpct = 100.0 * cos_zenith * tau
+    # Kasten clear-sky transmittance with precipitable water correction
+    transmittance = np.exp(-0.09 * airmass ** 0.75 * (1.0 + 0.012 * pw))
 
-    # Night = 0
-    sunpct = np.where(cos_zenith <= 0, 0.0, sunpct)
-    return np.clip(sunpct, 0.0, 100.0).astype(np.float32)
+    # Clear-sky radiation (DrJack solar constant = 1370 W/m^2)
+    clear_sky = 1370.0 * cos_z * transmittance
+
+    # Sunshine % = actual / clear-sky
+    sunpct = np.where(
+        ~sun_up, -999.0,
+        np.where(clear_sky > 10.0,
+                 np.clip(100.0 * swdown / np.maximum(clear_sky, 1.0), 0.0, 100.0),
+                 50.0)
+    )
+    return sunpct.astype(np.float32)
 
 
 def calc_subgrid_blcloudpct(qvapor, qcloud, tc, pmb, z, ter, pblh, crit):
-    """Sub-grid BL cloud fraction (GRADS method).
+    """Sub-grid BL cloud fraction (DrJack GrADS method).
 
-    Estimates the probability of cloud within each grid cell based on
-    the proximity of mixing ratio to saturation within the BL.
+    Per-level cloud fraction from a linear RH mapping, taking the
+    maximum over all BL levels. From the reverse-engineered Fortran:
+        cloud_frac = clamp(400 * RH - 300, 0, 95)
+    This gives 0% at RH=75% and linearly increases to a 95% cap.
 
     Args:
         qvapor: water vapor mixing ratio (kg/kg), 3D
@@ -525,29 +610,27 @@ def calc_subgrid_blcloudpct(qvapor, qcloud, tc, pmb, z, ter, pblh, crit):
         crit:   cloud water threshold (kg/kg)
 
     Returns:
-        Cloud fraction (0-100%), 2D
+        Cloud fraction (0-95%), 2D
     """
     bl_top = ter + pblh
     nz = tc.shape[0]
-    cloud_count = np.zeros_like(ter, dtype=np.float64)
-    total_count = np.zeros_like(ter, dtype=np.float64)
+    cloud_max = np.zeros_like(ter, dtype=np.float32)
 
     for k in range(nz):
-        in_bl = (z[k] >= ter) & (z[k] <= bl_top)
+        in_bl = z[k] <= bl_top
         if not np.any(in_bl):
             continue
-        # Saturation mixing ratio
-        es = 611.2 * np.exp(17.67 * tc[k] / (tc[k] + 243.5))
-        p_pa = pmb[k] * 100.0
-        qsat = EPS * es / (p_pa - es)
-        # RH proxy for sub-grid cloud probability
-        rh = qvapor[k] / np.maximum(qsat, 1e-10)
-        has_cloud = (qcloud[k] > crit) | (rh > 0.95)
-        cloud_count += np.where(in_bl & has_cloud, 1.0, 0.0)
-        total_count += np.where(in_bl, 1.0, 0.0)
+        # Saturation mixing ratio (Magnus formula, DrJack constants)
+        es = 6.112 * np.exp(17.67 * tc[k] / (tc[k] + 243.5))
+        qs = EPS * es / np.maximum(pmb[k] - 0.378 * es, 0.1)
+        # Relative humidity (fractional)
+        rh = np.clip(qvapor[k] / np.maximum(qs, 1e-10), 0.0, 1.0)
+        # DrJack linear RH -> cloud mapping
+        cf_layer = np.clip(400.0 * rh - 300.0, 0.0, 95.0)
+        # Take maximum over all BL levels
+        cloud_max = np.where(in_bl, np.maximum(cloud_max, cf_layer), cloud_max)
 
-    total_count = np.maximum(total_count, 1.0)
-    return (100.0 * cloud_count / total_count).astype(np.float32)
+    return cloud_max.astype(np.float32)
 
 
 def calc_qcblhf(rqcblten, mu, z, ter, pblh):

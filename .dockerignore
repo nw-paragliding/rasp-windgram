@@ -1,9 +1,0 @@
-.git/
-node_modules/
-docs/
-*.md
-.gitignore
-Gruntfile.js
-package.json
-package-lock.json
-windgram_pipeline.md
