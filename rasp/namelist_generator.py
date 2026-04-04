@@ -29,26 +29,60 @@ except ImportError:
 # Constants
 # ---------------------------------------------------------------------------
 
-# WRF outer domain grid spacing must match the input model resolution
-MODEL_DX = {
-    "nam": 12000.0,    # 12km
-    "gfs": 25000.0,    # 0.25deg ~ 25km
-    "hrrr": 3000.0,    # 3km
+# ---------------------------------------------------------------------------
+# Model registry — each supported NWP model and its properties
+# ---------------------------------------------------------------------------
+MODELS = {
+    "nam": {
+        "name": "NAM (North American Mesoscale)",
+        "dx": 12000.0,
+        "vtable": "Vtable.NAM",
+        "interval_seconds": 10800,     # 3h
+        "forecast_hours": list(range(6, 85, 3)),  # 6-84h, 3h steps
+        "cycles": [0, 6, 12, 18],
+        "coverage": "North America",
+        "source": "nomads",
+        "url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.{date}/nam.t{cycle}z.awip3d{fhr:02d}.tm00.grib2",
+    },
+    "hrrr": {
+        "name": "HRRR (High-Resolution Rapid Refresh)",
+        "dx": 3000.0,
+        "vtable": "Vtable.RAP.pressure.ncep",
+        "interval_seconds": 3600,      # 1h
+        "forecast_hours": list(range(0, 19)),  # 0-18h hourly (48h for 00/06/12/18z)
+        "cycles": list(range(0, 24)),   # hourly cycles
+        "coverage": "CONUS",
+        "source": "nomads",
+        "url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfprsf{fhr:02d}.grib2",
+    },
+    "gfs": {
+        "name": "GFS (Global Forecast System)",
+        "dx": 25000.0,
+        "vtable": "Vtable.GFS",
+        "interval_seconds": 10800,     # 3h (1h for fhr 0-120)
+        "forecast_hours": list(range(0, 121, 3)) + list(range(123, 385, 3)),
+        "cycles": [0, 6, 12, 18],
+        "coverage": "Global",
+        "source": "nomads",
+        "url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.{date}/{cycle}/atmos/gfs.t{cycle}z.pgrb2.0p25.f{fhr:03d}",
+    },
+    "hrdps": {
+        "name": "HRDPS (High Resolution Deterministic Prediction System)",
+        "dx": 2500.0,
+        "vtable": "Vtable.HRDPS",      # TODO: create or find
+        "interval_seconds": 3600,
+        "forecast_hours": list(range(0, 49)),
+        "cycles": [0, 6, 12, 18],
+        "coverage": "Canada",
+        "source": "msc_datamart",
+        "url_pattern": "https://dd.weather.gc.ca/model_hrdps/continental/2.5km/{cycle}/{fhr:03d}/",
+    },
 }
 
-# Default forecast hours by model
-MODEL_FORECAST_HOURS = {
-    "nam": [6, 9, 12, 15, 18, 21],
-    "gfs": [6, 12, 18, 24, 30, 36],
-    "hrrr": list(range(1, 19)),
-}
-
-# Vtable by model
-MODEL_VTABLE = {
-    "nam": "Vtable.NAM",
-    "gfs": "Vtable.GFS",
-    "hrrr": "Vtable.HRRR",
-}
+# Convenience accessors for backward compat
+MODEL_DX = {k: v["dx"] for k, v in MODELS.items()}
+MODEL_FORECAST_HOURS = {k: v["forecast_hours"] for k, v in MODELS.items()}
+MODEL_VTABLE = {k: v["vtable"] for k, v in MODELS.items()}
 
 
 # ---------------------------------------------------------------------------
@@ -381,7 +415,7 @@ def generate_namelist_wps(config, domains, date, cycle, geog_path="/mnt/geog"):
  max_dom = {ndomains},
  start_date = {rep(f"'{start_str}'")},
  end_date   = {rep(f"'{end_str}'")},
- interval_seconds = {(fhours[1] - fhours[0]) * 3600 if len(fhours) > 1 else 10800},
+ interval_seconds = {MODELS[model]["interval_seconds"]},
  io_form_geogrid = 2,
 /
 

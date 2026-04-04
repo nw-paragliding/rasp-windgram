@@ -179,6 +179,50 @@ Python replacement for `windgrams.ncl`. Visual elements per
 
 ---
 
+## Adding a New Model
+
+To add support for a new NWP model (e.g. ECMWF, HRDPS, ICON):
+
+1. **Find or create a Vtable** — check `Variable_Tables/` in the WPS distribution.
+   The Vtable maps GRIB fields to WPS intermediate format. If one doesn't exist,
+   create it from the model's GRIB2 field documentation.
+
+2. **Add to model registry** in `rasp/namelist_generator.py`:
+   ```python
+   MODELS["mymodel"] = {
+       "name": "My Model",
+       "dx": 3000.0,              # native resolution in meters
+       "vtable": "Vtable.MyModel",
+       "interval_seconds": 3600,   # temporal resolution
+       "forecast_hours": [...],
+       "cycles": [0, 6, 12, 18],
+       "coverage": "Region",
+       "source": "url_source",
+       "url_pattern": "https://...",
+   }
+   ```
+
+3. **Add a download adapter** in `scripts/` if the source uses a non-standard
+   URL pattern or API (e.g. ECMWF requires authentication).
+
+4. **Test with a real run** — download a few files, run ungrib with the Vtable,
+   check `num_metgrid_levels`, verify metgrid output looks right.
+
+5. **Domain config** — the outer domain `dx` should match the model resolution.
+   For high-res models (HRRR 3km, HRDPS 2.5km), you can nest directly to 1km
+   without the intermediate 4km domain.
+
+### Currently supported
+
+| Model | Resolution | Coverage | Vtable | Status |
+|-------|-----------|----------|--------|--------|
+| NAM | 12km | North America | Vtable.NAM | Working |
+| HRRR | 3km | CONUS | Vtable.RAP.pressure.ncep | In progress |
+| GFS | 25km | Global | Vtable.GFS | Config only |
+| HRDPS | 2.5km | Canada | TBD | Config only |
+
+---
+
 ## Future Work
 
 - **HRRR support**: Vtable validation, sigma-level namelist settings
