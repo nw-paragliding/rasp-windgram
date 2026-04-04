@@ -94,7 +94,8 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
     # --- Step 2: Download GRIB (if not provided) ---
     if grib_dir is None:
         grib_dir = f"{basedir}/grib"
-        _run(f"bash {scripts_dir}/get_nam_grib.sh {date} {cycle} {grib_dir}",
+        date_compact = date.replace("-", "")  # YYYY-MM-DD → YYYYMMDD
+        _run(f"bash {scripts_dir}/get_nam_grib.sh {date_compact} {cycle} {grib_dir}",
              "Downloading GRIB data")
 
     # --- Step 3: Run WPS ---

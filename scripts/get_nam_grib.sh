@@ -43,7 +43,7 @@ for FH in ${FHOURS}; do
         continue
     fi
     echo "  Downloading ${FNAME}..."
-    curl -fsSL --progress-bar "${NAM_DIR}/${FNAME}" -o "${DEST}" && \
+    curl --http1.1 -fsSL --progress-bar "${NAM_DIR}/${FNAME}" -o "${DEST}" && \
         echo "  ${FNAME}: OK ($(du -sh "${DEST}" | cut -f1))" || \
         echo "  WARNING: ${FNAME} download failed — may not be available yet"
 done
