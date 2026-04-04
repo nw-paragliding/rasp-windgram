@@ -9,18 +9,43 @@ on:
       target:
         description: 'Image to build (wrf, windgram, or both)'
         required: false
-        default: ''
+        default: 'windgram'
 
 env:
   REGISTRY: ghcr.io/${{ github.repository_owner }}
+  WRF_VERSION: v4.5.2
 
 jobs:
+  # Check if wrf-compiled image already exists — skip rebuild if so
+  check-wrf:
+    runs-on: ubuntu-24.04
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+      force: ${{ steps.force.outputs.force }}
+    steps:
+      - id: force
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && \
+             ([ "${{ inputs.target }}" = "wrf" ] || [ "${{ inputs.target }}" = "both" ]); then
+            echo "force=true" >> $GITHUB_OUTPUT
+          else
+            echo "force=false" >> $GITHUB_OUTPUT
+          fi
+
+      - id: check
+        run: |
+          if docker manifest inspect "${REGISTRY}/wrf-compiled:${WRF_VERSION}" > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "wrf-compiled:${WRF_VERSION} already exists — skipping rebuild"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "wrf-compiled:${WRF_VERSION} not found — will build"
+          fi
+
   # Build wrf-compiled for each arch natively (no QEMU)
   build-wrf:
-    if: >-
-      github.event_name == 'workflow_dispatch' &&
-      (inputs.target == 'wrf' || inputs.target == '')
-      || startsWith(github.ref, 'refs/tags/v')
+    needs: [check-wrf]
+    if: needs.check-wrf.outputs.exists == 'false' || needs.check-wrf.outputs.force == 'true'
     strategy:
       matrix:
         include:
@@ -36,9 +61,7 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
-
       - uses: docker/setup-buildx-action@v3
-
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -47,7 +70,6 @@ jobs:
 
       - name: Build and push wrf-compiled (${{ matrix.suffix }})
         run: |
-          WRF_VERSION="${WRF_VERSION:-v4.5.2}"
           docker buildx build \
             --platform ${{ matrix.platform }} \
             -f docker/Dockerfile.wrf \
@@ -57,7 +79,8 @@ jobs:
 
   # Create multi-arch manifest for wrf-compiled
   manifest-wrf:
-    needs: [build-wrf]
+    needs: [check-wrf, build-wrf]
+    if: always() && (needs.build-wrf.result == 'success' || needs.check-wrf.outputs.exists == 'true')
     runs-on: ubuntu-24.04
     permissions:
       packages: write
@@ -67,23 +90,19 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - uses: docker/setup-buildx-action@v3
 
-      - name: Create multi-arch manifest
+      - name: Create multi-arch manifest (if built)
+        if: needs.build-wrf.result == 'success'
         run: |
-          WRF_VERSION="${WRF_VERSION:-v4.5.2}"
           docker buildx imagetools create -t "${REGISTRY}/wrf-compiled:${WRF_VERSION}" \
             "${REGISTRY}/wrf-compiled:${WRF_VERSION}-amd64" \
             "${REGISTRY}/wrf-compiled:${WRF_VERSION}-arm64"
 
   # Build windgram for each arch natively
   build-windgram:
-    if: >-
-      github.event_name == 'workflow_dispatch' &&
-      (inputs.target == 'windgram' || inputs.target == '')
-      || startsWith(github.ref, 'refs/tags/v')
     needs: [manifest-wrf]
+    if: always() && needs.manifest-wrf.result != 'failure'
     strategy:
       matrix:
         include:
@@ -99,9 +118,7 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
-
       - uses: docker/setup-buildx-action@v3
-
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -111,7 +128,6 @@ jobs:
       - name: Build and push windgram (${{ matrix.suffix }})
         run: |
           VERSION=$(cat VERSION | tr -d '[:space:]')
-          WRF_VERSION="${WRF_VERSION:-v4.5.2}"
           docker buildx build \
             --platform ${{ matrix.platform }} \
             -f docker/Dockerfile.windgram \
@@ -129,13 +145,11 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
-
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - uses: docker/setup-buildx-action@v3
 
       - name: Create multi-arch manifests
