@@ -168,6 +168,17 @@ Python replacement for `windgrams.ncl`. Visual elements per
 
 ---
 
+## References
+
+- **[simonbesters/icon-d2-pipeline](https://github.com/simonbesters/icon-d2-pipeline)** — pure-Python reimplementation of DrJack's Fortran routines, reverse-engineered from compiled `.so` binary. Source of the empirical thermal penetration model constants used in `rasp/soaring.py`.
+- **[CazYokoyama/wrfv3](https://github.com/CazYokoyama/wrfv3)** — most complete RASP distribution (WRF v3, WPS, NCL scripts, domain wizard)
+- **[wargoth/rasp-gm](https://github.com/wargoth/rasp-gm)** — DrJack's GM (Graphical Model) subsystem with NCL calc scripts
+- **[oriolcervello/raspuri](https://github.com/oriolcervello/raspuri)** — Python/Bash RASP rewrite for WRF v4, shows calling conventions
+- **[TJ Olney's windgram docs](http://wxtofly.net/windgramexplain.html)** — reference for windgram visual design
+- **[DrJack's RASP](http://www.drjack.info/)** — original RASP/BLIPMAP project
+
+---
+
 ## Future Work
 
 - **HRRR support**: Vtable validation, sigma-level namelist settings
