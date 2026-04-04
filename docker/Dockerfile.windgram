@@ -35,9 +35,10 @@ ENV LANG=en_US.UTF-8
 
 # ── Install rasp-windgram Python package ────────────────────────────────────
 COPY pyproject.toml ${BASEDIR}/pyproject.toml
-COPY README.md ${BASEDIR}/README.md
 COPY rasp/ ${BASEDIR}/rasp/
-RUN pip3 install --no-cache-dir ${BASEDIR}/ && \
+# Create empty README so pyproject.toml doesn't error during pip install
+RUN touch ${BASEDIR}/README.md && \
+    pip3 install --no-cache-dir ${BASEDIR}/ && \
     pip3 install --no-cache-dir --no-deps wrf-python pyyaml
 
 # ── Scripts, templates, examples ────────────────────────────────────────────
