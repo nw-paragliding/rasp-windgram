@@ -62,20 +62,18 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
     """
     config = load_domain_config(config_path)
     model = config["model"]
-    fhours = MODEL_FORECAST_HOURS[model]
 
-    # Compute valid time range from cycle + forecast hours
-    start_valid = f"{date}_{int(cycle) + fhours[0]:02d}"
-    end_valid_h = int(cycle) + fhours[-1]
-    if end_valid_h >= 24:
-        # Rolls into next day — simplified, assumes single day rollover
-        from datetime import datetime, timedelta
-        d = datetime.strptime(date, "%Y-%m-%d") + timedelta(days=1)
-        end_valid = f"{d.strftime('%Y-%m-%d')}_{end_valid_h - 24:02d}"
-    else:
-        end_valid = f"{date}_{end_valid_h:02d}"
+    # Use the forecast hours that get_nam_grib.sh actually downloads (6-21)
+    # not the full model range (0-84h for NAM)
+    download_fhours = [6, 9, 12, 15, 18, 21]  # what the download script fetches
 
-    run_hours = fhours[-1] - fhours[0]
+    from datetime import datetime, timedelta
+    base_dt = datetime.strptime(f"{date}_{cycle}", "%Y-%m-%d_%H")
+    start_dt = base_dt + timedelta(hours=download_fhours[0])
+    end_dt = base_dt + timedelta(hours=download_fhours[-1])
+    start_valid = start_dt.strftime("%Y-%m-%d_%H")
+    end_valid = end_dt.strftime("%Y-%m-%d_%H")
+    run_hours = download_fhours[-1] - download_fhours[0]
 
     scripts_dir = f"{basedir}/scripts"
     run_dir = f"{basedir}/runs/{config['name']}"

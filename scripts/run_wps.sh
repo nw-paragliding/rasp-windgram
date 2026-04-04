@@ -54,7 +54,7 @@ _resolve_geog_path() {
 }
 
 GEOG_PATH="${4:-$(_resolve_geog_path /mnt/geog)}"
-NAMELIST_TEMPLATE="${WPS_DIR}/namelist.wps.PNW"
+NAMELIST_TEMPLATE="${BASEDIR}/templates/namelist.wps.PNW"
 LOG_DIR="${WPS_RUN_DIR}/log"
 
 mkdir -p "${WPS_RUN_DIR}" "${LOG_DIR}"
