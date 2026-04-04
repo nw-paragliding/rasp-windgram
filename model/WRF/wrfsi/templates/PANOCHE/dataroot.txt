@@ -1,1 +1,0 @@
-/home/admin/DRJACK/WRF/wrfsi/domains

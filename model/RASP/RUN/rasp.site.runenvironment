@@ -1,5 +1,0 @@
-#!/bin/bash
-
-### ADDITIONAL ENVIRONMENTAL VARIABLES NEEDED WITH ALTERNATIVE wrf.exe
-ulimit -s unlimited
-export KMP_STACKSIZE=100000000

@@ -1,9 +1,11 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.idea/
+.DS_Store
+*.swp
 .vs
 .vscode
 node_modules
-dist
-publish

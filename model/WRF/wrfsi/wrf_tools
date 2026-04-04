@@ -1,9 +1,0 @@
-#!/usr/bin/perl
-# Script to launch the WRFSI GUI.
-#
-umask 000;
-# $ENV{PERL5OPT}='-Mblib=[BASEDIR]/WRF/wrfsi/gui/perlTk/blib';
-
-my $ans=system("$BASEDIR/WRF/wrfsi/gui/guiTk/ui_system_tools.pl 1> /tmp/wrf_tools.log 2>&1");
-if ($ans) { print "Look at file /tmp/wrf_tools.log\n"; };
-exit;
