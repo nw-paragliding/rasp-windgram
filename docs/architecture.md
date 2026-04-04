@@ -3,8 +3,8 @@
 ## What This Is
 
 A pipeline for generating paragliding soaring forecasts (windgrams) from
-publicly available NWP model data. Runs on arm64 (Apple Silicon) and amd64
-natively — no emulation.
+publicly available NWP model data. Runs natively on arm64 (Apple Silicon) and
+amd64.
 
 ### Pipeline
 
@@ -20,7 +20,6 @@ NAM/GFS/HRRR GRIB2 data
 
 | Config | Time |
 |---|---|
-| Legacy (QEMU x86 emulation) | 5.5 hours |
 | Native arm64, d01 only (12km, serial) | ~2 min |
 | Native arm64, d01+d02+d03 (12km+4km+1.33km, 8 MPI cores) | ~45 min |
 
@@ -30,6 +29,7 @@ NAM/GFS/HRRR GRIB2 data
 
 ```
 rasp/           Python package (pip install rasp-windgram)
+  cli.py          Host-side CLI (wraps Docker)
   soaring.py      Soaring index calculations (w*, hcrit, BL diagnostics)
   windgram.py     Windgram renderer (matplotlib)
   namelist_generator.py   domain.yaml → namelist.wps + namelist.input
@@ -78,7 +78,7 @@ Tagged with semver from `VERSION` file: `0.1.0`, `latest`.
 ```
 
 CI builds trigger on `v*` tags via GitHub Actions. arm64 builds on
-`ubuntu-24.04-arm` (native), amd64 on `ubuntu-24.04` (native). No QEMU.
+`ubuntu-24.04-arm`, amd64 on `ubuntu-24.04` — both native.
 
 ---
 
@@ -126,7 +126,7 @@ Warnings emitted for:
 ## Soaring Index Functions
 
 Python replacements for the legacy `ncl_jack_fortran.so` Fortran library
-(21 functions, all in `rasp/soaring.py`):
+(all in `rasp/soaring.py`):
 
 | Function | Purpose |
 |---|---|
@@ -148,8 +148,7 @@ Python replacements for the legacy `ncl_jack_fortran.so` Fortran library
 | `calc_subgrid_blcloudpct` | Sub-grid BL cloud fraction |
 | `calc_qcblhf` | Cloud base height factor |
 
-All take NumPy arrays, no Fortran dependency. Previously required
-`ncl_jack_fortran.so` (x86_64 pre-compiled binary, no source available).
+All take NumPy arrays, no Fortran dependency.
 
 ---
 
@@ -174,6 +173,4 @@ Python replacement for `windgrams.ncl`. Visual elements per
 - **HRRR support**: Vtable validation, sigma-level namelist settings
 - **UW WRF support**: data access, direct wrfout → windgram path
 - **Map layers**: rain overlay, top-of-lift contours, wind maps
-- **High-res GEOG tiles**: per-domain tile subsetting (vs full 30GB download)
-- **Unified CLI**: `pip install rasp` wrapper around Docker
 - **Numerical validation**: compare soaring indices against legacy NCL + pilot reports

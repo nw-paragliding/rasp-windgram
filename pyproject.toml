@@ -29,6 +29,7 @@ wrf = ["wrf-python>=1.3"]
 all = ["wrf-python>=1.3", "pyyaml>=6.0"]
 
 [project.scripts]
+rasp = "rasp.cli:main"
 rasp-windgram = "rasp.windgram:main"
 rasp-namelist = "rasp.namelist_generator:main"
 

@@ -5,48 +5,163 @@ Generate paragliding soaring forecasts from WRF weather model output.
 Produces windgrams — vertical time-series charts showing thermal strength,
 wind, lapse rates, cloud base, and soaring ceiling for specific flying sites.
 
-## Quick Start (pip)
+## Quick Start
 
 ```bash
 pip install rasp-windgram
 
-# Render a windgram from any WRF output file
-rasp-windgram wrfout_d03_2026-04-04_12:00:00 \
-  --lat 47.503 --lon -121.975 --site Tiger --output-dir ./output
+# One-time: download WPS geographic data (high-res, ~2.6 GB)
+rasp setup-geog
 
-# Batch render for multiple sites
-rasp-windgram wrfout_d03_2026-04-04_12:00:00 \
-  --sites examples/pnw-sites.csv --output-dir ./output
+# Run a full forecast for tomorrow
+rasp run examples/cascades.yaml \
+  --date 2026-04-04 --cycle 06 \
+  --sites examples/pnw-sites.csv
+
+# Preview what Docker will run without executing
+rasp --dry-run run examples/cascades.yaml \
+  --date 2026-04-04 --cycle 06 \
+  --sites examples/pnw-sites.csv
+
+# Render windgrams from existing WRF output
+rasp windgram wrfout_d03_*.nc --sites examples/pnw-sites.csv
+
+# Single site
+rasp windgram wrfout_d03_*.nc \
+  --site Tiger --lat 47.503 --lon -121.975
 ```
 
-## Quick Start (Docker)
+### GEOG Data Setup
 
-Run the full forecast pipeline — downloads weather data, runs WRF, renders windgrams:
+The WRF Preprocessing System requires static geographic data. Download it once:
+
+```bash
+# High-res (default) — ~2.6 GB download, ~29 GB unpacked
+rasp setup-geog
+
+# Low-res (for testing) — ~0.4 GB download, ~3 GB unpacked
+rasp setup-geog --low-res
+
+# Custom destination
+rasp setup-geog --dest /data/wps-geog
+```
+
+Subsequent runs skip the download if data is already present.
+
+### CLI Reference
+
+| Command | Description |
+|---|---|
+| `rasp run <domain.yaml>` | Full pipeline: WPS → WRF → windgrams |
+| `rasp windgram <wrfout...>` | Render windgrams from existing WRF output |
+| `rasp setup-geog` | Download WPS GEOG static data |
+| `rasp --dry-run <cmd>` | Print the Docker command without executing |
+
+Configuration via environment variables:
+
+| Variable | Default | Description |
+|---|---|---|
+| `RASP_IMAGE` | `ghcr.io/nw-paragliding/windgram:latest` | Docker image to use |
+| `RASP_GEOG_DIR` | `~/rasp-data/geog` | WPS GEOG data directory |
+
+## Docker
+
+The CLI wraps these Docker images. You can also use them directly.
+
+### Images
+
+| Image | Description | Size |
+|---|---|---|
+| `ghcr.io/nw-paragliding/windgram:latest` | Full pipeline (WPS + WRF + renderer) | ~2 GB |
+| `ghcr.io/nw-paragliding/wrf-compiled:v4.5.2` | Pre-compiled WRF 4.5.2 + WPS 4.5 (base layer) | ~1.5 GB |
+
+Both images support `linux/arm64` and `linux/amd64`.
+
+### Running Directly
 
 ```bash
 docker pull ghcr.io/nw-paragliding/windgram:latest
 
-# Define your region
-cat > domain.yaml <<EOF
-name: cascades
-model: nam
-center_lat: 47.6
-center_lon: -121.4
-target_dx_km: 1.33
-inner_extent_km: 150
-EOF
-
-# Run forecast
-docker run \
+# Full pipeline
+docker run --rm \
   -v ~/rasp-data/geog:/mnt/geog:ro \
   -v ~/output:/mnt/output \
   ghcr.io/nw-paragliding/windgram run domain.yaml \
     --date 2026-04-04 --cycle 06 --sites examples/pnw-sites.csv
+
+# Render from existing wrfout
+docker run --rm \
+  -v ~/output:/mnt/output \
+  -v ./wrfout_d03_2026-04-04_12:00:00:/mnt/wrfout/wrfout:ro \
+  ghcr.io/nw-paragliding/windgram windgram /mnt/wrfout/wrfout \
+    --sites examples/pnw-sites.csv --output-dir /mnt/output
+
+# Interactive shell
+docker run --rm -it ghcr.io/nw-paragliding/windgram bash
 ```
 
-First run requires a one-time GEOG data download (~3GB):
+### Container Volumes
+
+| Mount | Purpose |
+|---|---|
+| `/mnt/geog` | WPS GEOG static data (read-only) |
+| `/mnt/grib` | GRIB input files (read-only, optional) |
+| `/mnt/output` | Windgram PNG output |
+
+### Building
+
 ```bash
-./scripts/setup_geog.sh ~/rasp-data/geog
+# User-facing image (fast, ~2 min — no WRF compilation)
+docker buildx build -f docker/Dockerfile.windgram \
+  -t ghcr.io/nw-paragliding/windgram:latest .
+
+# Base WRF image (slow, ~30 min — only rebuild when WRF version changes)
+docker buildx build -f docker/Dockerfile.wrf \
+  --platform linux/arm64,linux/amd64 \
+  -t ghcr.io/nw-paragliding/wrf-compiled:v4.5.2 .
+```
+
+## Python Library
+
+The windgram renderer can be used as a standalone Python library without Docker,
+for rendering windgrams from WRF output files you already have.
+
+### Install
+
+```bash
+pip install rasp-windgram
+
+# With WRF-Python support (optional)
+pip install rasp-windgram[all]
+```
+
+### Rendering Windgrams
+
+```bash
+# Single site
+rasp-windgram wrfout_d03_2026-04-04_12:00:00 \
+  --lat 47.503 --lon -121.975 --site Tiger --output-dir ./output
+
+# Batch render from site list
+rasp-windgram wrfout_d03_2026-04-04_12:00:00 \
+  --sites examples/pnw-sites.csv --output-dir ./output
+```
+
+```python
+from rasp.windgram import render_windgram
+
+render_windgram(
+    "wrfout_d03_2026-04-04_12:00:00",
+    lat=47.503, lon=-121.975,
+    site_name="Tiger",
+    output_dir="./output",
+)
+```
+
+### Generating Namelists
+
+```bash
+rasp-namelist examples/cascades.yaml --date 2026-04-04 --cycle 06
 ```
 
 ## What's in a Windgram
