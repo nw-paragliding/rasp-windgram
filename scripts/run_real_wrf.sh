@@ -24,10 +24,11 @@ END_DATE="${3:?Missing end_date (YYYY-MM-DD_HH)}"
 RUN_HOURS="${4:?Missing run_hours}"
 
 BASEDIR="${BASEDIR:-/opt/rasp}"
-WRF_DIR="${BASEDIR}/WRF/WRFV2"
-WRF_RUN_DIR="${WRF_RUN_DIR:-${BASEDIR}/WRF/WRFV2/RASP/PNW}"
-WPS_DIR="${BASEDIR}/WRF/WPS"
-NL_TEMPLATE="${WPS_DIR}/namelist.input.PNW"
+WRF_DIR="${BASEDIR}/bin"
+WRF_RUN_TABLES="${BASEDIR}/run"
+WRF_RUN_DIR="${WRF_RUN_DIR:-${BASEDIR}/runs/PNW}"
+WPS_DIR="${BASEDIR}/wps"
+NL_TEMPLATE="${BASEDIR}/templates/namelist.input.PNW"
 LOG_DIR="${WRF_RUN_DIR}/log"
 # Also save logs to /mnt/wrfout/logs/ so they survive container exit (--rm)
 PERSIST_LOG_DIR="/mnt/wrfout/logs"
@@ -84,8 +85,8 @@ echo "  namelist.input written"
 
 # ── Link required WRF table files ────────────────────────────────────────────
 # real.exe and wrf.exe need these in CWD.
-WRF_SRC="${WRF_DIR}/main"
-WRF_RUN_TABLES="${WRF_DIR}/run"   # installed by Dockerfile from /build/WRF/run/
+# WRF binaries and run tables — set at top of script via BASEDIR
+WRF_SRC="${WRF_DIR}"              # wrf.exe, real.exe live in $BASEDIR/bin/
 
 for f in RRTM_DATA RRTMG_LW_DATA RRTMG_SW_DATA CAMtr_volume_mixing_ratio \
          ETAMPNEW_DATA ETAMPNEW_DATA.expanded_rain \

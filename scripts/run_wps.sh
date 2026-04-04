@@ -27,7 +27,7 @@ START_DATE="${2:?Missing start_date (YYYY-MM-DD_HH)}"
 END_DATE="${3:?Missing end_date (YYYY-MM-DD_HH)}"
 
 BASEDIR="${BASEDIR:-/opt/rasp}"
-WPS_DIR="${WPS_DIR:-${BASEDIR}/WRF/WPS}"
+WPS_DIR="${WPS_DIR:-${BASEDIR}/wps}"
 WPS_RUN_DIR="${WPS_RUN_DIR:-${WPS_DIR}}"
 
 # /mnt/geog is volume-mounted from $HOME/rasp-data/wps-geog on the host.
