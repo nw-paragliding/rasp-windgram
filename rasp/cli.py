@@ -140,8 +140,8 @@ def cmd_run(args):
         volumes.append((grib_path, "/mnt/grib", "ro"))
         container_args.extend(["--grib-dir", "/mnt/grib"])
 
-    if args.num_procs:
-        container_args.extend(["--num-procs", str(args.num_procs)])
+    num_procs = args.num_procs or os.cpu_count() or 4
+    container_args.extend(["--num-procs", str(num_procs)])
     if args.utc_offset is not None:
         container_args.extend(["--utc-offset", str(args.utc_offset)])
     if args.start_hour is not None:
