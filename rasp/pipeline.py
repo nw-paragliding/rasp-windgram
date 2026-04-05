@@ -101,7 +101,8 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
          "Running WPS (ungrib + geogrid + metgrid)")
 
     # --- Step 4: Run WRF ---
-    _run(f"bash {scripts_dir}/run_real_wrf.sh {run_dir} {start_valid} {end_valid} {run_hours}",
+    wps_dir = f"{basedir}/wps"
+    _run(f"bash {scripts_dir}/run_real_wrf.sh {wps_dir} {start_valid} {end_valid} {run_hours}",
          f"Running real.exe + wrf.exe ({run_hours}h, {num_procs} procs)")
 
     # --- Step 5: Render windgrams ---
