@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-dev \
     netcdf-bin \
     gfortran \
+    libjpeg8 \
     locales \
     && rm -rf /var/lib/apt/lists/* \
     && locale-gen en_US.UTF-8

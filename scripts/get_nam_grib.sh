@@ -52,8 +52,9 @@ for FH in ${FHOURS}; do
     if [ -f "${DEST}" ] && [ "$(stat -f%z "${DEST}" 2>/dev/null || stat -c%s "${DEST}" 2>/dev/null)" -gt 1000000 ]; then
         echo "  ${FNAME}: OK ($(du -sh "${DEST}" | cut -f1))"
     else
-        echo "  WARNING: ${FNAME} download failed or incomplete — may not be available yet"
+        echo "  ERROR: ${FNAME} download failed after 3 attempts"
         rm -f "${DEST}"
+        exit 1
     fi
 done
 
