@@ -76,6 +76,12 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
     run_dir = f"{basedir}/runs/{config['name']}"  # WRF working dir
     scripts_dir = f"{basedir}/scripts"
 
+    # Resolve paths before any chdir
+    if sites_csv:
+        sites_csv = str(Path(sites_csv).resolve())
+    config_path = str(Path(config_path).resolve())
+    output_dir = str(Path(output_dir).resolve())
+
     print(f"\n  Pipeline: {config['name']}")
     print(f"  Model: {model.upper()}, Date: {date} {cycle}z")
     print(f"  Valid: {start_valid} to {end_valid} ({run_hours}h)")
