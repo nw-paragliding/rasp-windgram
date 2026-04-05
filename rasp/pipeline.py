@@ -214,7 +214,7 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
 
     # 4a. real.exe
     if num_procs > 1:
-        _run_exe(["mpirun", "--allow-run-as-root", "-np", "1", "./real.exe"],
+        _run_exe(["mpirun", "--allow-run-as-root", "--oversubscribe", "-np", "1", "./real.exe"],
                  "real.exe", cwd=run_dir)
     else:
         _run_exe(["./real.exe"], "real.exe", cwd=run_dir)
@@ -229,11 +229,19 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
         sys.exit(1)
     print(f"  real.exe: OK")
 
-    # 4b. wrf.exe
+    # 4b. wrf.exe — cap procs at available CPUs inside container
     import time
+    try:
+        avail = len(os.sched_getaffinity(0))
+    except AttributeError:
+        avail = os.cpu_count() or 4
+    if num_procs > avail:
+        print(f"  Note: capping MPI procs from {num_procs} to {avail} (container limit)")
+        num_procs = avail
+
     t0 = time.time()
     if num_procs > 1:
-        _run_exe(["mpirun", "--allow-run-as-root", "-np", str(num_procs), "./wrf.exe"],
+        _run_exe(["mpirun", "--allow-run-as-root", "--oversubscribe", "-np", str(num_procs), "./wrf.exe"],
                  f"wrf.exe ({num_procs} procs)", cwd=run_dir)
     else:
         _run_exe(["./wrf.exe"], "wrf.exe", cwd=run_dir)
