@@ -87,6 +87,9 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
         config_path, date, cycle,
         output_dir=wps_dir,  # Write namelist.wps directly to WPS working dir
         geog_path=geog_path,
+        start_date=start_valid,
+        end_date=end_valid,
+        run_hours=run_hours,
     )
 
     # Also copy namelist.input to the WRF run dir

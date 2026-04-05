@@ -373,7 +373,8 @@ def estimate_runtime(domains, ncores=4):
 # Namelist generation
 # ---------------------------------------------------------------------------
 
-def generate_namelist_wps(config, domains, date, cycle, geog_path="/mnt/geog"):
+def generate_namelist_wps(config, domains, date, cycle, geog_path="/mnt/geog",
+                          start_date=None, end_date=None):
     """Generate namelist.wps content.
 
     Args:
@@ -388,13 +389,16 @@ def generate_namelist_wps(config, domains, date, cycle, geog_path="/mnt/geog"):
     """
     model = config["model"]
     ndomains = len(domains)
-    fhours = MODEL_FORECAST_HOURS[model]
 
-    start_dt = datetime.strptime(f"{date} {cycle}:00:00", "%Y-%m-%d %H:%M:%S")
-    end_dt = start_dt + timedelta(hours=fhours[-1])
-
-    start_str = start_dt.strftime("%Y-%m-%d_%H:%M:%S")
-    end_str = end_dt.strftime("%Y-%m-%d_%H:%M:%S")
+    if start_date and end_date:
+        start_str = f"{start_date}:00:00" if len(start_date) <= 13 else start_date
+        end_str = f"{end_date}:00:00" if len(end_date) <= 13 else end_date
+    else:
+        fhours = MODEL_FORECAST_HOURS[model]
+        start_dt = datetime.strptime(f"{date} {cycle}:00:00", "%Y-%m-%d %H:%M:%S")
+        end_dt = start_dt + timedelta(hours=fhours[-1])
+        start_str = start_dt.strftime("%Y-%m-%d_%H:%M:%S")
+        end_str = end_dt.strftime("%Y-%m-%d_%H:%M:%S")
 
     # Repeated values for each domain
     def rep(val, n=ndomains):
@@ -454,7 +458,8 @@ def generate_namelist_wps(config, domains, date, cycle, geog_path="/mnt/geog"):
     return lines
 
 
-def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40):
+def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
+                            start_date=None, end_date=None, run_hours_override=None):
     """Generate namelist.input content.
 
     Args:
@@ -469,10 +474,14 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40)
     """
     model = config["model"]
     ndomains = len(domains)
-    fhours = MODEL_FORECAST_HOURS[model]
 
-    start_dt = datetime.strptime(f"{date} {cycle}:00:00", "%Y-%m-%d %H:%M:%S")
-    end_dt = start_dt + timedelta(hours=fhours[-1])
+    if start_date and end_date:
+        start_dt = datetime.strptime(start_date.replace("_", " ") + ":00:00" if len(start_date) <= 13 else start_date.replace("_", " "), "%Y-%m-%d %H:%M:%S")
+        end_dt = datetime.strptime(end_date.replace("_", " ") + ":00:00" if len(end_date) <= 13 else end_date.replace("_", " "), "%Y-%m-%d %H:%M:%S")
+    else:
+        fhours = MODEL_FORECAST_HOURS[model]
+        start_dt = datetime.strptime(f"{date} {cycle}:00:00", "%Y-%m-%d %H:%M:%S")
+        end_dt = start_dt + timedelta(hours=fhours[-1])
 
     def rep(val, n=ndomains):
         if isinstance(val, list):
@@ -500,7 +509,7 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40)
     lines = f"""\
 &time_control
  run_days                 = 0,
- run_hours                = {fhours[-1]},
+ run_hours                = {run_hours_override if run_hours_override else int((end_dt - start_dt).total_seconds() // 3600)},
  run_minutes              = 0,
  run_seconds              = 0,
  start_year               = {rep(start_dt.year)},
@@ -515,7 +524,7 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40)
  end_hour                 = {rep(f'{end_dt.hour:02d}')},
  end_minute               = {rep('00')},
  end_second               = {rep('00')},
- interval_seconds         = {(fhours[1] - fhours[0]) * 3600 if len(fhours) > 1 else 10800},
+ interval_seconds         = {MODELS[model]["interval_seconds"]},
  input_from_file          = {rep('.true.')},
  history_interval         = {rep(hist_interval)},
  frames_per_outfile       = {rep(1000)},
@@ -612,7 +621,8 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40)
 # ---------------------------------------------------------------------------
 
 def generate_namelists(config_path, date, cycle, output_dir=None,
-                       geog_path="/mnt/geog", num_metgrid_levels=40):
+                       geog_path="/mnt/geog", num_metgrid_levels=40,
+                       start_date=None, end_date=None, run_hours=None):
     """Generate namelist.wps and namelist.input from a domain config.
 
     Args:
@@ -622,6 +632,9 @@ def generate_namelists(config_path, date, cycle, output_dir=None,
         output_dir:  where to write namelists (default: current directory)
         geog_path:   GEOG data path
         num_metgrid_levels: vertical levels in met_em (auto-detect if possible)
+        start_date:  explicit start date "YYYY-MM-DD_HH" (overrides cycle+fhours)
+        end_date:    explicit end date "YYYY-MM-DD_HH" (overrides cycle+fhours)
+        run_hours:   explicit run hours (overrides fhours)
 
     Returns:
         dict with keys "namelist_wps", "namelist_input", "warnings", "domains"
@@ -653,9 +666,12 @@ def generate_namelists(config_path, date, cycle, output_dir=None,
     print()
 
     # Generate namelists
-    wps_content = generate_namelist_wps(config, domains, date, cycle, geog_path)
+    wps_content = generate_namelist_wps(config, domains, date, cycle, geog_path,
+                                        start_date=start_date, end_date=end_date)
     input_content = generate_namelist_input(config, domains, date, cycle,
-                                            num_metgrid_levels)
+                                            num_metgrid_levels,
+                                            start_date=start_date, end_date=end_date,
+                                            run_hours_override=run_hours)
 
     # Write files
     out = Path(output_dir) if output_dir else Path.cwd()
