@@ -43,9 +43,18 @@ for FH in ${FHOURS}; do
         continue
     fi
     echo "  Downloading ${FNAME}..."
-    curl --http1.1 -fsSL --progress-bar "${NAM_DIR}/${FNAME}" -o "${DEST}" && \
-        echo "  ${FNAME}: OK ($(du -sh "${DEST}" | cut -f1))" || \
-        echo "  WARNING: ${FNAME} download failed — may not be available yet"
+    for attempt in 1 2 3; do
+        curl --http1.1 -fsSL --retry 2 --retry-delay 5 --progress-bar "${NAM_DIR}/${FNAME}" -o "${DEST}" && break
+        echo "  Attempt ${attempt} failed, retrying in 10s..."
+        rm -f "${DEST}"
+        sleep 10
+    done
+    if [ -f "${DEST}" ] && [ "$(stat -f%z "${DEST}" 2>/dev/null || stat -c%s "${DEST}" 2>/dev/null)" -gt 1000000 ]; then
+        echo "  ${FNAME}: OK ($(du -sh "${DEST}" | cut -f1))"
+    else
+        echo "  WARNING: ${FNAME} download failed or incomplete — may not be available yet"
+        rm -f "${DEST}"
+    fi
 done
 
 echo
