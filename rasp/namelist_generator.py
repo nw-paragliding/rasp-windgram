@@ -230,13 +230,16 @@ def compute_nest_chain(config):
         if extents[i] == 0:
             extents[i] = min_parent_extent
 
-    # Compute grid dimensions (must be odd for WRF centered grids)
+    # Compute grid dimensions.
+    # WRF nesting requires: (e_we - 1) % parent_grid_ratio == 0 for child domains.
     domains = []
     for i, (dx, extent) in enumerate(zip(chain, extents)):
         n = int(math.ceil(extent / dx)) + 1
-        if n % 2 == 0:
-            n += 1  # WRF prefers odd grid dimensions
-        n = max(n, 11)  # minimum viable grid
+        n = max(n, 11)
+        # For nested domains, ensure (n-1) is divisible by parent ratio
+        if i > 0:
+            while (n - 1) % ratio != 0:
+                n += 1
 
         domains.append({
             "id": i + 1,
