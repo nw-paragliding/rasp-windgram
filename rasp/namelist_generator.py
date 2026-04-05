@@ -578,7 +578,6 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
  num_soil_layers          = 4,
  num_land_cat             = {physics['num_land_cat']},
  sf_urban_physics         = 0,
- gwd_opt                  = 1,
 /
 
 &fdda
