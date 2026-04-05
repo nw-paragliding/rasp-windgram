@@ -6,7 +6,7 @@
 #   docker run rasp/windgram windgram wrfout.nc --sites sites.csv --output-dir /mnt/output
 #   docker run rasp/windgram bash   (interactive shell)
 
-set -euo pipefail
+# No set -euo pipefail here — the Python pipeline handles its own errors
 
 COMMAND="${1:-help}"
 shift || true
