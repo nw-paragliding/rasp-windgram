@@ -358,9 +358,9 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
         tc_smooth[k, :] = f(t_fine)
     temp_levels = np.arange(-40, 120, 10)
     cs = ax.contour(t_fine, p_levels_full, tc_smooth, levels=temp_levels,
-                    colors="white", linewidths=0.8, alpha=0.7)
-    ax.clabel(cs, inline=True, fontsize=8, fmt="%d\u00b0F",
-              colors="white")
+                    colors="white", linewidths=0.8, alpha=0.7, zorder=1)
+    ax.clabel(cs, inline=True, fontsize=9, fmt="%d\u00b0F",
+              colors="navy", zorder=6)
 
     # --- Wind barbs (green < 9kts, white >= 9kts per TJ's docs) ---
     wspeed = np.sqrt(d["u_kts"]**2 + d["v_kts"]**2)
@@ -381,8 +381,8 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     # 32°F line stand out with a thicker, labeled line
     cs_freeze = ax.contour(t_fine, p_levels_full, tc_smooth, levels=[32],
                            colors="cyan", linewidths=1.5, alpha=0.8)
-    ax.clabel(cs_freeze, inline=True, fontsize=9, fmt="32\u00b0F",
-              colors="cyan")
+    ax.clabel(cs_freeze, inline=True, fontsize=10, fmt="32\u00b0F",
+              colors="darkblue", zorder=6)
 
     # --- Paraglider crescent markers (soaring ceiling) ---
     hglider_p = d["hglider_p"]
