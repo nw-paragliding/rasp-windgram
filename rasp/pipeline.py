@@ -419,7 +419,8 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
     for name, lat, lon in sites:
         try:
             render_windgram(finest_wrfout, lat, lon, name, str(output_path),
-                            utc_offset=utc_offset, start_hour=start_hour)
+                            utc_offset=utc_offset, start_hour=start_hour,
+                            model_name=model)
             rendered += 1
         except Exception as e:
             print(f"  WARNING: {name} failed: {e}")

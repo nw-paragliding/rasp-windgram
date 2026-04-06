@@ -214,7 +214,7 @@ def _extract_site_data(wrfout_path, lat, lon):
 
 def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
                     p_top_mb=None, headroom_ft=4000, utc_offset=-7,
-                    start_hour=8, dpi=100):
+                    start_hour=8, dpi=100, model_name=None):
     """Render a windgram PNG for a single site.
 
     Args:
@@ -452,7 +452,8 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
         res_str = f"{dx_km:.1f}km"
     else:
         res_str = f"{dx_km*1000:.0f}m"
-    ax.set_title(f"{day_of_week} {date_str} / {site_name} ({res_str})",
+    subtitle = f"{model_name.upper()} " if model_name else ""
+    ax.set_title(f"{day_of_week} {date_str} / {site_name} ({subtitle}{res_str})",
                  color="white", fontsize=12, fontweight="bold", pad=35)
 
     # --- Save ---
@@ -507,10 +508,12 @@ def main():
     parser.add_argument("--utc-offset", type=int, default=-7, help="UTC offset for local time")
     parser.add_argument("--start-hour", type=int, default=8, help="Earliest local hour")
     parser.add_argument("--dpi", type=int, default=100, help="Output DPI")
+    parser.add_argument("--model", help="Model name for title (e.g. NAM, GFS)")
     args = parser.parse_args()
 
     kwargs = dict(p_top_mb=args.p_top, utc_offset=args.utc_offset,
-                  start_hour=args.start_hour, dpi=args.dpi)
+                  start_hour=args.start_hour, dpi=args.dpi,
+                  model_name=args.model)
 
     if args.sites:
         render_batch(args.wrfout, args.sites, args.output_dir, **kwargs)
