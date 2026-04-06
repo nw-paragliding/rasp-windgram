@@ -332,13 +332,18 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     lcl_p = d["sfc_p"] - lcl_agl_ft / 32.0
     for t in range(ntimes):
         if lcl_p[t] > p_top_actual and lcl_p[t] < d["sfc_p"][t]:
+            # Position cloud so its bottom edge sits at LCL
+            # va="top" anchors the text at the top, but cloud glyph
+            # hangs down — use va="bottom" so the bottom of the icon
+            # aligns with LCL pressure level
+            cloud_p = lcl_p[t]
             # Grey shadow
-            ax.text(taus[t] + 0.05, lcl_p[t] - 1.0, "\u2601",
-                    fontsize=48, ha="center", va="center",
+            ax.text(taus[t] + 0.05, cloud_p - 1.0, "\u2601",
+                    fontsize=48, ha="center", va="bottom",
                     color="grey", alpha=0.5, zorder=3, clip_on=True)
             # White cloud
-            ax.text(taus[t], lcl_p[t], "\u2601",
-                    fontsize=48, ha="center", va="center",
+            ax.text(taus[t], cloud_p, "\u2601",
+                    fontsize=48, ha="center", va="bottom",
                     color="white", alpha=0.85, zorder=3, clip_on=True)
 
     # --- Temperature contour lines (isotherms in F) ---
