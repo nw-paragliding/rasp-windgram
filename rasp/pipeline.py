@@ -253,7 +253,11 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
     # 3b. Link GRIB files
     for f in Path(wps_dir).glob("GRIBFILE.*"):
         f.unlink()
-    grib_files = sorted(Path(grib_dir).glob("*.grib2"))
+    # Match GRIB files — NAM uses .grib2 extension, GFS uses .f### naming
+    grib_files = sorted(
+        list(Path(grib_dir).glob("*.grib2")) +
+        list(Path(grib_dir).glob("*.pgrb2*"))
+    )
     if not grib_files:
         print(f"  ERROR: No GRIB2 files found in {grib_dir}")
         sys.exit(1)
