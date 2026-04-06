@@ -1,0 +1,9 @@
+# Cascades domain using GFS global model
+# GFS is 25km → nest to 8.3km → 2.7km
+name: cascades-gfs
+model: gfs
+center_lat: 47.6
+center_lon: -121.4
+target_dx_km: 2.78
+inner_extent_km: 150
+nest_ratio: 3

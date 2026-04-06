@@ -55,8 +55,56 @@ def _run_exe(args, desc, cwd):
     return result.returncode
 
 
+def _download_grib(model_cfg, date, cycle, fhours, dest_dir):
+    """Download GRIB files using the model's URL pattern."""
+    print(f"\n{'='*60}")
+    print(f"  Downloading GRIB data ({model_cfg['name']})")
+    print(f"{'='*60}\n", flush=True)
+
+    Path(dest_dir).mkdir(parents=True, exist_ok=True)
+    date_compact = date.replace("-", "")
+    url_pattern = model_cfg["url_pattern"]
+
+    downloaded = 0
+    for fhr in fhours:
+        url = url_pattern.format(
+            date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr
+        )
+        fname = url.split("/")[-1]
+        dest = Path(dest_dir) / fname
+
+        if dest.exists() and dest.stat().st_size > 1_000_000:
+            print(f"  {fname}: cached ({dest.stat().st_size // 1_000_000}MB)")
+            downloaded += 1
+            continue
+
+        print(f"  Downloading {fname}...", flush=True)
+        success = False
+        for attempt in range(1, 4):
+            result = subprocess.run(
+                ["curl", "--http1.1", "-fsSL", "--retry", "2", "--retry-delay", "5",
+                 "--progress-bar", url, "-o", str(dest)],
+                stdout=sys.stdout, stderr=sys.stderr,
+            )
+            if result.returncode == 0 and dest.exists() and dest.stat().st_size > 1_000_000:
+                print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB)")
+                success = True
+                downloaded += 1
+                break
+            print(f"  Attempt {attempt} failed, retrying in 10s...")
+            if dest.exists():
+                dest.unlink()
+            time.sleep(10)
+
+        if not success:
+            print(f"  ERROR: {fname} download failed after 3 attempts")
+            sys.exit(1)
+
+    print(f"\n  Downloaded {downloaded}/{len(fhours)} files to {dest_dir}")
+
+
 def _detect_latest_cycle(model, date=None):
-    """Auto-detect the latest available NAM cycle from NOMADS.
+    """Auto-detect the latest available cycle from NOMADS.
 
     Returns (date_str, cycle_str) e.g. ("2026-04-06", "06").
     """
@@ -67,50 +115,30 @@ def _detect_latest_cycle(model, date=None):
     model_cfg = MODELS[model]
 
     if model_cfg.get("source") != "nomads":
-        # Can't auto-detect for non-NOMADS sources
         return date, "00"
 
-    # Check NOMADS for available cycles, newest first
-    url_base = f"https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.{date_compact}/"
-    try:
-        result = subprocess.run(
-            f'curl --http1.1 -skL --max-time 10 "{url_base}" 2>/dev/null | grep -o "nam\\.t[0-9]*z" | sort -u',
-            shell=True, capture_output=True, text=True, timeout=15
-        )
-        cycles = sorted(set(
-            line.split(".t")[1].replace("z", "")
-            for line in result.stdout.strip().splitlines()
-            if ".t" in line
-        ))
-    except Exception:
-        cycles = []
+    # Try each known cycle (newest first) and check if a sample file exists
+    url_pattern = model_cfg["url_pattern"]
+    known_cycles = sorted(model_cfg.get("cycles", [0, 6, 12, 18]), reverse=True)
 
-    if not cycles:
-        # Try yesterday
-        yesterday = (datetime.strptime(date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
-        date = yesterday
-        date_compact = date.replace("-", "")
-        url_base = f"https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.{date_compact}/"
-        try:
-            result = subprocess.run(
-                f'curl --http1.1 -skL --max-time 10 "{url_base}" 2>/dev/null | grep -o "nam\\.t[0-9]*z" | sort -u',
-                shell=True, capture_output=True, text=True, timeout=15
-            )
-            cycles = sorted(set(
-                line.split(".t")[1].replace("z", "")
-                for line in result.stdout.strip().splitlines()
-                if ".t" in line
-            ))
-        except Exception:
-            cycles = []
+    for try_date in [date, (datetime.strptime(date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")]:
+        dc = try_date.replace("-", "")
+        for cyc in known_cycles:
+            # Check if a low forecast hour file exists (fhr 3 as probe)
+            probe_url = url_pattern.format(date=dc, cycle=f"{cyc:02d}", fhr=3)
+            try:
+                result = subprocess.run(
+                    ["curl", "--http1.1", "-sfI", "--max-time", "5", probe_url],
+                    capture_output=True, text=True, timeout=8
+                )
+                if result.returncode == 0 and "200" in (result.stdout + result.stderr):
+                    print(f"  Auto-detected latest cycle: {try_date} {cyc:02d}z")
+                    return try_date, f"{cyc:02d}"
+            except Exception:
+                continue
 
-    if cycles:
-        latest = cycles[-1]  # e.g. "18"
-        print(f"  Auto-detected latest cycle: {date} {latest}z")
-        return date, latest
-    else:
-        print(f"  WARNING: Could not detect cycles, defaulting to {date} 00z")
-        return date, "00"
+    print(f"  WARNING: Could not detect cycles, defaulting to {date} 00z")
+    return date, "00"
 
 
 def _utc_offset_from_lon(lon):
@@ -206,10 +234,7 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
     # ── Step 2: Download GRIB ───────────────────────────────────────────
     if grib_dir is None:
         grib_dir = f"{basedir}/grib"
-        date_compact = date.replace("-", "")
-        fhours_str = " ".join(f"{h:02d}" for h in download_fhours)
-        _run(f'bash {scripts_dir}/get_nam_grib.sh {date_compact} {cycle} {grib_dir} "{fhours_str}"',
-             "Downloading GRIB data")
+        _download_grib(model_cfg, date, cycle, download_fhours, grib_dir)
 
     # ── Step 3: Run WPS (geogrid → ungrib → metgrid) ───────────────────
     print(f"\n{'='*60}")
