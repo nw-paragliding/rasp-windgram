@@ -9,9 +9,11 @@ amd64.
 ### Pipeline
 
 ```
-NAM/GFS/HRRR GRIB2 data
-  → WPS (ungrib + geogrid + metgrid)
-  → WRF (real.exe + wrf.exe)
+domain.yaml + sites.csv
+  → auto-detect latest NAM cycle from NOMADS
+  → download GRIB2 data (forecast hours covering 8am-8pm local)
+  → WPS (geogrid + ungrib + metgrid)
+  → WRF (real.exe + wrf.exe, MPI parallel)
   → Python windgram renderer
   → PNG windgrams per site
 ```
@@ -21,7 +23,8 @@ NAM/GFS/HRRR GRIB2 data
 | Config | Time |
 |---|---|
 | Native arm64, d01 only (12km, serial) | ~2 min |
-| Native arm64, d01+d02+d03 (12km+4km+1.33km, 8 MPI cores) | ~45 min |
+| Native arm64, d01+d02+d03 (12km+4km+1.33km, 4 MPI cores) | ~45 min |
+| Native arm64, d01+d02+d03, 8 MPI cores | ~25 min |
 
 ---
 
@@ -33,20 +36,19 @@ rasp/           Python package (pip install rasp-windgram)
   soaring.py      Soaring index calculations (w*, hcrit, BL diagnostics)
   windgram.py     Windgram renderer (matplotlib)
   namelist_generator.py   domain.yaml → namelist.wps + namelist.input
-  pipeline.py     Full pipeline orchestrator
+  pipeline.py     Full pipeline orchestrator (drives WPS + WRF directly)
 
-scripts/        Shell scripts
+scripts/        Shell scripts (used inside Docker container)
   run_wps.sh      Runs geogrid → ungrib → metgrid
   run_real_wrf.sh Runs real.exe → wrf.exe
-  get_nam_grib.sh Downloads NAM GRIB2 from NOMADS
+  get_nam_grib.sh Downloads NAM GRIB2 from NOMADS (with retry)
   setup_geog.sh   One-time WPS GEOG data download
-  entrypoint.sh   Docker entrypoint (run, windgram, namelist, bash)
+  entrypoint.sh   Docker entrypoint (run, windgram, bash)
   build-images.sh Docker image build script
 
-templates/      WRF/WPS namelist templates
 docker/         Dockerfile.wrf (heavy compile), Dockerfile.windgram (light)
 examples/       Domain configs (YAML) and site lists (CSV)
-.github/        CI workflow for multi-arch image builds
+.github/        CI (tests + multi-arch image builds)
 ```
 
 ---
@@ -67,18 +69,26 @@ User-facing image. FROM wrf-compiled — no WRF compilation.
 Adds Python (rasp-windgram package), scripts, entrypoint.
 Tagged with semver from `VERSION` file: `0.1.0`, `latest`.
 
-### Building
+### CI
+
+- **ci.yml**: runs on every PR and push to main — Python import tests,
+  namelist generation test, Docker build test
+- **build-images.yml**: runs on `v*` tags — builds and publishes multi-arch
+  images to GHCR. Skips WRF compile if image already exists.
+  arm64 on `ubuntu-24.04-arm`, amd64 on `ubuntu-24.04` (both native, no QEMU).
+
+### Building Locally
 
 ```bash
-# Local (single arch, for development)
-./scripts/build-images.sh
+# User-facing image (fast, ~2 min)
+docker buildx build -f docker/Dockerfile.windgram \
+  --build-arg WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2 \
+  -t ghcr.io/nw-paragliding/windgram:latest .
 
-# Push to GHCR (multi-arch, for release)
-./scripts/build-images.sh --push
+# Base WRF image (slow, ~30 min — only when WRF version changes)
+docker buildx build -f docker/Dockerfile.wrf \
+  -t ghcr.io/nw-paragliding/wrf-compiled:v4.5.2 .
 ```
-
-CI builds trigger on `v*` tags via GitHub Actions. arm64 builds on
-`ubuntu-24.04-arm`, amd64 on `ubuntu-24.04` — both native.
 
 ---
 
@@ -97,6 +107,9 @@ inner_extent_km: 150
 nest_ratio: 3
 ```
 
+Grid dimensions are automatically adjusted to satisfy WRF's nesting
+requirement: `(e_we - 1) % parent_grid_ratio == 0`.
+
 Warnings emitted for:
 - 1-4km: gray zone (convective parameterization disabled)
 - <1km: LES territory (PBL schemes outside design range)
@@ -104,38 +117,54 @@ Warnings emitted for:
 
 ---
 
+## Pipeline Intelligence
+
+The pipeline auto-detects several parameters:
+
+- **Latest cycle**: queries NOMADS for the newest available NAM cycle
+- **UTC offset**: computed from domain center longitude (with DST)
+- **Forecast hours**: computed to cover 8am-8pm local soaring window
+- **CPU count**: auto-caps MPI processes at container's available cores
+- **num_metgrid_levels**: read from met_em files after WPS runs
+
+---
+
 ## Supported Models
 
 ### NAM (working)
-- 12km, CONUS, 4 cycles/day, 84h forecast
-- Source: NOMADS (nomads.ncep.noaa.gov)
-- Pipeline: GRIB2 → WPS → WRF → windgrams
+- 12km, North America, 4 cycles/day, 84h forecast
+- Source: NOMADS
+- Auto-download with retry, smart forecast hour selection
 
-### HRRR (future)
+### HRRR (config ready, needs testing)
 - 3km, CONUS, hourly updates, 18h forecast
-- Use as WRF boundary conditions for 1km nest (not direct post-processing)
-- Needs: Vtable validation, sigma-level num_metgrid_levels
+- Vtable: `Vtable.RAP.pressure.ncep`
+- Nest directly to 1km (no intermediate 4km domain needed)
 
-### UW WRF (future)
-- 1.33km, PNW only, pre-computed wrfout
-- Skip WRF entirely — download wrfout → windgrams directly
-- Needs: data access URL confirmation
+### GFS (config only)
+- 25km, global, 4 cycles/day, 384h forecast
+- Vtable: `Vtable.GFS`
+
+### HRDPS (config only)
+- 2.5km, Canada, 4 cycles/day, 48h forecast
+- Vtable: TBD
 
 ---
 
 ## Soaring Index Functions
 
-Python replacements for the legacy `ncl_jack_fortran.so` Fortran library
-(all in `rasp/soaring.py`):
+Python reimplementations of DrJack's `ncl_jack_fortran.so` Fortran library
+(all in `rasp/soaring.py`). Uses the nonlinear thermal penetration model
+with empirical coefficients decoded from the compiled binary.
 
 | Function | Purpose |
 |---|---|
 | `calc_wstar` | Convective velocity scale (Deardorff 1970, with virtual heat flux) |
-| `calc_hcrit` | Max soaring height for 225 fpm (1.14 m/s) sink rate |
+| `calc_hcrit` | Max soaring height (DrJack nonlinear model, 225 fpm threshold) |
 | `calc_hlift` | Max soaring height for arbitrary sink rate |
 | `calc_blavg` | Boundary layer average of a 3D field |
 | `calc_blmax` | Boundary layer maximum |
-| `calc_wblmaxmin` | BL max/min vertical velocity (modes 0-3) |
+| `calc_wblmaxmin` | BL max/min vertical velocity |
 | `calc_sfclclheight` | Surface LCL height (Bolton approximation) |
 | `calc_blclheight` | BL cloud layer height |
 | `calc_cloudbase` | Cloud base from cloud water mixing ratio |
@@ -148,84 +177,67 @@ Python replacements for the legacy `ncl_jack_fortran.so` Fortran library
 | `calc_subgrid_blcloudpct` | Sub-grid BL cloud fraction |
 | `calc_qcblhf` | Cloud base height factor |
 
-All take NumPy arrays, no Fortran dependency.
-
 ---
 
 ## Windgram Rendering
 
-Python replacement for `windgrams.ncl`. Visual elements per
+Visual elements per
 [TJ Olney's windgram documentation](http://wxtofly.net/windgramexplain.html):
 
 - Lapse rate filled contours (NCL-matching colormap)
 - Wind barbs (green < 9kts, white ≥ 9kts)
 - Paraglider crescent markers at soaring ceiling (min of hcrit, LCL)
-- LCL cloud markers (potential cloudbase)
+- LCL cloud markers (bottom of cloud anchored at LCL height)
 - Diagonal hatching for moisture (RH > 94%, denser > 97%)
 - Temperature isolines (°F) with prominent 32°F freezing line
-- w* climb rate labels
+- w* climb rate labels above chart
 - Auto chart ceiling from max PBL height + headroom
-
----
-
-## References
-
-- **[simonbesters/icon-d2-pipeline](https://github.com/simonbesters/icon-d2-pipeline)** — pure-Python reimplementation of DrJack's Fortran routines, reverse-engineered from compiled `.so` binary. Source of the empirical thermal penetration model constants used in `rasp/soaring.py`.
-- **[CazYokoyama/wrfv3](https://github.com/CazYokoyama/wrfv3)** — most complete RASP distribution (WRF v3, WPS, NCL scripts, domain wizard)
-- **[wargoth/rasp-gm](https://github.com/wargoth/rasp-gm)** — DrJack's GM (Graphical Model) subsystem with NCL calc scripts
-- **[oriolcervello/raspuri](https://github.com/oriolcervello/raspuri)** — Python/Bash RASP rewrite for WRF v4, shows calling conventions
-- **[TJ Olney's windgram docs](http://wxtofly.net/windgramexplain.html)** — reference for windgram visual design
-- **[DrJack's RASP](http://www.drjack.info/)** — original RASP/BLIPMAP project
+- Auto time range from 8am to 8pm local
 
 ---
 
 ## Adding a New Model
 
-To add support for a new NWP model (e.g. ECMWF, HRDPS, ICON):
-
 1. **Find or create a Vtable** — check `Variable_Tables/` in the WPS distribution.
-   The Vtable maps GRIB fields to WPS intermediate format. If one doesn't exist,
-   create it from the model's GRIB2 field documentation.
 
 2. **Add to model registry** in `rasp/namelist_generator.py`:
    ```python
    MODELS["mymodel"] = {
        "name": "My Model",
-       "dx": 3000.0,              # native resolution in meters
+       "dx": 3000.0,
        "vtable": "Vtable.MyModel",
-       "interval_seconds": 3600,   # temporal resolution
+       "interval_seconds": 3600,
        "forecast_hours": [...],
        "cycles": [0, 6, 12, 18],
        "coverage": "Region",
-       "source": "url_source",
+       "source": "nomads",
        "url_pattern": "https://...",
    }
    ```
 
-3. **Add a download adapter** in `scripts/` if the source uses a non-standard
-   URL pattern or API (e.g. ECMWF requires authentication).
+3. **Add a download adapter** if the source uses non-standard URLs or auth.
 
-4. **Test with a real run** — download a few files, run ungrib with the Vtable,
-   check `num_metgrid_levels`, verify metgrid output looks right.
+4. **Test with a real run** — download files, run ungrib, check num_metgrid_levels.
 
-5. **Domain config** — the outer domain `dx` should match the model resolution.
-   For high-res models (HRRR 3km, HRDPS 2.5km), you can nest directly to 1km
-   without the intermediate 4km domain.
+5. **Domain config** — outer domain `dx` should match model resolution.
 
-### Currently supported
+---
 
-| Model | Resolution | Coverage | Vtable | Status |
-|-------|-----------|----------|--------|--------|
-| NAM | 12km | North America | Vtable.NAM | Working |
-| HRRR | 3km | CONUS | Vtable.RAP.pressure.ncep | In progress |
-| GFS | 25km | Global | Vtable.GFS | Config only |
-| HRDPS | 2.5km | Canada | TBD | Config only |
+## References
+
+- **[simonbesters/icon-d2-pipeline](https://github.com/simonbesters/icon-d2-pipeline)** — reverse-engineered DrJack Fortran routines
+- **[CazYokoyama/wrfv3](https://github.com/CazYokoyama/wrfv3)** — most complete RASP distribution
+- **[wargoth/rasp-gm](https://github.com/wargoth/rasp-gm)** — DrJack's GM subsystem
+- **[oriolcervello/raspuri](https://github.com/oriolcervello/raspuri)** — Python/Bash RASP rewrite for WRF v4
+- **[TJ Olney's windgram docs](http://wxtofly.net/windgramexplain.html)** — windgram visual design reference
+- **[DrJack's RASP](http://www.drjack.info/)** — original RASP/BLIPMAP project
 
 ---
 
 ## Future Work
 
-- **HRRR support**: Vtable validation, sigma-level namelist settings
-- **UW WRF support**: data access, direct wrfout → windgram path
+- **HRRR support**: test end-to-end with pressure-level files
+- **UW WRF support**: direct wrfout → windgram path (no WRF run needed)
 - **Map layers**: rain overlay, top-of-lift contours, wind maps
-- **Numerical validation**: compare soaring indices against legacy NCL + pilot reports
+- **Legend bar**: color scale on windgram for self-explanatory charts
+- **PyPI publishing**: `pip install rasp-windgram` from PyPI
