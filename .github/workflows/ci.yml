@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test-python:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install and test imports
+        run: |
+          uv run python -c "
+          from rasp.soaring import calc_wstar, calc_hcrit
+          from rasp.windgram import render_windgram
+          from rasp.namelist_generator import generate_namelists, MODELS
+          from rasp.pipeline import run_pipeline
+          print('All imports OK')
+          print('Models:', list(MODELS.keys()))
+          "
+      - name: Test namelist generation
+        run: |
+          uv run python -m rasp.namelist_generator examples/cascades.yaml \
+            --date 2026-04-06 --cycle 00 --output-dir /tmp/test-nl
+          test -f /tmp/test-nl/namelist.wps
+          test -f /tmp/test-nl/namelist.input
+          echo "Namelist generation OK"
+
+  test-docker-build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build windgram image
+        run: |
+          docker buildx build \
+            -f docker/Dockerfile.windgram \
+            --build-arg WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-amd64 \
+            --load \
+            -t rasp-windgram:ci .
+      - name: Verify image
+        run: |
+          docker run --rm --entrypoint="" rasp-windgram:ci python3 -c "
+          from rasp.soaring import calc_wstar
+          from rasp.windgram import render_windgram
+          print('Container imports OK')
+          "
+          docker run --rm rasp-windgram:ci help
