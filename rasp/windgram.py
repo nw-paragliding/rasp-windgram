@@ -143,15 +143,18 @@ def _extract_site_data(wrfout_path, lat, lon):
     buoy = (9.81 / T2) * (vhf / 1200.0)
     wstar = np.where(buoy > 0, (buoy * PBLH) ** (1.0 / 3.0), 0.0)
 
-    # hcrit: max soaring height based on thermal strength (w*) and BL depth.
-    # DrJack's formula: hcrit = ter + PBLH * (1 - sink_rate/wstar)
-    # This represents the height where the thermal updraft velocity profile
-    # drops below the glider's sink rate. w* is the convective velocity scale
-    # (not WRF's grid-scale W field, which doesn't resolve thermals).
-    SINK_RATE = 1.14  # m/s — 225 fpm, standard PG sink rate per TJ Olney
-    wstar_safe = np.maximum(wstar, 0.01)
-    hcrit_ft = (ter + PBLH * np.where(wstar > SINK_RATE,
-                1 - SINK_RATE / wstar_safe, 0)) * 3.28084
+    # hcrit: max soaring height using DrJack's nonlinear thermal penetration model
+    from .soaring import calc_hcrit as _calc_hcrit
+    # calc_hcrit expects 2D arrays — wrap scalars per time step
+    hcrit_m = np.zeros(ntimes)
+    for t in range(ntimes):
+        hc = _calc_hcrit(
+            np.array([[wstar[t]]]),
+            np.array([[ter]]),
+            np.array([[PBLH[t]]]),
+        )
+        hcrit_m[t] = hc[0, 0]
+    hcrit_ft = hcrit_m * 3.28084
 
     spread = np.maximum(tc[:, 0] - td[:, 0], 0)
     lcl_ft = (ter + 125.0 * spread) * 3.28084
