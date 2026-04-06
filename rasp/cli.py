@@ -123,7 +123,11 @@ def cmd_run(args):
         (config_path, f"/opt/rasp/{config_name}", "ro"),
     ]
 
-    container_args = ["run", config_name, "--date", args.date, "--cycle", args.cycle]
+    container_args = ["run", config_name]
+    if args.date:
+        container_args.extend(["--date", args.date])
+    if args.cycle:
+        container_args.extend(["--cycle", args.cycle])
     container_args.extend(["--output-dir", "/mnt/output"])
 
     if args.sites:
@@ -311,8 +315,8 @@ def main():
     # ── rasp run ──────────────────────────────────────────────────────────
     p_run = sub.add_parser("run", help="Full pipeline: domain.yaml → WPS → WRF → windgrams")
     p_run.add_argument("config", help="Path to domain.yaml")
-    p_run.add_argument("--date", required=True, help="Forecast date (YYYY-MM-DD)")
-    p_run.add_argument("--cycle", required=True, help="Model cycle (HH, e.g. 06)")
+    p_run.add_argument("--date", help="Forecast date YYYY-MM-DD (default: auto-detect)")
+    p_run.add_argument("--cycle", help="Model cycle HH (default: auto-detect latest)")
     p_run.add_argument("--sites", help="CSV file with sites (name lat lon)")
     p_run.add_argument("--output-dir", default="./output", help="Output directory (default: ./output)")
     p_run.add_argument("--geog-dir", help=f"WPS GEOG data path (default: $RASP_GEOG_DIR or {DEFAULT_GEOG})")

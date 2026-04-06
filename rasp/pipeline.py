@@ -9,15 +9,18 @@ Single entry point that runs the entire forecast pipeline:
 5. Render windgrams for all sites
 
 Usage:
-    python -m rasp.pipeline domain.yaml --date 2026-04-01 --cycle 06 \\
-        --sites sites.csv --output-dir ./output
+    python -m rasp.pipeline domain.yaml --sites sites.csv --output-dir ./output
+    python -m rasp.pipeline domain.yaml --date 2026-04-06 --cycle 00 --sites sites.csv
 """
 
 import argparse
+import math
 import os
+import re
 import shutil
 import subprocess
 import sys
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -52,32 +55,112 @@ def _run_exe(args, desc, cwd):
     return result.returncode
 
 
-def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output",
-                 grib_dir=None, geog_path="/mnt/geog", basedir="/opt/rasp",
-                 num_procs=1, utc_offset=-7, start_hour=8):
+def _detect_latest_cycle(model, date=None):
+    """Auto-detect the latest available NAM cycle from NOMADS.
+
+    Returns (date_str, cycle_str) e.g. ("2026-04-06", "06").
+    """
+    if date is None:
+        date = datetime.utcnow().strftime("%Y-%m-%d")
+
+    date_compact = date.replace("-", "")
+    model_cfg = MODELS[model]
+
+    if model_cfg.get("source") != "nomads":
+        # Can't auto-detect for non-NOMADS sources
+        return date, "00"
+
+    # Check NOMADS for available cycles, newest first
+    url_base = f"https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.{date_compact}/"
+    try:
+        result = subprocess.run(
+            f'curl --http1.1 -skL --max-time 10 "{url_base}" 2>/dev/null | grep -o "nam\\.t[0-9]*z" | sort -u',
+            shell=True, capture_output=True, text=True, timeout=15
+        )
+        cycles = sorted(set(
+            line.split(".t")[1].replace("z", "")
+            for line in result.stdout.strip().splitlines()
+            if ".t" in line
+        ))
+    except Exception:
+        cycles = []
+
+    if not cycles:
+        # Try yesterday
+        yesterday = (datetime.strptime(date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+        date = yesterday
+        date_compact = date.replace("-", "")
+        url_base = f"https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.{date_compact}/"
+        try:
+            result = subprocess.run(
+                f'curl --http1.1 -skL --max-time 10 "{url_base}" 2>/dev/null | grep -o "nam\\.t[0-9]*z" | sort -u',
+                shell=True, capture_output=True, text=True, timeout=15
+            )
+            cycles = sorted(set(
+                line.split(".t")[1].replace("z", "")
+                for line in result.stdout.strip().splitlines()
+                if ".t" in line
+            ))
+        except Exception:
+            cycles = []
+
+    if cycles:
+        latest = cycles[-1]  # e.g. "18"
+        print(f"  Auto-detected latest cycle: {date} {latest}z")
+        return date, latest
+    else:
+        print(f"  WARNING: Could not detect cycles, defaulting to {date} 00z")
+        return date, "00"
+
+
+def _utc_offset_from_lon(lon):
+    """Estimate UTC offset from longitude (rough, ignores DST)."""
+    # -122 → -8 (PST), -121 → -8, etc.
+    # Add 1 for daylight savings (rough approximation for North America in summer)
+    offset = round(lon / 15)
+    # Assume DST for simplicity (April-October)
+    offset += 1
+    return offset
+
+
+def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
+                 output_dir="./output", grib_dir=None, geog_path="/mnt/geog",
+                 basedir="/opt/rasp", num_procs=1, utc_offset=None, start_hour=8):
     """Run the full forecast pipeline."""
     config = load_domain_config(config_path)
     model = config["model"]
     model_cfg = MODELS[model]
 
+    # Auto-detect UTC offset from domain center longitude
+    if utc_offset is None:
+        utc_offset = _utc_offset_from_lon(config["center_lon"])
+        print(f"  UTC offset: {utc_offset} (from center lon {config['center_lon']:.1f})")
+
+    # Auto-detect latest cycle if not provided
+    if date is None or cycle is None:
+        auto_date, auto_cycle = _detect_latest_cycle(model, date)
+        if date is None:
+            date = auto_date
+        if cycle is None:
+            cycle = auto_cycle
+
     # Compute forecast hours needed to cover the soaring window.
-    # Target: 15z-03z (8am-8pm PDT) on the day AFTER the cycle date.
-    # This adapts to whichever cycle you use.
+    # Soaring window in UTC: (12 - utc_offset)z to (20 - utc_offset)z
+    # e.g. PDT (offset=-7): 8am=15z, 8pm=03z next day
+    target_start_local = 8   # 8am local
+    target_end_local = 20    # 8pm local
+    target_start_utc = target_start_local - utc_offset
+    target_end_utc = target_end_local - utc_offset
+
     base_dt = datetime.strptime(f"{date}_{cycle}", "%Y-%m-%d_%H")
     cycle_hour = int(cycle)
 
-    # Soaring window: 15z to 03z next day (8am-8pm PDT)
-    target_start_utc = 15  # 8am PDT
-    target_end_utc = 27    # 8pm PDT = 03z next day
-
-    # Forecast hours needed
     interval_hours = model_cfg["interval_seconds"] // 3600
     fhr_start = target_start_utc - cycle_hour
     fhr_end = target_end_utc - cycle_hour
     if fhr_start < 0:
         fhr_start += 24
         fhr_end += 24
-    # Ensure minimum 3h lead time (models need spin-up)
     fhr_start = max(fhr_start, 3)
     download_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
 
@@ -89,8 +172,8 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
     interval_seconds = model_cfg["interval_seconds"]
 
     # Directories
-    wps_dir = f"{basedir}/wps"       # WPS executables + working dir
-    run_dir = f"{basedir}/runs/{config['name']}"  # WRF working dir
+    wps_dir = f"{basedir}/wps"
+    run_dir = f"{basedir}/runs/{config['name']}"
     scripts_dir = f"{basedir}/scripts"
 
     # Resolve paths before any chdir
@@ -102,13 +185,14 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
     print(f"\n  Pipeline: {config['name']}")
     print(f"  Model: {model.upper()}, Date: {date} {cycle}z")
     print(f"  Valid: {start_valid} to {end_valid} ({run_hours}h)")
+    print(f"  UTC offset: {utc_offset}")
     print(f"  WPS dir: {wps_dir}")
     print(f"  Run dir: {run_dir}", flush=True)
 
     # ── Step 1: Generate namelists ──────────────────────────────────────
     result = generate_namelists(
         config_path, date, cycle,
-        output_dir=wps_dir,  # Write namelist.wps directly to WPS working dir
+        output_dir=wps_dir,
         geog_path=geog_path,
         start_date=start_valid,
         end_date=end_valid,
@@ -211,8 +295,6 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
         if src.exists():
             dst.symlink_to(src)
 
-    # namelist.input is already in run_dir from Step 1
-
     # Auto-detect num_metgrid_levels from met_em
     met_sample = met_files[0] if met_files else None
     if met_sample:
@@ -222,10 +304,8 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
                 shell=True, capture_output=True, text=True
             )
             nml = int(r.stdout.strip())
-            # Patch namelist.input with correct num_metgrid_levels
             nl_path = run_path / "namelist.input"
             nl_text = nl_path.read_text()
-            import re
             nl_text = re.sub(
                 r'num_metgrid_levels\s*=\s*\d+',
                 f'num_metgrid_levels = {nml}',
@@ -243,10 +323,8 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
     else:
         _run_exe(["./real.exe"], "real.exe", cwd=run_dir)
 
-    # Check real.exe output
     if not (run_path / "wrfinput_d01").exists():
         print("  ERROR: real.exe failed — no wrfinput_d01")
-        # Try to show error
         rsl = run_path / "rsl.error.0000"
         if rsl.exists():
             print(rsl.read_text()[-500:])
@@ -254,7 +332,6 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
     print(f"  real.exe: OK")
 
     # 4b. wrf.exe — cap procs at available CPUs inside container
-    import time
     try:
         avail = len(os.sched_getaffinity(0))
     except AttributeError:
@@ -297,7 +374,6 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
     print(f"  Rendering windgrams")
     print(f"{'='*60}\n", flush=True)
 
-    # Use the finest domain wrfout
     finest_wrfout = str(wrfout_files[-1])
     print(f"  Source: {finest_wrfout}")
 
@@ -352,19 +428,21 @@ def main():
         description="Run the full RASP forecast pipeline"
     )
     parser.add_argument("config", help="Path to domain.yaml")
-    parser.add_argument("--date", required=True, help="Forecast date (YYYY-MM-DD)")
-    parser.add_argument("--cycle", required=True, help="Forecast cycle (HH)")
+    parser.add_argument("--date", help="Forecast date YYYY-MM-DD (default: auto-detect)")
+    parser.add_argument("--cycle", help="Model cycle HH (default: auto-detect latest)")
     parser.add_argument("--sites", help="CSV file with sites (name lat lon)")
     parser.add_argument("--output-dir", default="./output", help="Output directory")
     parser.add_argument("--grib-dir", help="Directory with GRIB2 files")
     parser.add_argument("--geog-path", default="/mnt/geog", help="GEOG data path")
     parser.add_argument("--num-procs", type=int, default=1, help="MPI processes")
-    parser.add_argument("--utc-offset", type=int, default=-7, help="UTC offset")
-    parser.add_argument("--start-hour", type=int, default=8, help="Earliest hour to show")
+    parser.add_argument("--utc-offset", type=int, help="UTC offset (default: auto from domain center)")
+    parser.add_argument("--start-hour", type=int, default=8, help="Earliest local hour to show")
     args = parser.parse_args()
 
     run_pipeline(
-        args.config, args.date, args.cycle,
+        args.config,
+        date=args.date,
+        cycle=args.cycle,
         sites_csv=args.sites,
         output_dir=args.output_dir,
         grib_dir=args.grib_dir,

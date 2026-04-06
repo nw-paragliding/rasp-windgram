@@ -42,11 +42,10 @@ RUN touch ${BASEDIR}/README.md && \
     pip3 install --no-cache-dir ${BASEDIR}/ && \
     pip3 install --no-cache-dir --no-deps wrf-python pyyaml
 
-# ── Scripts, templates, examples ────────────────────────────────────────────
+# ── Scripts and examples ───────────────────────────────────────────────────
 COPY scripts/run_wps.sh        ${BASEDIR}/scripts/run_wps.sh
 COPY scripts/run_real_wrf.sh   ${BASEDIR}/scripts/run_real_wrf.sh
 COPY scripts/get_nam_grib.sh   ${BASEDIR}/scripts/get_nam_grib.sh
-COPY templates/                ${BASEDIR}/templates/
 RUN chmod +x ${BASEDIR}/scripts/*.sh
 
 # Symlink WRF binaries into a standard location
