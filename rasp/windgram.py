@@ -180,10 +180,15 @@ def _extract_site_data(wrfout_path, lat, lon):
                 freeze_p[t] = ptot[t, k]
                 break
 
+    # Grid spacing for title
+    dx_m = float(nc.getncattr("DX"))
+    dx_km = dx_m / 1000.0
+
     nc.close()
 
     return {
         "time_strings": time_strings,
+        "dx_km": dx_km,
         "hours_utc": np.array(hours_utc),
         "ntimes": ntimes,
         "ptot": ptot,
@@ -442,7 +447,12 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     date_str = d["time_strings"][0][:10]
     from datetime import datetime as dt
     day_of_week = dt.strptime(date_str, "%Y-%m-%d").strftime("%a")
-    ax.set_title(f"{day_of_week} {date_str} / {site_name}",
+    dx_km = d["dx_km"]
+    if dx_km >= 1:
+        res_str = f"{dx_km:.1f}km"
+    else:
+        res_str = f"{dx_km*1000:.0f}m"
+    ax.set_title(f"{day_of_week} {date_str} / {site_name} ({res_str})",
                  color="white", fontsize=12, fontweight="bold", pad=35)
 
     # --- Save ---
