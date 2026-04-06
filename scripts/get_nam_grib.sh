@@ -21,6 +21,8 @@ set -euo pipefail
 DATE="${1:-$(date +%Y%m%d)}"
 CYCLE="${2:-06}"
 DEST_DIR="${3:-${HOME}/rasp-data/grib}"
+# Optional 4th arg: space-separated forecast hours (default: 06 09 12 15 18 21)
+FHOURS_ARG="${4:-}"
 
 NOMADS_BASE="https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod"
 NAM_DIR="${NOMADS_BASE}/nam.${DATE}"
@@ -34,7 +36,7 @@ echo "  Source:  ${NAM_DIR}"
 echo "  Dest:    ${DEST_DIR}"
 echo
 
-FHOURS="06 09 12 15 18 21"
+FHOURS="${FHOURS_ARG:-06 09 12 15 18 21}"
 for FH in ${FHOURS}; do
     FNAME="nam.t${CYCLE}z.awip3d${FH}.tm00.grib2"
     DEST="${DEST_DIR}/${FNAME}"

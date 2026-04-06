@@ -60,10 +60,27 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
     model = config["model"]
     model_cfg = MODELS[model]
 
-    # Forecast hours to download (NAM: 6-21, HRRR: 0-18, etc.)
-    download_fhours = [6, 9, 12, 15, 18, 21]  # NAM default
-
+    # Compute forecast hours needed to cover the soaring window.
+    # Target: 15z-03z (8am-8pm PDT) on the day AFTER the cycle date.
+    # This adapts to whichever cycle you use.
     base_dt = datetime.strptime(f"{date}_{cycle}", "%Y-%m-%d_%H")
+    cycle_hour = int(cycle)
+
+    # Soaring window: 15z to 03z next day (8am-8pm PDT)
+    target_start_utc = 15  # 8am PDT
+    target_end_utc = 27    # 8pm PDT = 03z next day
+
+    # Forecast hours needed
+    interval_hours = model_cfg["interval_seconds"] // 3600
+    fhr_start = target_start_utc - cycle_hour
+    fhr_end = target_end_utc - cycle_hour
+    if fhr_start < 0:
+        fhr_start += 24
+        fhr_end += 24
+    # Ensure minimum 3h lead time (models need spin-up)
+    fhr_start = max(fhr_start, 3)
+    download_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
+
     start_dt = base_dt + timedelta(hours=download_fhours[0])
     end_dt = base_dt + timedelta(hours=download_fhours[-1])
     start_valid = start_dt.strftime("%Y-%m-%d_%H")
@@ -106,7 +123,8 @@ def run_pipeline(config_path, date, cycle, sites_csv=None, output_dir="./output"
     if grib_dir is None:
         grib_dir = f"{basedir}/grib"
         date_compact = date.replace("-", "")
-        _run(f"bash {scripts_dir}/get_nam_grib.sh {date_compact} {cycle} {grib_dir}",
+        fhours_str = " ".join(f"{h:02d}" for h in download_fhours)
+        _run(f'bash {scripts_dir}/get_nam_grib.sh {date_compact} {cycle} {grib_dir} "{fhours_str}"',
              "Downloading GRIB data")
 
     # ── Step 3: Run WPS (geogrid → ungrib → metgrid) ───────────────────
