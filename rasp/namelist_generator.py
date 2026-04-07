@@ -47,14 +47,15 @@ MODELS = {
     "hrrr": {
         "name": "HRRR (High-Resolution Rapid Refresh)",
         "dx": 3000.0,
-        "vtable": "Vtable.raphrrr",
+        "vtable": "Vtable.RAP.pressure.ncep",
         "interval_seconds": 3600,      # 1h
         "forecast_hours": list(range(0, 19)),  # 0-18h hourly (48h for 00/06/12/18z)
         "cycles": list(range(0, 24)),   # hourly cycles
         "coverage": "CONUS",
         "source": "nomads",
-        # wrfnat includes soil data (needed for Noah LSM); wrfprs does not
-        "url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfnatf{fhr:02d}.grib2",
+        # wrfprs = pressure levels (smaller, no soil data)
+        # wrfnat = native levels (larger, includes soil) — needs ≥16GB RAM
+        "url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfprsf{fhr:02d}.grib2",
     },
     "gfs": {
         "name": "GFS (Global Forecast System)",
@@ -274,7 +275,7 @@ def compute_nest_chain(config):
 # Physics selection
 # ---------------------------------------------------------------------------
 
-def select_physics(dx_km, overrides=None):
+def select_physics(dx_km, overrides=None, model=None):
     """Select physics schemes appropriate for the grid resolution.
 
     Returns a dict of namelist physics options.
@@ -298,6 +299,13 @@ def select_physics(dx_km, overrides=None):
         physics["cu_physics"] = 0  # off but borderline
     else:
         physics["cu_physics"] = 0  # must be off at convection-resolving scales
+
+    # Model-specific adjustments
+    if model == "hrrr":
+        # HRRR pressure-level files lack soil data — use slab model
+        # instead of Noah LSM. BL/thermal physics are unaffected.
+        physics["sf_surface_physics"] = 1  # simple slab
+        physics["num_soil_layers"] = 5     # slab uses 5 layers
 
     # Apply user overrides
     if overrides:
@@ -496,7 +504,7 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
     hist_interval = 60
 
     # Physics
-    physics = select_physics(domains[-1]["dx_km"], config.get("physics"))
+    physics = select_physics(domains[-1]["dx_km"], config.get("physics"), model=model)
 
     # Per-domain physics (some must match, some can differ)
     # cu_physics should be 0 for fine nests
