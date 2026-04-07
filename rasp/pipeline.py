@@ -336,18 +336,27 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
                 shell=True, capture_output=True, text=True
             )
             nml = int(r.stdout.strip())
-            # Patch both namelist.input AND namelist.wps
-            for nl_name in ["namelist.input"]:
-                nl_path = run_path / nl_name
-                if nl_path.exists():
-                    nl_text = nl_path.read_text()
-                    nl_text = re.sub(
-                        r'num_metgrid_levels\s*=\s*\d+',
-                        f'num_metgrid_levels = {nml}',
-                        nl_text
-                    )
-                    nl_path.write_text(nl_text)
-            print(f"  num_metgrid_levels: {nml}")
+            # Also detect num_metgrid_soil_levels
+            r2 = subprocess.run(
+                f"ncdump -h {met_sample} | awk '/NUM_METGRID_SOIL_LEVELS/ {{print $3+0; exit}}'",
+                shell=True, capture_output=True, text=True
+            )
+            nsl = int(r2.stdout.strip()) if r2.stdout.strip() else 4
+
+            nl_path = run_path / "namelist.input"
+            nl_text = nl_path.read_text()
+            nl_text = re.sub(
+                r'num_metgrid_levels\s*=\s*\d+',
+                f'num_metgrid_levels = {nml}',
+                nl_text
+            )
+            nl_text = re.sub(
+                r'num_metgrid_soil_levels\s*=\s*\d+',
+                f'num_metgrid_soil_levels = {nsl}',
+                nl_text
+            )
+            nl_path.write_text(nl_text)
+            print(f"  num_metgrid_levels: {nml}, num_metgrid_soil_levels: {nsl}")
         except Exception as e:
             print(f"  WARNING: Could not detect num_metgrid_levels: {e}")
 
