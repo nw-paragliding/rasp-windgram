@@ -165,6 +165,17 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
         print(f"  UTC offset: {utc_offset} (from center lon {config['center_lon']:.1f})")
 
     # Auto-detect latest cycle if not provided
+    # Soaring window in UTC
+    target_start_local = 8   # 8am local
+    target_end_local = 20    # 8pm local
+    target_start_utc = target_start_local - utc_offset
+    target_end_utc = target_end_local - utc_offset
+    max_fhr = max(model_cfg.get("forecast_hours", [84]))
+    native_interval = model_cfg["interval_seconds"] // 3600
+    interval_hours = max(native_interval, 3)
+
+    # Find a cycle that covers the soaring window within the model's forecast range.
+    # Try the user-specified or auto-detected cycle first, then fall back to earlier ones.
     if date is None or cycle is None:
         auto_date, auto_cycle = _detect_latest_cycle(model, date)
         if date is None:
@@ -172,35 +183,41 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
         if cycle is None:
             cycle = auto_cycle
 
-    # Compute forecast hours needed to cover the soaring window.
-    # Soaring window in UTC: (12 - utc_offset)z to (20 - utc_offset)z
-    # e.g. PDT (offset=-7): 8am=15z, 8pm=03z next day
-    target_start_local = 8   # 8am local
-    target_end_local = 20    # 8pm local
-    target_start_utc = target_start_local - utc_offset
-    target_end_utc = target_end_local - utc_offset
+    # Try the selected cycle and progressively earlier ones
+    known_cycles = sorted(model_cfg.get("cycles", [0, 6, 12, 18]), reverse=True)
+    best_date, best_cycle, best_fhours = date, cycle, None
+
+    for try_date in [date, (datetime.strptime(date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")]:
+        for cyc in known_cycles:
+            cyc_hour = cyc
+            fhr_start = target_start_utc - cyc_hour
+            fhr_end = target_end_utc - cyc_hour
+            if fhr_start < 0:
+                fhr_start += 24
+                fhr_end += 24
+            fhr_start = max(fhr_start, 3)
+            if fhr_end <= max_fhr and fhr_start < fhr_end:
+                best_date = try_date
+                best_cycle = f"{cyc:02d}"
+                best_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
+                break
+        if best_fhours:
+            break
+
+    if not best_fhours:
+        # Fallback: use whatever we can from the original cycle
+        cycle_hour = int(cycle)
+        fhr_start = max(target_start_utc - cycle_hour, 3)
+        fhr_end = min(target_end_utc - cycle_hour, max_fhr)
+        if fhr_start < 0:
+            fhr_start += 24
+            fhr_end += 24
+        best_fhours = list(range(max(fhr_start, 3), min(fhr_end, max_fhr) + 1, interval_hours))
+        print(f"  WARNING: No cycle fully covers soaring window, using partial coverage")
+
+    date, cycle, download_fhours = best_date, best_cycle, best_fhours
 
     base_dt = datetime.strptime(f"{date}_{cycle}", "%Y-%m-%d_%H")
-    cycle_hour = int(cycle)
-
-    # Use model's native interval, but cap at 3h for downloads (WRF interpolates)
-    native_interval = model_cfg["interval_seconds"] // 3600
-    interval_hours = max(native_interval, 3)
-    fhr_start = target_start_utc - cycle_hour
-    fhr_end = target_end_utc - cycle_hour
-    if fhr_start < 0:
-        fhr_start += 24
-        fhr_end += 24
-    fhr_start = max(fhr_start, 3)
-    # Cap at model's max forecast hour
-    max_fhr = max(model_cfg.get("forecast_hours", [84]))
-    fhr_end = min(fhr_end, max_fhr)
-    if fhr_start > fhr_end:
-        print(f"  WARNING: Soaring window (fhr {fhr_start}-{fhr_end}) exceeds model range ({max_fhr}h)")
-        print(f"  Using an earlier cycle for longer forecast range")
-        # Fall back: use fhr 3 to max
-        fhr_start = 3
-    download_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
 
     start_dt = base_dt + timedelta(hours=download_fhours[0])
     end_dt = base_dt + timedelta(hours=download_fhours[-1])

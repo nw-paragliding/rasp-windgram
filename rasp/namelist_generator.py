@@ -49,8 +49,8 @@ MODELS = {
         "dx": 3000.0,
         "vtable": "Vtable.RAP.pressure.ncep",
         "interval_seconds": 3600,      # 1h
-        "forecast_hours": list(range(0, 19)),  # 0-18h hourly (48h for 00/06/12/18z)
-        "cycles": list(range(0, 24)),   # hourly cycles
+        "forecast_hours": list(range(0, 49)),  # 0-48h
+        "cycles": [0, 6, 12, 18],      # major cycles only (go to 48h; others only 18h)
         "coverage": "CONUS",
         "source": "nomads",
         # wrfprs = pressure levels (smaller, no soil data)
