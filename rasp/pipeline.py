@@ -187,7 +187,9 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
     known_cycles = sorted(model_cfg.get("cycles", [0, 6, 12, 18]), reverse=True)
     best_date, best_cycle, best_fhours = date, cycle, None
 
+    url_pattern = model_cfg["url_pattern"]
     for try_date in [date, (datetime.strptime(date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")]:
+        dc = try_date.replace("-", "")
         for cyc in known_cycles:
             cyc_hour = cyc
             fhr_start = target_start_utc - cyc_hour
@@ -197,9 +199,21 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
                 fhr_end += 24
             fhr_start = max(fhr_start, 3)
             if fhr_end <= max_fhr and fhr_start < fhr_end:
+                # Verify this cycle actually exists on NOMADS
+                probe_url = url_pattern.format(date=dc, cycle=f"{cyc:02d}", fhr=fhr_start)
+                try:
+                    r = subprocess.run(
+                        ["curl", "--http1.1", "-sfI", "--max-time", "5", probe_url],
+                        capture_output=True, timeout=8
+                    )
+                    if r.returncode != 0:
+                        continue  # cycle not available, try next
+                except Exception:
+                    continue
                 best_date = try_date
                 best_cycle = f"{cyc:02d}"
                 best_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
+                print(f"  Selected cycle: {try_date} {cyc:02d}z (fhr {fhr_start}-{fhr_end})")
                 break
         if best_fhours:
             break
