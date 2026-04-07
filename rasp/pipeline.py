@@ -192,6 +192,14 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
         fhr_start += 24
         fhr_end += 24
     fhr_start = max(fhr_start, 3)
+    # Cap at model's max forecast hour
+    max_fhr = max(model_cfg.get("forecast_hours", [84]))
+    fhr_end = min(fhr_end, max_fhr)
+    if fhr_start > fhr_end:
+        print(f"  WARNING: Soaring window (fhr {fhr_start}-{fhr_end}) exceeds model range ({max_fhr}h)")
+        print(f"  Using an earlier cycle for longer forecast range")
+        # Fall back: use fhr 3 to max
+        fhr_start = 3
     download_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
 
     start_dt = base_dt + timedelta(hours=download_fhours[0])
