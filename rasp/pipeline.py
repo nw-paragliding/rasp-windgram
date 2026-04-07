@@ -183,7 +183,9 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
     base_dt = datetime.strptime(f"{date}_{cycle}", "%Y-%m-%d_%H")
     cycle_hour = int(cycle)
 
-    interval_hours = model_cfg["interval_seconds"] // 3600
+    # Use model's native interval, but cap at 3h for downloads (WRF interpolates)
+    native_interval = model_cfg["interval_seconds"] // 3600
+    interval_hours = max(native_interval, 3)
     fhr_start = target_start_utc - cycle_hour
     fhr_end = target_end_utc - cycle_hour
     if fhr_start < 0:
@@ -197,7 +199,7 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
     start_valid = start_dt.strftime("%Y-%m-%d_%H")
     end_valid = end_dt.strftime("%Y-%m-%d_%H")
     run_hours = download_fhours[-1] - download_fhours[0]
-    interval_seconds = model_cfg["interval_seconds"]
+    interval_seconds = interval_hours * 3600  # match what we actually download
 
     # Directories
     wps_dir = f"{basedir}/wps"
@@ -225,6 +227,7 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
         start_date=start_valid,
         end_date=end_valid,
         run_hours=run_hours,
+        interval_seconds_override=interval_seconds,
     )
 
     # Also copy namelist.input to the WRF run dir
@@ -333,30 +336,37 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
                 shell=True, capture_output=True, text=True
             )
             nml = int(r.stdout.strip())
-            nl_path = run_path / "namelist.input"
-            nl_text = nl_path.read_text()
-            nl_text = re.sub(
-                r'num_metgrid_levels\s*=\s*\d+',
-                f'num_metgrid_levels = {nml}',
-                nl_text
-            )
-            nl_path.write_text(nl_text)
+            # Patch both namelist.input AND namelist.wps
+            for nl_name in ["namelist.input"]:
+                nl_path = run_path / nl_name
+                if nl_path.exists():
+                    nl_text = nl_path.read_text()
+                    nl_text = re.sub(
+                        r'num_metgrid_levels\s*=\s*\d+',
+                        f'num_metgrid_levels = {nml}',
+                        nl_text
+                    )
+                    nl_path.write_text(nl_text)
             print(f"  num_metgrid_levels: {nml}")
         except Exception as e:
             print(f"  WARNING: Could not detect num_metgrid_levels: {e}")
 
     # 4a. real.exe
+    print(f"  real.exe...", flush=True)
     if num_procs > 1:
-        _run_exe(["mpirun", "--allow-run-as-root", "--oversubscribe", "-np", "1", "./real.exe"],
-                 "real.exe", cwd=run_dir)
+        real_cmd = ["mpirun", "--allow-run-as-root", "--oversubscribe", "-np", "1", "./real.exe"]
     else:
-        _run_exe(["./real.exe"], "real.exe", cwd=run_dir)
+        real_cmd = ["./real.exe"]
+    real_result = subprocess.run(real_cmd, cwd=run_dir, stdout=sys.stdout, stderr=sys.stderr)
 
-    if not (run_path / "wrfinput_d01").exists():
-        print("  ERROR: real.exe failed — no wrfinput_d01")
-        rsl = run_path / "rsl.error.0000"
-        if rsl.exists():
-            print(rsl.read_text()[-500:])
+    if real_result.returncode != 0 or not (run_path / "wrfinput_d01").exists():
+        print(f"  ERROR: real.exe failed (exit {real_result.returncode})")
+        for rsl_name in ["rsl.error.0000", "rsl.out.0000"]:
+            rsl = run_path / rsl_name
+            if rsl.exists():
+                content = rsl.read_text()
+                print(f"\n  === {rsl_name} (last 1500 chars) ===")
+                print(content[-1500:])
         sys.exit(1)
     print(f"  real.exe: OK")
 

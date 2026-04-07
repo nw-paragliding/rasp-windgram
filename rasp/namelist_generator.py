@@ -621,7 +621,8 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
 
 def generate_namelists(config_path, date, cycle, output_dir=None,
                        geog_path="/mnt/geog", num_metgrid_levels=40,
-                       start_date=None, end_date=None, run_hours=None):
+                       start_date=None, end_date=None, run_hours=None,
+                       interval_seconds_override=None):
     """Generate namelist.wps and namelist.input from a domain config.
 
     Args:
@@ -663,6 +664,10 @@ def generate_namelists(config_path, date, cycle, output_dir=None,
             print(f"    WARNING: {w}")
 
     print()
+
+    # Override interval_seconds if caller specifies (e.g. 3h for HRRR downloads)
+    if interval_seconds_override:
+        MODELS[config["model"]]["interval_seconds"] = interval_seconds_override
 
     # Generate namelists
     wps_content = generate_namelist_wps(config, domains, date, cycle, geog_path,
