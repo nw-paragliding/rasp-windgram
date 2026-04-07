@@ -47,13 +47,14 @@ MODELS = {
     "hrrr": {
         "name": "HRRR (High-Resolution Rapid Refresh)",
         "dx": 3000.0,
-        "vtable": "Vtable.RAP.pressure.ncep",
+        "vtable": "Vtable.raphrrr",
         "interval_seconds": 3600,      # 1h
         "forecast_hours": list(range(0, 19)),  # 0-18h hourly (48h for 00/06/12/18z)
         "cycles": list(range(0, 24)),   # hourly cycles
         "coverage": "CONUS",
         "source": "nomads",
-        "url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfprsf{fhr:02d}.grib2",
+        # wrfnat includes soil data (needed for Noah LSM); wrfprs does not
+        "url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfnatf{fhr:02d}.grib2",
     },
     "gfs": {
         "name": "GFS (Global Forecast System)",
