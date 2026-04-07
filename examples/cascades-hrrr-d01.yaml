@@ -1,0 +1,8 @@
+# Cascades HRRR — d01 only (3km, no nesting)
+# Use this on machines with limited RAM (< 16GB)
+name: cascades-hrrr
+model: hrrr
+center_lat: 47.6
+center_lon: -121.4
+target_dx_km: 3.0
+inner_extent_km: 160

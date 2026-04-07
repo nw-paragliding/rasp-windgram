@@ -1,0 +1,8 @@
+# Cascades domain using HRRR (3km → 1km direct nest)
+name: cascades-hrrr
+model: hrrr
+center_lat: 47.6
+center_lon: -121.4
+target_dx_km: 1.0
+inner_extent_km: 100
+nest_ratio: 3
