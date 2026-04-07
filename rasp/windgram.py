@@ -180,10 +180,15 @@ def _extract_site_data(wrfout_path, lat, lon):
                 freeze_p[t] = ptot[t, k]
                 break
 
+    # Grid spacing for title
+    dx_m = float(nc.getncattr("DX"))
+    dx_km = dx_m / 1000.0
+
     nc.close()
 
     return {
         "time_strings": time_strings,
+        "dx_km": dx_km,
         "hours_utc": np.array(hours_utc),
         "ntimes": ntimes,
         "ptot": ptot,
@@ -209,7 +214,7 @@ def _extract_site_data(wrfout_path, lat, lon):
 
 def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
                     p_top_mb=None, headroom_ft=4000, utc_offset=-7,
-                    start_hour=8, dpi=100):
+                    start_hour=8, dpi=100, model_name=None):
     """Render a windgram PNG for a single site.
 
     Args:
@@ -358,9 +363,9 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
         tc_smooth[k, :] = f(t_fine)
     temp_levels = np.arange(-40, 120, 10)
     cs = ax.contour(t_fine, p_levels_full, tc_smooth, levels=temp_levels,
-                    colors="white", linewidths=0.8, alpha=0.7)
-    ax.clabel(cs, inline=True, fontsize=8, fmt="%d\u00b0F",
-              colors="white")
+                    colors="white", linewidths=0.8, alpha=0.7, zorder=1)
+    ax.clabel(cs, inline=True, fontsize=9, fmt="%d\u00b0F",
+              colors="navy", zorder=6)
 
     # --- Wind barbs (green < 9kts, white >= 9kts per TJ's docs) ---
     wspeed = np.sqrt(d["u_kts"]**2 + d["v_kts"]**2)
@@ -381,8 +386,8 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     # 32°F line stand out with a thicker, labeled line
     cs_freeze = ax.contour(t_fine, p_levels_full, tc_smooth, levels=[32],
                            colors="cyan", linewidths=1.5, alpha=0.8)
-    ax.clabel(cs_freeze, inline=True, fontsize=9, fmt="32\u00b0F",
-              colors="cyan")
+    ax.clabel(cs_freeze, inline=True, fontsize=10, fmt="32\u00b0F",
+              colors="darkblue", zorder=6)
 
     # --- Paraglider crescent markers (soaring ceiling) ---
     hglider_p = d["hglider_p"]
@@ -442,7 +447,13 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     date_str = d["time_strings"][0][:10]
     from datetime import datetime as dt
     day_of_week = dt.strptime(date_str, "%Y-%m-%d").strftime("%a")
-    ax.set_title(f"{day_of_week} {date_str} / {site_name}",
+    dx_km = d["dx_km"]
+    if dx_km >= 1:
+        res_str = f"{dx_km:.1f}km"
+    else:
+        res_str = f"{dx_km*1000:.0f}m"
+    subtitle = f"{model_name.upper()} " if model_name else ""
+    ax.set_title(f"{day_of_week} {date_str} / {site_name} ({subtitle}{res_str})",
                  color="white", fontsize=12, fontweight="bold", pad=35)
 
     # --- Save ---
@@ -497,10 +508,12 @@ def main():
     parser.add_argument("--utc-offset", type=int, default=-7, help="UTC offset for local time")
     parser.add_argument("--start-hour", type=int, default=8, help="Earliest local hour")
     parser.add_argument("--dpi", type=int, default=100, help="Output DPI")
+    parser.add_argument("--model", help="Model name for title (e.g. NAM, GFS)")
     args = parser.parse_args()
 
     kwargs = dict(p_top_mb=args.p_top, utc_offset=args.utc_offset,
-                  start_hour=args.start_hour, dpi=args.dpi)
+                  start_hour=args.start_hour, dpi=args.dpi,
+                  model_name=args.model)
 
     if args.sites:
         render_batch(args.wrfout, args.sites, args.output_dir, **kwargs)
