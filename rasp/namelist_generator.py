@@ -53,9 +53,10 @@ MODELS = {
         "cycles": [0, 6, 12, 18],      # major cycles only (go to 48h; others only 18h)
         "coverage": "CONUS",
         "source": "nomads",
-        # wrfprs = pressure levels (smaller, no soil data)
-        # wrfnat = native levels (larger, includes soil) — needs ≥16GB RAM
         "url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfprsf{fhr:02d}.grib2",
+        # Surface files for soil data (Noah LSM) — downloaded alongside wrfprs
+        "sfc_url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfsfcf{fhr:02d}.grib2",
+        "sfc_vtable": "Vtable.raphrrr",
     },
     "gfs": {
         "name": "GFS (Global Forecast System)",
@@ -301,13 +302,8 @@ def select_physics(dx_km, overrides=None, model=None, hrrr_levels="pressure"):
     else:
         physics["cu_physics"] = 0  # must be off at convection-resolving scales
 
-    # Model-specific adjustments
-    if model == "hrrr" and hrrr_levels == "pressure":
-        # HRRR pressure-level files lack soil data — use slab model
-        # instead of Noah LSM. BL/thermal physics are unaffected.
-        # Native-level files include soil data and can use Noah LSM.
-        physics["sf_surface_physics"] = 1  # simple slab
-        physics["num_soil_layers"] = 5     # slab uses 5 layers
+    # HRRR: Noah LSM works when surface files (wrfsfc) are downloaded alongside
+    # pressure files. No physics override needed — default Noah is fine.
 
     # Apply user overrides
     if overrides:
