@@ -54,8 +54,9 @@ MODELS = {
         "coverage": "CONUS",
         "source": "nomads",
         "url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfprsf{fhr:02d}.grib2",
-        # Surface files for soil data (Noah LSM) — downloaded alongside wrfprs
-        "sfc_url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfsfcf{fhr:02d}.grib2",
+        # Soil data (TSOIL/SOILW at 9 depths) is in wrfprs files but needs
+        # a second ungrib pass with Vtable.raphrrr to extract it (the default
+        # Vtable.RAP.pressure.ncep only maps atmosphere on pressure levels).
         "sfc_vtable": "Vtable.raphrrr",
     },
     "gfs": {

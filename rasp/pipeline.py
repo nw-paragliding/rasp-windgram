@@ -102,47 +102,6 @@ def _download_grib(model_cfg, date, cycle, fhours, dest_dir):
 
     print(f"\n  Downloaded {downloaded}/{len(fhours)} files to {dest_dir}")
 
-    # Download surface files if model has sfc_url_pattern (e.g. HRRR wrfsfc for soil data)
-    sfc_url_pattern = model_cfg.get("sfc_url_pattern")
-    if sfc_url_pattern:
-        print(f"\n  Downloading surface GRIB data...\n")
-        sfc_downloaded = 0
-        for fhr in fhours:
-            url = sfc_url_pattern.format(
-                date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr
-            )
-            fname = url.split("/")[-1]
-            dest = Path(dest_dir) / fname
-
-            if dest.exists() and dest.stat().st_size > 1_000_000:
-                print(f"  {fname}: cached ({dest.stat().st_size // 1_000_000}MB)")
-                sfc_downloaded += 1
-                continue
-
-            print(f"  Downloading {fname}...", flush=True)
-            success = False
-            for attempt in range(1, 4):
-                result = subprocess.run(
-                    ["curl", "--http1.1", "-fsSL", "--retry", "2", "--retry-delay", "5",
-                     "--progress-bar", url, "-o", str(dest)],
-                    stdout=sys.stdout, stderr=sys.stderr,
-                )
-                if result.returncode == 0 and dest.exists() and dest.stat().st_size > 1_000_000:
-                    print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB)")
-                    success = True
-                    sfc_downloaded += 1
-                    break
-                print(f"  Attempt {attempt} failed, retrying in 10s...")
-                if dest.exists():
-                    dest.unlink()
-                time.sleep(10)
-
-            if not success:
-                print(f"  ERROR: {fname} download failed after 3 attempts")
-                sys.exit(1)
-
-        print(f"\n  Downloaded {sfc_downloaded}/{len(fhours)} surface files")
-
 
 def _detect_latest_cycle(model, date=None):
     """Auto-detect the latest available cycle from NOMADS.
@@ -365,16 +324,10 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
         print(f"  geogrid: cached (geo_em files exist)")
 
     # 3b. Link GRIB files
-    has_sfc = model_cfg.get("sfc_url_pattern") is not None
-
-    # For two-pass ungrib (HRRR), only link atmosphere files first
-    if has_sfc:
-        grib_files = sorted(f for f in Path(grib_dir).glob("*.grib2") if "wrfsfc" not in f.name)
-    else:
-        grib_files = sorted(
-            list(Path(grib_dir).glob("*.grib2")) +
-            list(Path(grib_dir).glob("*.pgrb2*"))
-        )
+    grib_files = sorted(
+        list(Path(grib_dir).glob("*.grib2")) +
+        list(Path(grib_dir).glob("*.pgrb2*"))
+    )
     if not grib_files:
         print(f"  ERROR: No GRIB2 files found in {grib_dir}")
         sys.exit(1)
@@ -403,46 +356,35 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     file_count = len(list(Path(wps_dir).glob("FILE:*")))
     print(f"  ungrib: OK ({file_count} intermediate files)")
 
-    # 3d'. Second ungrib pass — surface/soil data (e.g. HRRR wrfsfc for Noah LSM)
-    if has_sfc:
-        sfc_files = sorted(f for f in Path(grib_dir).glob("*wrfsfc*.grib2"))
-        if sfc_files:
-            # Re-link GRIB files to surface files
-            for f in Path(wps_dir).glob("GRIBFILE.*"):
-                f.unlink()
-            for i, f in enumerate(sfc_files):
-                c1 = chr(65 + i // 676)
-                c2 = chr(65 + (i % 676) // 26)
-                c3 = chr(65 + i % 26)
-                link = Path(wps_dir) / f"GRIBFILE.{c1}{c2}{c3}"
-                link.symlink_to(f)
-            print(f"  Linked {len(sfc_files)} surface GRIB files")
+    # 3d'. Second ungrib pass — extract soil fields with a different Vtable.
+    # HRRR wrfprs files contain TSOIL/SOILW at 9 depths, but the default
+    # Vtable.RAP.pressure.ncep only maps atmosphere. Re-running ungrib with
+    # Vtable.raphrrr extracts soil data (atmosphere won't match due to
+    # hybrid vs pressure level types, which is fine).
+    sfc_vtable_name = model_cfg.get("sfc_vtable")
+    if sfc_vtable_name:
+        # GRIB files are already linked — just switch Vtable and prefix
+        vtable_src = Path(wps_dir) / "Variable_Tables" / sfc_vtable_name
+        if vtable_dst.is_symlink():
+            vtable_dst.unlink()
+        vtable_dst.symlink_to(vtable_src)
+        print(f"  Vtable: {sfc_vtable_name}")
 
-            # Switch Vtable to surface table
-            sfc_vtable_name = model_cfg["sfc_vtable"]
-            vtable_src = Path(wps_dir) / "Variable_Tables" / sfc_vtable_name
-            if vtable_dst.is_symlink():
-                vtable_dst.unlink()
-            vtable_dst.symlink_to(vtable_src)
-            print(f"  Vtable: {sfc_vtable_name}")
+        # Update namelist.wps prefix for second pass
+        nml_path = Path(wps_dir) / "namelist.wps"
+        nml_text = nml_path.read_text()
+        nml_text = nml_text.replace("prefix = 'FILE'", "prefix = 'SFC'")
+        nml_path.write_text(nml_text)
 
-            # Update namelist.wps prefix for second pass
-            nml_path = Path(wps_dir) / "namelist.wps"
-            nml_text = nml_path.read_text()
-            nml_text = nml_text.replace("prefix = 'FILE'", "prefix = 'SFC'")
-            nml_path.write_text(nml_text)
+        _run_exe(["./ungrib.exe"], "ungrib (soil)", cwd=wps_dir)
+        sfc_count = len(list(Path(wps_dir).glob("SFC:*")))
+        print(f"  ungrib (soil): OK ({sfc_count} intermediate files)")
 
-            _run_exe(["./ungrib.exe"], "ungrib (surface)", cwd=wps_dir)
-            sfc_count = len(list(Path(wps_dir).glob("SFC:*")))
-            print(f"  ungrib (surface): OK ({sfc_count} intermediate files)")
-
-            # Update fg_name for metgrid to merge both atmosphere and soil data
-            nml_text = nml_path.read_text()
-            nml_text = nml_text.replace("fg_name = 'FILE'", "fg_name = 'FILE','SFC'")
-            nml_text = nml_text.replace("prefix = 'SFC'", "prefix = 'FILE'")
-            nml_path.write_text(nml_text)
-        else:
-            print(f"  WARNING: No surface GRIB files found, skipping two-pass ungrib")
+        # Update fg_name for metgrid to merge both atmosphere and soil data
+        nml_text = nml_path.read_text()
+        nml_text = nml_text.replace("fg_name = 'FILE'", "fg_name = 'FILE','SFC'")
+        nml_text = nml_text.replace("prefix = 'SFC'", "prefix = 'FILE'")
+        nml_path.write_text(nml_text)
 
     # 3e. metgrid
     _run_exe(["./metgrid.exe"], "metgrid", cwd=wps_dir)
