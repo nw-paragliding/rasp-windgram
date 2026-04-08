@@ -151,9 +151,10 @@ def _utc_offset_from_lon(lon):
     return offset
 
 
-def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
-                 output_dir="./output", grib_dir=None, geog_path="/mnt/geog",
-                 basedir="/opt/rasp", num_procs=1, utc_offset=None, start_hour=8):
+def run_pipeline(config_path, date=None, cycle=None, target_date=None,
+                 sites_csv=None, output_dir="./output", grib_dir=None,
+                 geog_path="/mnt/geog", basedir="/opt/rasp", num_procs=1,
+                 utc_offset=None, start_hour=8):
     """Run the full forecast pipeline."""
     config = load_domain_config(config_path)
     model = config["model"]
@@ -164,72 +165,102 @@ def run_pipeline(config_path, date=None, cycle=None, sites_csv=None,
         utc_offset = _utc_offset_from_lon(config["center_lon"])
         print(f"  UTC offset: {utc_offset} (from center lon {config['center_lon']:.1f})")
 
-    # Auto-detect latest cycle if not provided
-    # Soaring window in UTC
+    # Compute the soaring window target in UTC hours.
+    # If --target-date is given, the soaring window is for that specific date.
+    # Otherwise, it's derived from the cycle date.
     target_start_local = 8   # 8am local
     target_end_local = 20    # 8pm local
-    target_start_utc = target_start_local - utc_offset
-    target_end_utc = target_end_local - utc_offset
     max_fhr = max(model_cfg.get("forecast_hours", [84]))
     native_interval = model_cfg["interval_seconds"] // 3600
     interval_hours = max(native_interval, 3)
-
-    # Find a cycle that covers the soaring window within the model's forecast range.
-    # Try the user-specified or auto-detected cycle first, then fall back to earlier ones.
-    if date is None or cycle is None:
-        auto_date, auto_cycle = _detect_latest_cycle(model, date)
-        if date is None:
-            date = auto_date
-        if cycle is None:
-            cycle = auto_cycle
-
-    # Try the selected cycle and progressively earlier ones
     known_cycles = sorted(model_cfg.get("cycles", [0, 6, 12, 18]), reverse=True)
-    best_date, best_cycle, best_fhours = date, cycle, None
-
     url_pattern = model_cfg["url_pattern"]
-    for try_date in [date, (datetime.strptime(date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")]:
-        dc = try_date.replace("-", "")
-        for cyc in known_cycles:
-            cyc_hour = cyc
-            fhr_start = target_start_utc - cyc_hour
-            fhr_end = target_end_utc - cyc_hour
+
+    if target_date:
+        # User wants forecasts for a specific date (e.g. "tomorrow")
+        # Compute soaring window as absolute UTC times, then find the best cycle
+        target_dt = datetime.strptime(target_date, "%Y-%m-%d")
+        soaring_start_utc = target_dt + timedelta(hours=target_start_local - utc_offset)
+        soaring_end_utc = target_dt + timedelta(hours=target_end_local - utc_offset)
+        print(f"  Target date: {target_date} ({soaring_start_utc.strftime('%H')}z-{soaring_end_utc.strftime('%d %H')}z)")
+    else:
+        soaring_start_utc = None
+        soaring_end_utc = None
+
+    # Find the best cycle: latest available that covers the soaring window
+    if date is not None and cycle is not None:
+        # User specified both — use as-is
+        pass
+    else:
+        # Auto-detect: try recent dates and cycles
+        if date is None:
+            date = datetime.utcnow().strftime("%Y-%m-%d")
+
+        best_date, best_cycle, best_fhours = None, None, None
+        search_dates = [date, (datetime.strptime(date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")]
+
+        for try_date in search_dates:
+            dc = try_date.replace("-", "")
+            for cyc in known_cycles:
+                cycle_dt = datetime.strptime(f"{try_date}_{cyc:02d}", "%Y-%m-%d_%H")
+
+                if soaring_start_utc:
+                    # target-date mode: compute fhr from absolute times
+                    fhr_start = int((soaring_start_utc - cycle_dt).total_seconds() / 3600)
+                    fhr_end = int((soaring_end_utc - cycle_dt).total_seconds() / 3600)
+                else:
+                    # Auto mode: soaring window relative to cycle
+                    fhr_start = (target_start_local - utc_offset) - cyc
+                    fhr_end = (target_end_local - utc_offset) - cyc
+                    if fhr_start < 0:
+                        fhr_start += 24
+                        fhr_end += 24
+
+                fhr_start = max(fhr_start, 3)
+                if fhr_end <= max_fhr and fhr_start < fhr_end and fhr_start >= 0:
+                    # Verify cycle exists on NOMADS
+                    probe_url = url_pattern.format(date=dc, cycle=f"{cyc:02d}", fhr=fhr_start)
+                    try:
+                        r = subprocess.run(
+                            ["curl", "--http1.1", "-sfI", "--max-time", "5", probe_url],
+                            capture_output=True, timeout=8
+                        )
+                        if r.returncode != 0:
+                            continue
+                    except Exception:
+                        continue
+                    best_date = try_date
+                    best_cycle = f"{cyc:02d}"
+                    best_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
+                    print(f"  Selected cycle: {try_date} {cyc:02d}z (fhr {fhr_start}-{fhr_end})")
+                    break
+            if best_fhours:
+                break
+
+        if best_fhours:
+            date, cycle, download_fhours = best_date, best_cycle, best_fhours
+        else:
+            print(f"  WARNING: No cycle covers the soaring window. Using latest available.")
+            auto_date, auto_cycle = _detect_latest_cycle(model, date)
+            date, cycle = auto_date, auto_cycle
+            fhr_start = 3
+            fhr_end = min(max_fhr, 18)
+            download_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
+
+    # If user specified date+cycle explicitly, compute fhours from them
+    if 'download_fhours' not in locals():
+        cycle_hour = int(cycle)
+        if soaring_start_utc:
+            cycle_dt = datetime.strptime(f"{date}_{cycle}", "%Y-%m-%d_%H")
+            fhr_start = max(int((soaring_start_utc - cycle_dt).total_seconds() / 3600), 3)
+            fhr_end = min(int((soaring_end_utc - cycle_dt).total_seconds() / 3600), max_fhr)
+        else:
+            fhr_start = max((target_start_local - utc_offset) - cycle_hour, 3)
+            fhr_end = min((target_end_local - utc_offset) - cycle_hour, max_fhr)
             if fhr_start < 0:
                 fhr_start += 24
                 fhr_end += 24
-            fhr_start = max(fhr_start, 3)
-            if fhr_end <= max_fhr and fhr_start < fhr_end:
-                # Verify this cycle actually exists on NOMADS
-                probe_url = url_pattern.format(date=dc, cycle=f"{cyc:02d}", fhr=fhr_start)
-                try:
-                    r = subprocess.run(
-                        ["curl", "--http1.1", "-sfI", "--max-time", "5", probe_url],
-                        capture_output=True, timeout=8
-                    )
-                    if r.returncode != 0:
-                        continue  # cycle not available, try next
-                except Exception:
-                    continue
-                best_date = try_date
-                best_cycle = f"{cyc:02d}"
-                best_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
-                print(f"  Selected cycle: {try_date} {cyc:02d}z (fhr {fhr_start}-{fhr_end})")
-                break
-        if best_fhours:
-            break
-
-    if not best_fhours:
-        # Fallback: use whatever we can from the original cycle
-        cycle_hour = int(cycle)
-        fhr_start = max(target_start_utc - cycle_hour, 3)
-        fhr_end = min(target_end_utc - cycle_hour, max_fhr)
-        if fhr_start < 0:
-            fhr_start += 24
-            fhr_end += 24
-        best_fhours = list(range(max(fhr_start, 3), min(fhr_end, max_fhr) + 1, interval_hours))
-        print(f"  WARNING: No cycle fully covers soaring window, using partial coverage")
-
-    date, cycle, download_fhours = best_date, best_cycle, best_fhours
+        download_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
 
     base_dt = datetime.strptime(f"{date}_{cycle}", "%Y-%m-%d_%H")
 
@@ -516,7 +547,8 @@ def main():
         description="Run the full RASP forecast pipeline"
     )
     parser.add_argument("config", help="Path to domain.yaml")
-    parser.add_argument("--date", help="Forecast date YYYY-MM-DD (default: auto-detect)")
+    parser.add_argument("--target-date", help="Generate forecast for this date YYYY-MM-DD (auto-selects best cycle)")
+    parser.add_argument("--date", help="Model cycle date YYYY-MM-DD (default: auto-detect)")
     parser.add_argument("--cycle", help="Model cycle HH (default: auto-detect latest)")
     parser.add_argument("--sites", help="CSV file with sites (name lat lon)")
     parser.add_argument("--output-dir", default="./output", help="Output directory")
@@ -531,6 +563,7 @@ def main():
         args.config,
         date=args.date,
         cycle=args.cycle,
+        target_date=args.target_date,
         sites_csv=args.sites,
         output_dir=args.output_dir,
         grib_dir=args.grib_dir,

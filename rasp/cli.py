@@ -124,6 +124,8 @@ def cmd_run(args):
     ]
 
     container_args = ["run", config_name]
+    if args.target_date:
+        container_args.extend(["--target-date", args.target_date])
     if args.date:
         container_args.extend(["--date", args.date])
     if args.cycle:
@@ -315,7 +317,8 @@ def main():
     # ── rasp run ──────────────────────────────────────────────────────────
     p_run = sub.add_parser("run", help="Full pipeline: domain.yaml → WPS → WRF → windgrams")
     p_run.add_argument("config", help="Path to domain.yaml")
-    p_run.add_argument("--date", help="Forecast date YYYY-MM-DD (default: auto-detect)")
+    p_run.add_argument("--target-date", help="Generate forecast for this date YYYY-MM-DD (auto-selects best cycle)")
+    p_run.add_argument("--date", help="Model cycle date YYYY-MM-DD (default: auto-detect)")
     p_run.add_argument("--cycle", help="Model cycle HH (default: auto-detect latest)")
     p_run.add_argument("--sites", help="CSV file with sites (name lat lon)")
     p_run.add_argument("--output-dir", default="./output", help="Output directory (default: ./output)")
