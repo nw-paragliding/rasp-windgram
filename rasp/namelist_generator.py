@@ -49,10 +49,12 @@ MODELS = {
         "dx": 3000.0,
         "vtable": "Vtable.RAP.pressure.ncep",
         "interval_seconds": 3600,      # 1h
-        "forecast_hours": list(range(0, 19)),  # 0-18h hourly (48h for 00/06/12/18z)
-        "cycles": list(range(0, 24)),   # hourly cycles
+        "forecast_hours": list(range(0, 49)),  # 0-48h
+        "cycles": [0, 6, 12, 18],      # major cycles only (go to 48h; others only 18h)
         "coverage": "CONUS",
         "source": "nomads",
+        # wrfprs = pressure levels (smaller, no soil data)
+        # wrfnat = native levels (larger, includes soil) — needs ≥16GB RAM
         "url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfprsf{fhr:02d}.grib2",
     },
     "gfs": {
@@ -101,6 +103,7 @@ def load_domain_config(config_path):
         inner_extent_km: 150
         outer_extent_km: 600    # optional, auto-sized if omitted
         nest_ratio: 3           # optional, default 3
+        hrrr_levels: pressure   # optional, HRRR only: 'pressure' (default) or 'native'
         physics:                # optional overrides
           cu_physics: 0
           bl_pbl_physics: 2
@@ -273,7 +276,7 @@ def compute_nest_chain(config):
 # Physics selection
 # ---------------------------------------------------------------------------
 
-def select_physics(dx_km, overrides=None):
+def select_physics(dx_km, overrides=None, model=None, hrrr_levels="pressure"):
     """Select physics schemes appropriate for the grid resolution.
 
     Returns a dict of namelist physics options.
@@ -297,6 +300,14 @@ def select_physics(dx_km, overrides=None):
         physics["cu_physics"] = 0  # off but borderline
     else:
         physics["cu_physics"] = 0  # must be off at convection-resolving scales
+
+    # Model-specific adjustments
+    if model == "hrrr" and hrrr_levels == "pressure":
+        # HRRR pressure-level files lack soil data — use slab model
+        # instead of Noah LSM. BL/thermal physics are unaffected.
+        # Native-level files include soil data and can use Noah LSM.
+        physics["sf_surface_physics"] = 1  # simple slab
+        physics["num_soil_layers"] = 5     # slab uses 5 layers
 
     # Apply user overrides
     if overrides:
@@ -495,7 +506,9 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
     hist_interval = 60
 
     # Physics
-    physics = select_physics(domains[-1]["dx_km"], config.get("physics"))
+    hrrr_levels = config.get("hrrr_levels", "pressure") if model == "hrrr" else "pressure"
+    physics = select_physics(domains[-1]["dx_km"], config.get("physics"),
+                             model=model, hrrr_levels=hrrr_levels)
 
     # Per-domain physics (some must match, some can differ)
     # cu_physics should be 0 for fine nests
@@ -621,7 +634,8 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
 
 def generate_namelists(config_path, date, cycle, output_dir=None,
                        geog_path="/mnt/geog", num_metgrid_levels=40,
-                       start_date=None, end_date=None, run_hours=None):
+                       start_date=None, end_date=None, run_hours=None,
+                       interval_seconds_override=None):
     """Generate namelist.wps and namelist.input from a domain config.
 
     Args:
@@ -639,6 +653,17 @@ def generate_namelists(config_path, date, cycle, output_dir=None,
         dict with keys "namelist_wps", "namelist_input", "warnings", "domains"
     """
     config = load_domain_config(config_path)
+
+    # HRRR level type: 'pressure' (default, smaller) or 'native' (larger, better soil)
+    if config["model"] == "hrrr":
+        hrrr_levels = config.get("hrrr_levels", "pressure")
+        if hrrr_levels == "native":
+            MODELS["hrrr"]["vtable"] = "Vtable.raphrrr"
+            MODELS["hrrr"]["url_pattern"] = (
+                "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/"
+                "hrrr.{date}/conus/hrrr.t{cycle}z.wrfnatf{fhr:02d}.grib2"
+            )
+
     domains = compute_nest_chain(config)
     warnings = check_warnings(domains)
     est_minutes = estimate_runtime(domains)
@@ -663,6 +688,10 @@ def generate_namelists(config_path, date, cycle, output_dir=None,
             print(f"    WARNING: {w}")
 
     print()
+
+    # Override interval_seconds if caller specifies (e.g. 3h for HRRR downloads)
+    if interval_seconds_override:
+        MODELS[config["model"]]["interval_seconds"] = interval_seconds_override
 
     # Generate namelists
     wps_content = generate_namelist_wps(config, domains, date, cycle, geog_path,

@@ -115,6 +115,19 @@ Warnings emitted for:
 - <1km: LES territory (PBL schemes outside design range)
 - <500m: extreme compute cost
 
+### HRRR-specific options
+
+```yaml
+hrrr_levels: pressure   # default — smaller files (437MB), slab land surface
+hrrr_levels: native     # larger files (763MB), full Noah LSM, needs ≥16GB RAM
+```
+
+Pressure-level files omit soil data, so the pipeline auto-selects a simpler
+land surface scheme (slab). BL/thermal physics (MYNN PBL, which drives w*)
+are identical. Native-level files preserve the full vertical structure and
+include soil data for the Noah LSM — better surface heat flux accuracy but
+requires more RAM for ungrib processing.
+
 ---
 
 ## Pipeline Intelligence

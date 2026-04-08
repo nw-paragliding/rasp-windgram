@@ -1,0 +1,12 @@
+# Cascades domain using HRRR (3km → 1km direct nest)
+# Uses pressure-level files by default (works on 8GB+ machines)
+# Set hrrr_levels: native for better soil physics (needs ≥16GB RAM)
+name: cascades-hrrr
+model: hrrr
+center_lat: 47.6
+center_lon: -121.4
+target_dx_km: 1.0
+inner_extent_km: 100
+nest_ratio: 3
+# hrrr_levels: pressure    # pressure (default, 437MB/file, slab LSM)
+                            # native (763MB/file, Noah LSM, needs ≥16GB RAM)
