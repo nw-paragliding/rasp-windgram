@@ -218,16 +218,26 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
 
                 fhr_start = max(fhr_start, 3)
                 if fhr_end <= max_fhr and fhr_start < fhr_end and fhr_start >= 0:
-                    # Verify cycle exists on NOMADS
-                    probe_url = url_pattern.format(date=dc, cycle=f"{cyc:02d}", fhr=fhr_start)
-                    try:
-                        r = subprocess.run(
-                            ["curl", "--http1.1", "-sfI", "--max-time", "5", probe_url],
-                            capture_output=True, timeout=8
-                        )
-                        if r.returncode != 0:
-                            continue
-                    except Exception:
+                    # Verify ALL needed files exist on NOMADS — probe the LAST
+                    # forecast hour (the most likely to still be publishing).
+                    # NOMADS publishes forecast hours progressively, so a cycle
+                    # with fhr 3 available may not yet have fhr 27.
+                    probe_fhrs = [fhr_start, fhr_end]
+                    all_available = True
+                    for pf in probe_fhrs:
+                        probe_url = url_pattern.format(date=dc, cycle=f"{cyc:02d}", fhr=pf)
+                        try:
+                            r = subprocess.run(
+                                ["curl", "--http1.1", "-sfI", "--max-time", "5", probe_url],
+                                capture_output=True, timeout=8
+                            )
+                            if r.returncode != 0:
+                                all_available = False
+                                break
+                        except Exception:
+                            all_available = False
+                            break
+                    if not all_available:
                         continue
                     best_date = try_date
                     best_cycle = f"{cyc:02d}"
