@@ -154,11 +154,27 @@ def _utc_offset_from_lon(lon):
 def run_pipeline(config_path, date=None, cycle=None, target_date=None,
                  sites_csv=None, output_dir="./output", grib_dir=None,
                  geog_path="/mnt/geog", basedir="/opt/rasp", num_procs=1,
-                 utc_offset=None, start_hour=8):
+                 utc_offset=None, start_hour=8, not_before=None):
     """Run the full forecast pipeline."""
     config = load_domain_config(config_path)
     model = config["model"]
     model_cfg = MODELS[model]
+
+    # --not-before HH:MM — sleep until this UTC time before starting.
+    # Lets scheduled workflows compensate for GH Actions cron delays without
+    # running against a stale cycle if the delay happens to be short.
+    if not_before:
+        target_hh, target_mm = map(int, not_before.split(":"))
+        now = datetime.utcnow()
+        target = now.replace(hour=target_hh, minute=target_mm, second=0, microsecond=0)
+        if now < target:
+            wait_seconds = int((target - now).total_seconds())
+            print(f"  --not-before {not_before} UTC: sleeping {wait_seconds}s "
+                  f"(current {now.strftime('%H:%M')} UTC)", flush=True)
+            time.sleep(wait_seconds)
+        else:
+            print(f"  --not-before {not_before} UTC: already past, proceeding "
+                  f"(current {now.strftime('%H:%M')} UTC)")
 
     # Auto-detect UTC offset from domain center longitude
     if utc_offset is None:
@@ -597,6 +613,7 @@ def main():
     parser.add_argument("--num-procs", type=int, default=1, help="MPI processes")
     parser.add_argument("--utc-offset", type=int, help="UTC offset (default: auto from domain center)")
     parser.add_argument("--start-hour", type=int, default=8, help="Earliest local hour to show")
+    parser.add_argument("--not-before", help="Sleep until this UTC time (HH:MM) before starting. Lets scheduled workflows fire early to hedge GH cron delays without using stale cycles if delay is short.")
     args = parser.parse_args()
 
     run_pipeline(
@@ -611,6 +628,7 @@ def main():
         num_procs=args.num_procs,
         utc_offset=args.utc_offset,
         start_hour=args.start_hour,
+        not_before=args.not_before,
     )
 
 
