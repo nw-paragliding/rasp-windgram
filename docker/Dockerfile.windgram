@@ -29,6 +29,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     netcdf-bin \
     gfortran \
     libjpeg8 \
+    libeccodes-dev \
+    python3-eccodes \
     locales \
     && rm -rf /var/lib/apt/lists/* \
     && locale-gen en_US.UTF-8

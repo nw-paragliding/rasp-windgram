@@ -1,6 +1,6 @@
 [project]
 name = "rasp-windgram"
-version = "0.1.4"
+version = "0.2.0"
 description = "Soaring forecast windgram renderer for WRF output"
 readme = "README.md"
 license = "MIT"
@@ -22,6 +22,7 @@ dependencies = [
     "matplotlib>=3.5",
     "netCDF4>=1.5",
     "scipy>=1.7",
+    "eccodes>=1.4",
 ]
 
 [project.optional-dependencies]

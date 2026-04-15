@@ -102,6 +102,47 @@ def _download_grib(model_cfg, date, cycle, fhours, dest_dir):
 
     print(f"\n  Downloaded {downloaded}/{len(fhours)} files to {dest_dir}")
 
+    # Download surface files if model has sfc_url_pattern (e.g. HRRR wrfsfc)
+    sfc_url_pattern = model_cfg.get("sfc_url_pattern")
+    if sfc_url_pattern:
+        print(f"\n  Downloading surface GRIB data...\n")
+        sfc_downloaded = 0
+        for fhr in fhours:
+            url = sfc_url_pattern.format(
+                date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr
+            )
+            fname = url.split("/")[-1]
+            dest = Path(dest_dir) / fname
+
+            if dest.exists() and dest.stat().st_size > 1_000_000:
+                print(f"  {fname}: cached ({dest.stat().st_size // 1_000_000}MB)")
+                sfc_downloaded += 1
+                continue
+
+            print(f"  Downloading {fname}...", flush=True)
+            success = False
+            for attempt in range(1, 4):
+                result = subprocess.run(
+                    ["curl", "--http1.1", "-fsSL", "--retry", "2", "--retry-delay", "5",
+                     "--progress-bar", url, "-o", str(dest)],
+                    stdout=sys.stdout, stderr=sys.stderr,
+                )
+                if result.returncode == 0 and dest.exists() and dest.stat().st_size > 1_000_000:
+                    print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB)")
+                    success = True
+                    sfc_downloaded += 1
+                    break
+                print(f"  Attempt {attempt} failed, retrying in 10s...")
+                if dest.exists():
+                    dest.unlink()
+                time.sleep(10)
+
+            if not success:
+                print(f"  ERROR: {fname} download failed after 3 attempts")
+                sys.exit(1)
+
+        print(f"\n  Downloaded {sfc_downloaded}/{len(fhours)} surface files")
+
 
 def _detect_latest_cycle(model, date=None):
     """Auto-detect the latest available cycle from NOMADS.
@@ -334,6 +375,52 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     if grib_dir is None:
         grib_dir = f"{basedir}/grib"
         _download_grib(model_cfg, date, cycle, download_fhours, grib_dir)
+
+    # ── HRRR direct reader: skip WPS/WRF, read GRIB output directly ───
+    if model_cfg.get("direct_reader"):
+        from .hrrr_reader import extract_hrrr_site_data
+
+        prs_files = sorted(f for f in Path(grib_dir).glob("*wrfprs*.grib2"))
+        sfc_files = sorted(f for f in Path(grib_dir).glob("*wrfsfc*.grib2"))
+
+        if not prs_files or not sfc_files:
+            print("  ERROR: Missing HRRR wrfprs or wrfsfc files for direct reader")
+            sys.exit(1)
+
+        print(f"\n{'='*60}")
+        print(f"  Direct HRRR reader ({len(prs_files)} forecast hours)")
+        print(f"{'='*60}\n", flush=True)
+
+        sites = _load_sites(sites_csv) if sites_csv else []
+        if not sites:
+            print("  No sites provided — skipping windgram rendering")
+            return
+
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        rendered = 0
+        for name, lat, lon in sites:
+            try:
+                data = extract_hrrr_site_data(
+                    [str(f) for f in prs_files],
+                    [str(f) for f in sfc_files],
+                    lat, lon,
+                )
+                render_windgram(
+                    None, lat, lon, name, str(output_path),
+                    utc_offset=utc_offset, start_hour=start_hour,
+                    model_name=model, data=data,
+                )
+                rendered += 1
+            except Exception as e:
+                print(f"  WARNING: {name} failed: {e}")
+
+        print(f"\n{'='*60}")
+        print(f"  Pipeline complete!")
+        print(f"  Rendered {rendered}/{len(sites)} windgrams to {output_path}/")
+        print(f"{'='*60}\n")
+        return  # Skip WPS/WRF
 
     # ── Step 3: Run WPS (geogrid → ungrib → metgrid) ───────────────────
     print(f"\n{'='*60}")

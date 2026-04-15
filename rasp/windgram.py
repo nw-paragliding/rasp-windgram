@@ -214,11 +214,11 @@ def _extract_site_data(wrfout_path, lat, lon):
 
 def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
                     p_top_mb=None, headroom_ft=4000, utc_offset=-7,
-                    start_hour=8, dpi=100, model_name=None):
+                    start_hour=8, dpi=100, model_name=None, data=None):
     """Render a windgram PNG for a single site.
 
     Args:
-        wrfout_path: path to wrfout NetCDF file
+        wrfout_path: path to wrfout NetCDF file (None if data= is provided)
         lat, lon:    site latitude and longitude
         site_name:   name for the output file and title
         output_dir:  directory to write PNG to
@@ -227,11 +227,15 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
         utc_offset:  hours to add to UTC for local time labels (default -7 PDT)
         start_hour:  earliest local hour to show (default 8, skips pre-dawn)
         dpi:         output resolution
+        data:        pre-built data dict (skips WRF extraction, e.g. from HRRR direct reader)
 
     Returns:
         Path to the output PNG file.
     """
-    d = _extract_site_data(wrfout_path, lat, lon)
+    if data is not None:
+        d = data
+    else:
+        d = _extract_site_data(wrfout_path, lat, lon)
 
     # Filter to local hours >= start_hour (skip pre-dawn)
     local_all = (d["hours_utc"] + utc_offset) % 24

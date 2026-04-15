@@ -54,10 +54,12 @@ MODELS = {
         "coverage": "CONUS",
         "source": "nomads",
         "url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfprsf{fhr:02d}.grib2",
-        # Soil data (TSOIL/SOILW at 9 depths) is in wrfprs files but needs
-        # a second ungrib pass with Vtable.raphrrr to extract it (the default
-        # Vtable.RAP.pressure.ncep only maps atmosphere on pressure levels).
-        "sfc_vtable": "Vtable.raphrrr",
+        # Direct reader: skip WPS/WRF, read HRRR GRIB output directly.
+        # HRRR IS a WRF model at 3km — re-running WRF loses cloud state
+        # and produces false soaring forecasts on cloudy days.
+        "direct_reader": True,
+        "sfc_url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfsfcf{fhr:02d}.grib2",
+        "sfc_vtable": "Vtable.raphrrr",  # kept for fallback WRF path
     },
     "gfs": {
         "name": "GFS (Global Forecast System)",
