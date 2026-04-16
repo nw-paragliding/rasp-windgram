@@ -59,7 +59,9 @@ MODELS = {
         # and produces false soaring forecasts on cloudy days.
         "direct_reader": True,
         "sfc_url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfsfcf{fhr:02d}.grib2",
-        "sfc_vtable": "Vtable.raphrrr",  # kept for fallback WRF path
+        # Full Vtable for WRF nesting path (direct_reader: false): maps
+        # atmosphere + soil + hydrometeors from wrfprs in a single ungrib pass.
+        "wrf_vtable": "Vtable.HRRR.full",
     },
     "gfs": {
         "name": "GFS (Global Forecast System)",

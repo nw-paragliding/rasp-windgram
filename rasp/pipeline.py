@@ -465,7 +465,8 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     print(f"  Linked {len(grib_files)} GRIB files")
 
     # 3c. Link Vtable
-    vtable_name = model_cfg["vtable"]
+    # Use wrf_vtable if available (single-pass: atmosphere + soil + hydrometeors)
+    vtable_name = model_cfg.get("wrf_vtable", model_cfg["vtable"])
     vtable_src = Path(wps_dir) / "Variable_Tables" / vtable_name
     vtable_dst = Path(wps_dir) / "Vtable"
     if vtable_dst.exists() or vtable_dst.is_symlink():
@@ -479,12 +480,11 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     print(f"  ungrib: OK ({file_count} intermediate files)")
 
     # 3d'. Second ungrib pass — extract soil fields with a different Vtable.
-    # HRRR wrfprs files contain TSOIL/SOILW at 9 depths, but the default
-    # Vtable.RAP.pressure.ncep only maps atmosphere. Re-running ungrib with
-    # Vtable.raphrrr extracts soil data (atmosphere won't match due to
-    # hybrid vs pressure level types, which is fine).
+    # Only needed when using a partial Vtable (e.g. Vtable.RAP.pressure.ncep).
+    # Skipped when using wrf_vtable (e.g. Vtable.HRRR.full) which maps everything
+    # including soil and hydrometeors in a single pass.
     sfc_vtable_name = model_cfg.get("sfc_vtable")
-    if sfc_vtable_name:
+    if sfc_vtable_name and not model_cfg.get("wrf_vtable"):
         # GRIB files are already linked — just switch Vtable and prefix
         vtable_src = Path(wps_dir) / "Variable_Tables" / sfc_vtable_name
         if vtable_dst.is_symlink():

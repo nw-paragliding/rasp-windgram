@@ -1,0 +1,55 @@
+GRIB1| Level| From |  To  | metgrid  |  metgrid| metgrid                                 |GRIB2|GRIB2|GRIB2|GRIB2|
+Param| Type |Level1|Level2| Name     |  Units  | Description                             |Discp|Catgy|Param|Level|
+-----+------+------+------+----------+---------+-----------------------------------------+-----------------------+
+#  Atmosphere on pressure levels
+  11 | 100  |   *  |      | TT       | K       | Temperature                             |  0  |  0  |  0  | 100 |
+  33 | 100  |   *  |      | UU       | m s-1   | U                                       |  0  |  2  |  2  | 100 |
+  34 | 100  |   *  |      | VV       | m s-1   | V                                       |  0  |  2  |  3  | 100 |
+  52 | 100  |   *  |      | RH       | %       | Relative Humidity                       |  0  |  1  |  1  | 100 |
+   7 | 100  |   *  |      | HGT      | m       | Height                                  |  0  |  3  |  5  | 100 |
+#  Hydrometeors on pressure levels (for cloud initialization)
+ 153 | 100  |   *  |      | QC       | kg kg-1 | Cloud water mixing ratio                |  0  |  1  | 22  | 100 |
+ 170 | 100  |   *  |      | QR       | kg kg-1 | Rain water mixing ratio                 |  0  |  1  | 24  | 100 |
+ 178 | 100  |   *  |      | QI       | kg kg-1 | Cloud ice mixing ratio                  |  0  |  6  |  0  | 100 |
+ 171 | 100  |   *  |      | QS       | kg kg-1 | Snow mixing ratio                       |  0  |  1  | 25  | 100 |
+ 179 | 100  |   *  |      | QG       | kg kg-1 | Graupel mixing ratio                    |  0  |  1  | 32  | 100 |
+#  Near-surface fields
+  11 | 105  |   2  |      | TT       | K       | Temperature at 2 m                      |  0  |  0  |  0  | 103 |
+  51 | 105  |   2  |      | SPECHUMD | kg kg-1 | Specific Humidity at 2 m                |  0  |  1  |  0  | 103 |
+  33 | 105  |  10  |      | UU       | m s-1   | U at 10 m                               |  0  |  2  |  2  | 103 |
+  34 | 105  |  10  |      | VV       | m s-1   | V at 10 m                               |  0  |  2  |  3  | 103 |
+#  Surface fields
+   1 |   1  |   0  |      | PSFC     | Pa      | Surface Pressure                        |  0  |  3  |  0  |   1 |
+ 129 | 102  |   0  |      | PMSL     | Pa      | Sea-level Pressure                      |  0  |  3  | 198 | 101 |
+   7 |   1  |   0  |      | SOILHGT  | m       | Terrain field of source analysis         |  0  |  3  |  5  |   1 |
+  65 |   1  |   0  |      | SNOW     | kg m-2  | Water equivalent snow depth              |  0  |  1  | 13  |   1 |
+  11 |   1  |   0  |      | SKINTEMP | K       | Skin temperature                        |  0  |  0  |  0  |   1 |
+#  Soil fields (below ground, in wrfprs)
+  85 | 112  |   0  |   0  | SOILT000 | K       | Soil temperature 0 cm                   |  0  |  0  |  0  | 106 |
+  85 | 112  |   1  |   1  | SOILT001 | K       | Soil temperature 1 cm                   |  0  |  0  |  0  | 106 |
+  85 | 112  |   4  |   4  | SOILT004 | K       | Soil temperature 4 cm                   |  0  |  0  |  0  | 106 |
+  85 | 112  |  10  |  10  | SOILT010 | K       | Soil temperature 10 cm                  |  0  |  0  |  0  | 106 |
+  85 | 112  |  30  |  30  | SOILT030 | K       | Soil temperature 30 cm                  |  0  |  0  |  0  | 106 |
+  85 | 112  |  60  |  60  | SOILT060 | K       | Soil temperature 60 cm                  |  0  |  0  |  0  | 106 |
+  85 | 112  | 100  | 100  | SOILT100 | K       | Soil temperature 100 cm                 |  0  |  0  |  0  | 106 |
+  85 | 112  | 160  | 160  | SOILT160 | K       | Soil temperature 160 cm                 |  0  |  0  |  0  | 106 |
+  85 | 112  | 300  | 300  | SOILT300 | K       | Soil temperature 300 cm                 |  0  |  0  |  0  | 106 |
+ 144 | 112  |   0  |   0  | SOILM000 | fraction| Soil moisture 0 cm                      |  2  |  0  | 22  | 106 |
+ 144 | 112  |   1  |   1  | SOILM001 | fraction| Soil moisture 1 cm                      |  2  |  0  | 22  | 106 |
+ 144 | 112  |   4  |   4  | SOILM004 | fraction| Soil moisture 4 cm                      |  2  |  0  | 22  | 106 |
+ 144 | 112  |  10  |  10  | SOILM010 | fraction| Soil moisture 10 cm                     |  2  |  0  | 22  | 106 |
+ 144 | 112  |  30  |  30  | SOILM030 | fraction| Soil moisture 30 cm                     |  2  |  0  | 22  | 106 |
+ 144 | 112  |  60  |  60  | SOILM060 | fraction| Soil moisture 60 cm                     |  2  |  0  | 22  | 106 |
+ 144 | 112  | 100  | 100  | SOILM100 | fraction| Soil moisture 100 cm                    |  2  |  0  | 22  | 106 |
+ 144 | 112  | 160  | 160  | SOILM160 | fraction| Soil moisture 160 cm                    |  2  |  0  | 22  | 106 |
+ 144 | 112  | 300  | 300  | SOILM300 | fraction| Soil moisture 300 cm                    |  2  |  0  | 22  | 106 |
+-----+------+------+------+----------+---------+-----------------------------------------+-----------------------+
+#
+#  Combined Vtable for HRRR wrfprs files — extracts atmosphere, hydrometeors,
+#  and soil data in a SINGLE ungrib pass. Used when nesting HRRR to finer
+#  resolution via WRF (direct_reader: false).
+#
+#  Hydrometeor fields (QC, QR, QI, QS, QG) initialize WRF with HRRR's actual
+#  cloud state, preventing the cloud spin-up problem that causes false soaring
+#  forecasts on cloudy/rainy days.
+#
