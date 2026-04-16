@@ -421,12 +421,14 @@ def generate_namelist_wps(config, domains, date, cycle, geog_path="/mnt/geog",
     dx = domains[0]["dx"]
     dy = domains[0]["dx"]
 
-    # Determine GEOG resolution recommendation
-    finest_dx_km = domains[-1]["dx_km"]
-    if finest_dx_km >= 4:
-        geog_res = "lowres"
-    else:
-        geog_res = "default+lowres"
+    # Determine GEOG resolution — configurable from domain YAML
+    geog_res = config.get("geog_data_res")
+    if not geog_res:
+        finest_dx_km = domains[-1]["dx_km"]
+        if finest_dx_km >= 4:
+            geog_res = "lowres"
+        else:
+            geog_res = "default+lowres"
 
     lines = f"""\
 &share
