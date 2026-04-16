@@ -26,8 +26,8 @@ Param| Type |Level1|Level2| Name     |  Units  | Description                    
   11 |   1  |   0  |      | SKINTEMP | K       | Skin temperature                        |  0  |  0  |  0  |   1 |
 #  Soil fields (below ground, in wrfprs) — wildcard levels, matching
 #  all depths. ungrib creates separate records per depth automatically.
-  85 | 112  |   *  |      | SOILT    | K       | Soil temperature                        |  0  |  0  |  0  | 106 |
- 144 | 112  |   *  |      | SOILM    | fraction| Soil moisture                           |  2  |  0  | 22  | 106 |
+  85 | 111  |   *  |      | SOILT    | K       | Soil temperature                        |  0  |  0  |  0  | 106 |
+ 144 | 111  |   *  |      | SOILM    | fraction| Soil moisture                           |  2  |  0  | 22  | 106 |
 -----+------+------+------+----------+---------+-----------------------------------------+-----------------------+
 #
 #  Combined Vtable for HRRR wrfprs files — extracts atmosphere, hydrometeors,
