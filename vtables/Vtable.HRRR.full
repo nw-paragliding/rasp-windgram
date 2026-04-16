@@ -24,25 +24,10 @@ Param| Type |Level1|Level2| Name     |  Units  | Description                    
    7 |   1  |   0  |      | SOILHGT  | m       | Terrain field of source analysis         |  0  |  3  |  5  |   1 |
   65 |   1  |   0  |      | SNOW     | kg m-2  | Water equivalent snow depth              |  0  |  1  | 13  |   1 |
   11 |   1  |   0  |      | SKINTEMP | K       | Skin temperature                        |  0  |  0  |  0  |   1 |
-#  Soil fields (below ground, in wrfprs)
-  85 | 112  |   0  |   0  | SOILT000 | K       | Soil temperature 0 cm                   |  0  |  0  |  0  | 106 |
-  85 | 112  |   1  |   1  | SOILT001 | K       | Soil temperature 1 cm                   |  0  |  0  |  0  | 106 |
-  85 | 112  |   4  |   4  | SOILT004 | K       | Soil temperature 4 cm                   |  0  |  0  |  0  | 106 |
-  85 | 112  |  10  |  10  | SOILT010 | K       | Soil temperature 10 cm                  |  0  |  0  |  0  | 106 |
-  85 | 112  |  30  |  30  | SOILT030 | K       | Soil temperature 30 cm                  |  0  |  0  |  0  | 106 |
-  85 | 112  |  60  |  60  | SOILT060 | K       | Soil temperature 60 cm                  |  0  |  0  |  0  | 106 |
-  85 | 112  | 100  | 100  | SOILT100 | K       | Soil temperature 100 cm                 |  0  |  0  |  0  | 106 |
-  85 | 112  | 160  | 160  | SOILT160 | K       | Soil temperature 160 cm                 |  0  |  0  |  0  | 106 |
-  85 | 112  | 300  | 300  | SOILT300 | K       | Soil temperature 300 cm                 |  0  |  0  |  0  | 106 |
- 144 | 112  |   0  |   0  | SOILM000 | fraction| Soil moisture 0 cm                      |  2  |  0  | 22  | 106 |
- 144 | 112  |   1  |   1  | SOILM001 | fraction| Soil moisture 1 cm                      |  2  |  0  | 22  | 106 |
- 144 | 112  |   4  |   4  | SOILM004 | fraction| Soil moisture 4 cm                      |  2  |  0  | 22  | 106 |
- 144 | 112  |  10  |  10  | SOILM010 | fraction| Soil moisture 10 cm                     |  2  |  0  | 22  | 106 |
- 144 | 112  |  30  |  30  | SOILM030 | fraction| Soil moisture 30 cm                     |  2  |  0  | 22  | 106 |
- 144 | 112  |  60  |  60  | SOILM060 | fraction| Soil moisture 60 cm                     |  2  |  0  | 22  | 106 |
- 144 | 112  | 100  | 100  | SOILM100 | fraction| Soil moisture 100 cm                    |  2  |  0  | 22  | 106 |
- 144 | 112  | 160  | 160  | SOILM160 | fraction| Soil moisture 160 cm                    |  2  |  0  | 22  | 106 |
- 144 | 112  | 300  | 300  | SOILM300 | fraction| Soil moisture 300 cm                    |  2  |  0  | 22  | 106 |
+#  Soil fields (below ground, in wrfprs) — wildcard levels, matching
+#  all depths. ungrib creates separate records per depth automatically.
+  85 | 112  |   *  |      | SOILT    | K       | Soil temperature                        |  0  |  0  |  0  | 106 |
+ 144 | 112  |   *  |      | SOILM    | fraction| Soil moisture                           |  2  |  0  | 22  | 106 |
 -----+------+------+------+----------+---------+-----------------------------------------+-----------------------+
 #
 #  Combined Vtable for HRRR wrfprs files — extracts atmosphere, hydrometeors,
