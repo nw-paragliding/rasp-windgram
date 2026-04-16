@@ -199,7 +199,11 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     """Run the full forecast pipeline."""
     config = load_domain_config(config_path)
     model = config["model"]
-    model_cfg = MODELS[model]
+    model_cfg = dict(MODELS[model])  # copy so domain overrides don't mutate global
+
+    # Domain YAML can override direct_reader (e.g. direct_reader: false to force WRF)
+    if "direct_reader" in config:
+        model_cfg["direct_reader"] = config["direct_reader"]
 
     # --not-before HH:MM — sleep until this UTC time before starting.
     # Lets scheduled workflows compensate for GH Actions cron delays without
@@ -229,7 +233,12 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     target_end_local = 20    # 8pm local
     max_fhr = max(model_cfg.get("forecast_hours", [84]))
     native_interval = model_cfg["interval_seconds"] // 3600
-    interval_hours = max(native_interval, 3)
+    # Direct reader can use native interval (e.g. 1h for HRRR).
+    # WPS/WRF path needs ≥3h for boundary condition consistency.
+    if model_cfg.get("direct_reader"):
+        interval_hours = native_interval
+    else:
+        interval_hours = max(native_interval, 3)
     known_cycles = sorted(model_cfg.get("cycles", [0, 6, 12, 18]), reverse=True)
     url_pattern = model_cfg["url_pattern"]
 
