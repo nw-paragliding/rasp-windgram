@@ -65,7 +65,7 @@ RUN mkdir -p ${BASEDIR}/wps/geogrid ${BASEDIR}/wps/metgrid && \
     ln -sf /opt/wrf/wps/geogrid/GEOGRID.TBL   ${BASEDIR}/wps/geogrid/GEOGRID.TBL && \
     ln -sf /opt/wrf/wps/metgrid/METGRID.TBL   ${BASEDIR}/wps/metgrid/METGRID.TBL && \
     ln -sf /opt/wrf/wps/link_grib.csh         ${BASEDIR}/wps/link_grib.csh && \
-    ln -sf /opt/wrf/wps/Variable_Tables       ${BASEDIR}/wps/Variable_Tables
+    cp -r /opt/wrf/wps/Variable_Tables        ${BASEDIR}/wps/Variable_Tables
 
 # Custom Vtables (supplement the WPS-provided ones)
 COPY vtables/ ${BASEDIR}/wps/Variable_Tables/
