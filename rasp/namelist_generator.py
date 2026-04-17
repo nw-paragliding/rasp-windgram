@@ -575,7 +575,7 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
  j_parent_start           = {rep([d['j_parent_start'] for d in domains])},
  parent_grid_ratio        = {rep([d['parent_grid_ratio'] for d in domains])},
  parent_time_step_ratio   = {rep([d['parent_grid_ratio'] for d in domains])},
- feedback                 = 1,
+ feedback                 = 0,
  smooth_option            = 0,
 /
 
