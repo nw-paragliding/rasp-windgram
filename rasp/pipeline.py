@@ -339,12 +339,15 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
                 fhr_end += 24
         download_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
 
-    # --max-hours: truncate the simulation window for fast iteration/debugging
+    # --max-hours: truncate the simulation window for fast iteration/debugging.
+    # Always preserve the native interval so WRF boundary times line up.
     if max_hours is not None:
         cutoff = download_fhours[0] + max_hours
-        download_fhours = [f for f in download_fhours if f <= cutoff]
-        if len(download_fhours) < 2:
-            download_fhours = download_fhours + [download_fhours[0] + max_hours]
+        truncated = [f for f in download_fhours if f <= cutoff]
+        # Need at least 2 fhrs for WRF (start + end boundary)
+        if len(truncated) < 2 and len(download_fhours) >= 2:
+            truncated = download_fhours[:2]
+        download_fhours = truncated
         print(f"  --max-hours {max_hours}: truncated to {len(download_fhours)} fhrs ({download_fhours[0]}-{download_fhours[-1]})")
 
     base_dt = datetime.strptime(f"{date}_{cycle}", "%Y-%m-%d_%H")
