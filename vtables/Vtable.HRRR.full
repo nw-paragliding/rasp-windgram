@@ -1,13 +1,13 @@
 GRIB1| Level| From |  To  | metgrid  |  metgrid| metgrid                                 |GRIB2|GRIB2|GRIB2|GRIB2|
 Param| Type |Level1|Level2| Name     |  Units  | Description                             |Discp|Catgy|Param|Level|
 -----+------+------+------+----------+---------+-----------------------------------------+-----------------------+
-#  Atmosphere on pressure levels
+#  Atmosphere on pressure levels (same as Vtable.RAP.pressure.ncep)
   11 | 100  |   *  |      | TT       | K       | Temperature                             |  0  |  0  |  0  | 100 |
   33 | 100  |   *  |      | UU       | m s-1   | U                                       |  0  |  2  |  2  | 100 |
   34 | 100  |   *  |      | VV       | m s-1   | V                                       |  0  |  2  |  3  | 100 |
   52 | 100  |   *  |      | RH       | %       | Relative Humidity                       |  0  |  1  |  1  | 100 |
    7 | 100  |   *  |      | HGT      | m       | Height                                  |  0  |  3  |  5  | 100 |
-#  Hydrometeors on pressure levels (for cloud initialization)
+#  Hydrometeors on pressure levels (cloud initialization for WRF nesting)
  153 | 100  |   *  |      | QC       | kg kg-1 | Cloud water mixing ratio                |  0  |  1  | 22  | 100 |
  170 | 100  |   *  |      | QR       | kg kg-1 | Rain water mixing ratio                 |  0  |  1  | 24  | 100 |
  178 | 100  |   *  |      | QI       | kg kg-1 | Cloud ice mixing ratio                  |  0  |  6  |  0  | 100 |
@@ -24,17 +24,9 @@ Param| Type |Level1|Level2| Name     |  Units  | Description                    
    7 |   1  |   0  |      | SOILHGT  | m       | Terrain field of source analysis         |  0  |  3  |  5  |   1 |
   65 |   1  |   0  |      | SNOW     | kg m-2  | Water equivalent snow depth              |  0  |  1  | 13  |   1 |
   11 |   1  |   0  |      | SKINTEMP | K       | Skin temperature                        |  0  |  0  |  0  |   1 |
-#  Soil fields (below ground, in wrfprs) — wildcard levels, matching
-#  all depths. ungrib creates separate records per depth automatically.
-  85 | 111  |   *  |      | SOILT    | K       | Soil temperature                        |  0  |  0  |  0  | 106 |
- 144 | 111  |   *  |      | SOILM    | fraction| Soil moisture                           |  2  |  0  | 22  | 106 |
 -----+------+------+------+----------+---------+-----------------------------------------+-----------------------+
 #
-#  Combined Vtable for HRRR wrfprs files — extracts atmosphere, hydrometeors,
-#  and soil data in a SINGLE ungrib pass. Used when nesting HRRR to finer
-#  resolution via WRF (direct_reader: false).
-#
-#  Hydrometeor fields (QC, QR, QI, QS, QG) initialize WRF with HRRR's actual
-#  cloud state, preventing the cloud spin-up problem that causes false soaring
-#  forecasts on cloudy/rainy days.
+#  Extended Vtable for HRRR wrfprs — adds hydrometeor fields (QC/QR/QI/QS/QG)
+#  to Vtable.RAP.pressure.ncep for cloud state initialization.
+#  Soil fields are handled by the second ungrib pass (Vtable.raphrrr → SFC prefix).
 #

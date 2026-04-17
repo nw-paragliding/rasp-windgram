@@ -480,11 +480,10 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     print(f"  ungrib: OK ({file_count} intermediate files)")
 
     # 3d'. Second ungrib pass — extract soil fields with a different Vtable.
-    # Only needed when using a partial Vtable (e.g. Vtable.RAP.pressure.ncep).
-    # Skipped when using wrf_vtable (e.g. Vtable.HRRR.full) which maps everything
-    # including soil and hydrometeors in a single pass.
+    # Vtable.raphrrr extracts soil data from wrfprs at below-ground levels
+    # (atmosphere fields don't match due to hybrid vs pressure level types).
     sfc_vtable_name = model_cfg.get("sfc_vtable")
-    if sfc_vtable_name and not model_cfg.get("wrf_vtable"):
+    if sfc_vtable_name:
         # GRIB files are already linked — just switch Vtable and prefix
         vtable_src = Path(wps_dir) / "Variable_Tables" / sfc_vtable_name
         if vtable_dst.is_symlink():
