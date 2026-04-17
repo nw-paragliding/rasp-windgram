@@ -60,9 +60,10 @@ MODELS = {
         "direct_reader": True,
         "sfc_url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfsfcf{fhr:02d}.grib2",
         # WRF nesting path (direct_reader: false):
-        # Pass 1: wrf_vtable extracts atmosphere + hydrometeors (QC/QR/QI/QS/QG)
+        # Pass 1: wrf_vtable extracts atmosphere (+ hydrometeors if using Vtable.HRRR.full)
         # Pass 2: sfc_vtable extracts soil (SOILT/SOILM) via Vtable.raphrrr
-        "wrf_vtable": "Vtable.HRRR.full",
+        # TODO: re-enable hydrometeors once WRF stability issue is resolved
+        # "wrf_vtable": "Vtable.HRRR.full",
         "sfc_vtable": "Vtable.raphrrr",
     },
     "gfs": {
