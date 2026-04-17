@@ -195,7 +195,8 @@ def _utc_offset_from_lon(lon):
 def run_pipeline(config_path, date=None, cycle=None, target_date=None,
                  sites_csv=None, output_dir="./output", grib_dir=None,
                  geog_path="/mnt/geog", basedir="/opt/rasp", num_procs=1,
-                 utc_offset=None, start_hour=8, not_before=None):
+                 utc_offset=None, start_hour=8, not_before=None,
+                 max_hours=None):
     """Run the full forecast pipeline."""
     config = load_domain_config(config_path)
     model = config["model"]
@@ -337,6 +338,14 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
                 fhr_start += 24
                 fhr_end += 24
         download_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
+
+    # --max-hours: truncate the simulation window for fast iteration/debugging
+    if max_hours is not None:
+        cutoff = download_fhours[0] + max_hours
+        download_fhours = [f for f in download_fhours if f <= cutoff]
+        if len(download_fhours) < 2:
+            download_fhours = download_fhours + [download_fhours[0] + max_hours]
+        print(f"  --max-hours {max_hours}: truncated to {len(download_fhours)} fhrs ({download_fhours[0]}-{download_fhours[-1]})")
 
     base_dt = datetime.strptime(f"{date}_{cycle}", "%Y-%m-%d_%H")
 
@@ -709,6 +718,7 @@ def main():
     parser.add_argument("--utc-offset", type=int, help="UTC offset (default: auto from domain center)")
     parser.add_argument("--start-hour", type=int, default=8, help="Earliest local hour to show")
     parser.add_argument("--not-before", help="Sleep until this UTC time (HH:MM) before starting. Lets scheduled workflows fire early to hedge GH cron delays without using stale cycles if delay is short.")
+    parser.add_argument("--max-hours", type=int, help="Truncate simulation to N hours (for fast debug iterations)")
     args = parser.parse_args()
 
     run_pipeline(
@@ -724,6 +734,7 @@ def main():
         utc_offset=args.utc_offset,
         start_hour=args.start_hour,
         not_before=args.not_before,
+        max_hours=args.max_hours,
     )
 
 
