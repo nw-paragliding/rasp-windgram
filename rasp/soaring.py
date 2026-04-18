@@ -78,7 +78,10 @@ def _drjack_height_frac(threshold_fpm, wstar_fpm):
         ratio = threshold / wstar_fpm
         height_frac = sqrt(alpha3 * (alpha2 - alpha1 * ratio) + alpha4) + alpha5
     """
-    ratio = threshold_fpm / wstar_fpm
+    # Avoid divide-by-zero for wstar=0 cells; their results are masked out
+    # by np.where(valid, ...) in calc_hcrit anyway.
+    safe_wstar = np.where(wstar_fpm > 0, wstar_fpm, 1.0)
+    ratio = threshold_fpm / safe_wstar
     inner = _ALPHA3 * (_ALPHA2 - _ALPHA1 * ratio) + _ALPHA4
     height_frac = np.sqrt(np.maximum(inner, 0.0)) + _ALPHA5
     return height_frac
