@@ -1680,7 +1680,7 @@ wheels = [
 
 [[package]]
 name = "rasp-windgram"
-version = "0.1.4"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "eccodes" },
@@ -1692,6 +1692,7 @@ dependencies = [
     { name = "numpy", version = "2.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
     { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "pyyaml" },
     { name = "scipy", version = "1.13.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
@@ -1708,6 +1709,7 @@ requires-dist = [
     { name = "matplotlib", specifier = ">=3.5" },
     { name = "netcdf4", specifier = ">=1.5" },
     { name = "numpy", specifier = ">=1.20" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "pyyaml", marker = "extra == 'yaml'", specifier = ">=6.0" },
     { name = "scipy", specifier = ">=1.7" },
 ]

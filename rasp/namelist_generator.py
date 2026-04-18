@@ -508,6 +508,9 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
     # Time step: ~6 * dx_km for the outer domain
     dt = int(6 * domains[0]["dx_km"])
 
+    # Vertical levels (e_vert) — configurable via domain YAML, default 45
+    e_vert = int(config.get("e_vert", 45))
+
     # History output interval (minutes)
     hist_interval = 60
 
@@ -562,7 +565,7 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
  max_dom                  = {ndomains},
  e_we                     = {rep([d['e_we'] for d in domains])},
  e_sn                     = {rep([d['e_sn'] for d in domains])},
- e_vert                   = {rep(45)},
+ e_vert                   = {rep(e_vert)},
  dzstretch_s              = 1.1,
  p_top_requested          = 5000,
  num_metgrid_levels       = {num_metgrid_levels},
