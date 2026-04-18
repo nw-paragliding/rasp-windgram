@@ -6,7 +6,9 @@ center_lat: 47.6
 center_lon: -121.4
 
 # Finest resolution — system builds nest chain automatically
-# NAM 12km → 4km → 1.33km
+# Match DrJack RASP PNW-WINDOW: NAM 12km → WRF 4km → WRF 1.33km (2 WRF domains,
+# skipping an intermediate 12km WRF step for cleaner boundary forcing).
+outer_dx_km: 4.0
 target_dx_km: 1.33
 
 # Physical extent at finest resolution (km)
@@ -15,7 +17,17 @@ inner_extent_km: 150
 # Nesting ratio (default 3)
 nest_ratio: 3
 
-# Physics overrides (optional — auto-selected by resolution if omitted)
-# physics:
-#   cu_physics: 0
-#   bl_pbl_physics: 2
+# Vertical levels — DrJack RASP uses 52 (vs WRF default 45)
+# More levels = better boundary layer resolution.
+e_vert: 52
+
+# Physics matched to DrJack RASP (raspnw-v2 / wxtofly.net) for consistency
+# with the established PNW soaring community calibration.
+physics:
+  mp_physics: 5         # Eta Ferrier (was Thompson 8)
+  ra_lw_physics: 1      # RRTM (was RRTMG 4)
+  ra_sw_physics: 1      # Dudhia (was RRTMG 4)
+  radt: 10              # 10-min radiation calls (was 15)
+  sf_sfclay_physics: 1  # MM5 similarity / Monin-Obukhov (was MYNN 2)
+  bl_pbl_physics: 1     # YSU non-local PBL (was MYNN 5)
+                        # — produces deeper convective BL = stronger w*

@@ -203,7 +203,11 @@ def compute_nest_chain(config):
     model = config["model"]
     target_dx_m = config["target_dx_km"] * 1000.0
     ratio = config["nest_ratio"]
-    outer_dx_m = MODEL_DX[model]
+    # outer_dx_km lets the domain YAML skip the coarsest WRF step.
+    # E.g. for NAM (12km native), setting outer_dx_km=4 means WRF interpolates
+    # NAM 12km directly into a 4km outer domain, skipping the 12km WRF integration.
+    # Matches DrJack RASP convention for higher-quality fine-nest forcing.
+    outer_dx_m = float(config.get("outer_dx_km", MODEL_DX[model] / 1000.0)) * 1000.0
 
     # Build chain from outer to inner
     chain = []
