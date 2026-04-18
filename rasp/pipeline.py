@@ -195,8 +195,9 @@ def _utc_offset_from_lon(lon):
 def run_pipeline(config_path, date=None, cycle=None, target_date=None,
                  sites_csv=None, output_dir="./output", grib_dir=None,
                  geog_path="/mnt/geog", basedir="/opt/rasp", num_procs=1,
-                 utc_offset=None, start_hour=8, not_before=None,
-                 max_hours=None):
+                 utc_offset=None, start_hour=8,
+                 max_hours=None, target_cycle=None,
+                 poll_interval_min=10, poll_max_min=240):
     """Run the full forecast pipeline."""
     config = load_domain_config(config_path)
     model = config["model"]
@@ -206,21 +207,6 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     if "direct_reader" in config:
         model_cfg["direct_reader"] = config["direct_reader"]
 
-    # --not-before HH:MM — sleep until this UTC time before starting.
-    # Lets scheduled workflows compensate for GH Actions cron delays without
-    # running against a stale cycle if the delay happens to be short.
-    if not_before:
-        target_hh, target_mm = map(int, not_before.split(":"))
-        now = datetime.utcnow()
-        target = now.replace(hour=target_hh, minute=target_mm, second=0, microsecond=0)
-        if now < target:
-            wait_seconds = int((target - now).total_seconds())
-            print(f"  --not-before {not_before} UTC: sleeping {wait_seconds}s "
-                  f"(current {now.strftime('%H:%M')} UTC)", flush=True)
-            time.sleep(wait_seconds)
-        else:
-            print(f"  --not-before {not_before} UTC: already past, proceeding "
-                  f"(current {now.strftime('%H:%M')} UTC)")
 
     # Auto-detect UTC offset from domain center longitude
     if utc_offset is None:
@@ -253,6 +239,59 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     else:
         soaring_start_utc = None
         soaring_end_utc = None
+
+    # --target-cycle: pin to a specific cycle and poll NOMADS until ready.
+    # Better than --not-before (time-based) — runs as soon as data is actually available.
+    if target_cycle is not None:
+        target_cyc = int(target_cycle)
+        # Use today's UTC date for the target cycle. If the cycle is in the future
+        # (e.g. running at 22z asking for 00z today which already passed), use today.
+        # If it's far in the past (>23h), bump to next day. Generally cron should
+        # fire just before/after the cycle is initialized.
+        if date is None:
+            date = datetime.utcnow().strftime("%Y-%m-%d")
+        cycle = f"{target_cyc:02d}"
+        cycle_dt = datetime.strptime(f"{date}_{target_cyc:02d}", "%Y-%m-%d_%H")
+
+        # Compute needed forecast hours from soaring window
+        if soaring_start_utc:
+            fhr_start = max(int((soaring_start_utc - cycle_dt).total_seconds() / 3600), 0)
+            fhr_end = int((soaring_end_utc - cycle_dt).total_seconds() / 3600)
+        else:
+            fhr_start = max((target_start_local - utc_offset) - target_cyc, 0)
+            fhr_end = (target_end_local - utc_offset) - target_cyc
+            if fhr_start < 0:
+                fhr_start += 24
+                fhr_end += 24
+        fhr_start = max(fhr_start, native_interval)
+        download_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
+        if max_hours is not None:
+            cutoff = download_fhours[0] + max_hours
+            truncated = [f for f in download_fhours if f <= cutoff]
+            if len(truncated) < 2 and len(download_fhours) >= 2:
+                truncated = download_fhours[:2]
+            download_fhours = truncated
+
+        print(f"  Target cycle: {date} {target_cyc:02d}z (fhr {download_fhours[0]}-{download_fhours[-1]})")
+
+        # Poll until the LAST needed fhour is published on NOMADS
+        dc = date.replace("-", "")
+        probe_url = url_pattern.format(date=dc, cycle=f"{target_cyc:02d}", fhr=download_fhours[-1])
+        elapsed_min = 0
+        while elapsed_min < poll_max_min:
+            r = subprocess.run(
+                ["curl", "--http1.1", "-sfI", "--max-time", "10", probe_url],
+                capture_output=True, timeout=15
+            )
+            if r.returncode == 0:
+                print(f"  Target cycle ready (waited {elapsed_min} min)")
+                break
+            print(f"  Cycle {target_cyc:02d}z fhr {download_fhours[-1]} not ready, sleeping {poll_interval_min} min (elapsed {elapsed_min} min)", flush=True)
+            time.sleep(poll_interval_min * 60)
+            elapsed_min += poll_interval_min
+        else:
+            print(f"  ERROR: Target cycle {target_cyc:02d}z not ready after {poll_max_min} min")
+            sys.exit(1)
 
     # Find the best cycle: latest available that covers the soaring window
     if date is not None and cycle is not None:
@@ -720,7 +759,9 @@ def main():
     parser.add_argument("--num-procs", type=int, default=1, help="MPI processes")
     parser.add_argument("--utc-offset", type=int, help="UTC offset (default: auto from domain center)")
     parser.add_argument("--start-hour", type=int, default=8, help="Earliest local hour to show")
-    parser.add_argument("--not-before", help="Sleep until this UTC time (HH:MM) before starting. Lets scheduled workflows fire early to hedge GH cron delays without using stale cycles if delay is short.")
+    parser.add_argument("--target-cycle", help="Pin to specific cycle hour (e.g. 0 or 12), poll NOMADS until the needed forecast hours are available, then run. Replaces time-based --not-before.")
+    parser.add_argument("--poll-interval-min", type=int, default=10, help="Minutes between NOMADS availability polls (default 10)")
+    parser.add_argument("--poll-max-min", type=int, default=240, help="Max minutes to wait for cycle to become available (default 240)")
     parser.add_argument("--max-hours", type=int, help="Truncate simulation to N hours (for fast debug iterations)")
     args = parser.parse_args()
 
@@ -736,7 +777,9 @@ def main():
         num_procs=args.num_procs,
         utc_offset=args.utc_offset,
         start_hour=args.start_hour,
-        not_before=args.not_before,
+        target_cycle=args.target_cycle,
+        poll_interval_min=args.poll_interval_min,
+        poll_max_min=args.poll_max_min,
         max_hours=args.max_hours,
     )
 
