@@ -255,15 +255,16 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
 
         # Compute needed forecast hours from soaring window
         if soaring_start_utc:
-            fhr_start = max(int((soaring_start_utc - cycle_dt).total_seconds() / 3600), 0)
             fhr_end = int((soaring_end_utc - cycle_dt).total_seconds() / 3600)
         else:
-            fhr_start = max((target_start_local - utc_offset) - target_cyc, 0)
             fhr_end = (target_end_local - utc_offset) - target_cyc
-            if fhr_start < 0:
-                fhr_start += 24
+            if fhr_end < 0:
                 fhr_end += 24
-        fhr_start = max(fhr_start, native_interval)
+        # Start from cycle init (fhr 0) for WRF spin-up. The windgram renderer
+        # filters output to start_hour=8 local time, so early fhrs aren't shown
+        # but WRF gets proper initialization time before the soaring window.
+        # Matches DrJack RASP convention (e.g. TIGER.12z uses 12Z+0 through 12Z+15).
+        fhr_start = 0
         download_fhours = list(range(fhr_start, fhr_end + 1, interval_hours))
         if max_hours is not None:
             cutoff = download_fhours[0] + max_hours
