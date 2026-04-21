@@ -327,15 +327,16 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     rh_crit = 75.0
     cldfra = np.clip((rh_smooth - rh_crit) / (100.0 - rh_crit), 0.0, 1.0)
 
-    # Graduated cross-hatch: 5 levels → 4 bands, increasing density
+    # Graduated cross-hatch: 5 levels → 4 bands, increasing density.
+    # Matplotlib hatch chars: / \ | - + x o O . * (case-sensitive — only 'x', not 'X')
     cldfra_levels = [0.1, 0.3, 0.5, 0.7, 1.01]
-    cldfra_hatches = ["..", "//", "xx", "XX"]
+    cldfra_hatches = [".", "//", "x", "xx"]
     n_before = len(ax.collections)
     ax.contourf(t_fine, p_levels_full, cldfra, levels=cldfra_levels,
                 colors="none", hatches=cldfra_hatches, alpha=0)
     for c in ax.collections[n_before:]:
         c.set_edgecolor("white")
-        c.set_linewidth(0.4)
+        c.set_linewidth(0.6)
 
     # --- Cloud markers at LCL height (where cumulus would form) ---
     # Per TJ Olney: "Small clouds represent the expected LCL (lowest
