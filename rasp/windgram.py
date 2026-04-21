@@ -307,7 +307,11 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     ax.contourf(t_fine, p_levels_mid, lapse_smooth,
                 levels=LAPSE_LEVELS, colors=LAPSE_COLORS, extend="both")
 
-    # --- Condensation hatching (RH > 94%) — diagonal white lines ---
+    # --- Cloud fraction hatching — derived from RH via Sundqvist-like scheme ---
+    # cldfra ≈ clip((RH - RHcrit) / (1 - RHcrit), 0, 1) with RHcrit=0.75
+    # Matches DrJack RASP's graduated cross-hatching based on 3D cloud fraction.
+    # We don't have WRF CLDFRA field directly (not in default wrfout), so derive
+    # from RH. Good enough proxy for visual cloud indication.
     rh = d["rh"]
     rh_grid = rh[:, :ptop_idx].T  # (levels, time)
     p_levels_full = ptot[0, :ptop_idx]
@@ -319,20 +323,19 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
                      bounds_error=False, fill_value="extrapolate")
         rh_smooth[k, :] = f(t_fine)
 
-    # Light hatching at RH > 94%
+    # Sundqvist-style cloud fraction from RH (RH is 0-100 scale)
+    rh_crit = 75.0
+    cldfra = np.clip((rh_smooth - rh_crit) / (100.0 - rh_crit), 0.0, 1.0)
+
+    # Graduated cross-hatch: 5 levels → 4 bands, increasing density
+    cldfra_levels = [0.1, 0.3, 0.5, 0.7, 1.01]
+    cldfra_hatches = ["..", "//", "xx", "XX"]
     n_before = len(ax.collections)
-    ax.contourf(t_fine, p_levels_full, rh_smooth, levels=[94, 100],
-                colors="none", hatches=["//"], alpha=0)
+    ax.contourf(t_fine, p_levels_full, cldfra, levels=cldfra_levels,
+                colors="none", hatches=cldfra_hatches, alpha=0)
     for c in ax.collections[n_before:]:
         c.set_edgecolor("white")
-        c.set_linewidth(0.3)
-    # Dense hatching at RH > 97%
-    n_before2 = len(ax.collections)
-    ax.contourf(t_fine, p_levels_full, rh_smooth, levels=[97, 100],
-                colors="none", hatches=["////"], alpha=0)
-    for c in ax.collections[n_before2:]:
-        c.set_edgecolor("white")
-        c.set_linewidth(0.5)
+        c.set_linewidth(0.4)
 
     # --- Cloud markers at LCL height (where cumulus would form) ---
     # Per TJ Olney: "Small clouds represent the expected LCL (lowest
