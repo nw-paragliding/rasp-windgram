@@ -24,6 +24,9 @@ import argparse
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
+# Hatching for cloud-fraction overlay — white lines, moderate weight
+matplotlib.rcParams["hatch.color"] = "white"
+matplotlib.rcParams["hatch.linewidth"] = 0.5
 import matplotlib.pyplot as plt
 import matplotlib.patheffects
 from matplotlib.colors import ListedColormap, BoundaryNorm
@@ -328,15 +331,11 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     cldfra = np.clip((rh_smooth - rh_crit) / (100.0 - rh_crit), 0.0, 1.0)
 
     # Graduated cross-hatch: 5 levels → 4 bands, increasing density.
-    # Matplotlib hatch chars: / \ | - + x o O . * (case-sensitive — only 'x', not 'X')
+    # Hatch color/width set globally via matplotlib.rcParams at module load.
     cldfra_levels = [0.1, 0.3, 0.5, 0.7, 1.01]
     cldfra_hatches = [".", "//", "x", "xx"]
-    n_before = len(ax.collections)
     ax.contourf(t_fine, p_levels_full, cldfra, levels=cldfra_levels,
-                colors="none", hatches=cldfra_hatches, alpha=0)
-    for c in ax.collections[n_before:]:
-        c.set_edgecolor("white")
-        c.set_linewidth(0.6)
+                colors="none", hatches=cldfra_hatches)
 
     # --- Cloud markers at LCL height (where cumulus would form) ---
     # Per TJ Olney: "Small clouds represent the expected LCL (lowest
