@@ -189,7 +189,7 @@ def _extract_site_data(wrfout_path, lat, lon):
 
     nc.close()
 
-    return {
+    result = {
         "time_strings": time_strings,
         "dx_km": dx_km,
         "hours_utc": np.array(hours_utc),
@@ -213,6 +213,20 @@ def _extract_site_data(wrfout_path, lat, lon):
         "lat": xlat[iy, ix],
         "lon": xlon[iy, ix],
     }
+
+    # netCDF4 returns masked arrays for any field carrying a _FillValue. A
+    # field that comes back entirely fill on some cycles (e.g. a degenerate
+    # PBLH) otherwise surfaces downstream as a numpy MaskedConstant, which
+    # crashes scalar coercions like round()/int(). Convert masks to NaN so the
+    # renderer can degrade gracefully instead of dropping the whole site.
+    for k, val in result.items():
+        if isinstance(val, np.ma.MaskedArray):
+            result[k] = val.filled(np.nan)
+        elif val is np.ma.masked:
+            result[k] = np.nan
+    result["ter_ft"] = float(np.ma.filled(result["ter_ft"], np.nan))
+
+    return result
 
 
 def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
@@ -262,10 +276,15 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
 
     # Auto-compute chart ceiling from max PBL height + headroom
     if p_top_mb is None:
-        max_pbl_p = np.min(d["pbl_p"])  # lowest pressure = highest PBL
+        # nanmin ignores fill/NaN points; lowest pressure = highest PBL
+        max_pbl_p = np.nanmin(d["pbl_p"]) if np.any(np.isfinite(d["pbl_p"])) else np.nan
         # Convert headroom from feet to pressure delta
         headroom_p = headroom_ft / 32.0
         p_top_mb = max_pbl_p - headroom_p
+        # Fall back to a sane ceiling when PBL data is missing this cycle, so a
+        # degenerate PBLH field doesn't crash an otherwise-renderable sounding.
+        if not np.isfinite(p_top_mb):
+            p_top_mb = 600.0
         # Clamp to reasonable range (don't go above ~500mb / ~18,000ft)
         p_top_mb = max(p_top_mb, 500.0)
         # Round to nearest 10mb
@@ -438,6 +457,8 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     ax2.set_ylim(ax.get_ylim())
     # Round altitude ticks: terrain elevation + every 1000ft above
     ter_ft = d["ter_ft"]
+    if not np.isfinite(ter_ft):
+        ter_ft = 0.0
     first_tick = int(np.ceil(ter_ft / 1000) * 1000)
     ft_asl = np.arange(first_tick, 18001, 1000)
     # Convert feet ASL to pressure using surface reference
