@@ -55,6 +55,26 @@ def _run_exe(args, desc, cwd):
     return result.returncode
 
 
+def _cleanup_files(paths, label):
+    """Delete intermediate files to reclaim disk mid-pipeline.
+
+    Sums bytes of real files (symlinks are unlinked without counting) and
+    prints how much was freed. Best-effort: missing/locked files are skipped.
+    """
+    freed = 0
+    removed = 0
+    for f in paths:
+        try:
+            if not f.is_symlink():
+                freed += f.stat().st_size
+            f.unlink()
+            removed += 1
+        except OSError:
+            pass
+    if removed:
+        print(f"  Freed {freed / 1e9:.1f}GB ({removed} files): {label}", flush=True)
+
+
 def _download_grib(model_cfg, date, cycle, fhours, dest_dir):
     """Download GRIB files using the model's URL pattern."""
     print(f"\n{'='*60}")
@@ -573,6 +593,20 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     for f in met_files:
         print(f"    {f.name}")
 
+    # Free intermediates that metgrid has consumed: raw GRIB, the
+    # GRIBFILE.* symlinks, and ungrib output (FILE:/SFC:/PFILE:). On the
+    # 1km nest these total many GB and can exhaust the runner disk before
+    # WRF even starts. met_em (the input WRF needs) is kept.
+    _cleanup_files(
+        list(Path(grib_dir).glob("*.grib2")) +
+        list(Path(grib_dir).glob("*.pgrb2*")) +
+        list(Path(wps_dir).glob("GRIBFILE.*")) +
+        list(Path(wps_dir).glob("FILE:*")) +
+        list(Path(wps_dir).glob("SFC:*")) +
+        list(Path(wps_dir).glob("PFILE:*")),
+        "GRIB/ungrib intermediates",
+    )
+
     # ── Step 4: Run WRF (real.exe → wrf.exe) ───────────────────────────
     print(f"\n{'='*60}")
     print(f"  Running WRF ({run_hours}h, {num_procs} procs)")
@@ -658,6 +692,14 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
                 print(content[-1500:])
         sys.exit(1)
     print(f"  real.exe: OK")
+
+    # real.exe has baked met_em into wrfinput/wrfbdy; free the met_em files
+    # (several GB on the 1km nest) before wrf.exe writes its output.
+    _cleanup_files(
+        list(Path(wps_dir).glob("met_em.d0*.nc")) +
+        list(run_path.glob("met_em.d0*.nc")),
+        "met_em intermediates",
+    )
 
     # 4b. wrf.exe — cap procs at available CPUs inside container
     try:
