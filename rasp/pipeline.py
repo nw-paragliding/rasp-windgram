@@ -439,7 +439,7 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
 
     # ── HRRR direct reader: skip WPS/WRF, read GRIB output directly ───
     if model_cfg.get("direct_reader"):
-        from .hrrr_reader import extract_hrrr_site_data
+        from .hrrr_reader import extract_hrrr_sites_data
 
         prs_files = sorted(f for f in Path(grib_dir).glob("*wrfprs*.grib2"))
         sfc_files = sorted(f for f in Path(grib_dir).glob("*wrfsfc*.grib2"))
@@ -460,14 +460,21 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
 
+        # Single pass over the GRIB files for all sites (decode once, pluck
+        # every site), then render each. Avoids re-decoding the whole CONUS
+        # grid once per site.
+        site_data = extract_hrrr_sites_data(
+            [str(f) for f in prs_files],
+            [str(f) for f in sfc_files],
+            sites,
+        )
+
         rendered = 0
-        for name, lat, lon in sites:
+        for (name, lat, lon), (_, data) in zip(sites, site_data):
+            if data is None:
+                print(f"  WARNING: {name} failed: no usable data extracted")
+                continue
             try:
-                data = extract_hrrr_site_data(
-                    [str(f) for f in prs_files],
-                    [str(f) for f in sfc_files],
-                    lat, lon,
-                )
                 render_windgram(
                     None, lat, lon, name, str(output_path),
                     utc_offset=utc_offset, start_hour=start_hour,
