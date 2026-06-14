@@ -611,7 +611,7 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
 
 &dynamics
  hybrid_opt               = 0,
- w_damping                = 0,
+ w_damping                = 1,
  diff_opt                 = 1,
  km_opt                   = 4,
  diff_6th_opt             = {rep(0)},
