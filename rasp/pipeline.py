@@ -747,6 +747,21 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     finest_wrfout = str(wrfout_files[-1])
     print(f"  Source: {finest_wrfout}")
 
+    # ── V2: soaring data cube (Zarr v3, native LCC) for the interactive
+    # frontend — full-grid overlays (TOL/w*/BL-wind) + profiles for
+    # click-anywhere windgrams, served from one chunked GeoZarr on R2.
+    # Non-fatal: a cube failure must never break the windgram forecast.
+    try:
+        from .export_cube import export_soaring_cube
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
+        cube_path = str(Path(output_dir) / "soaring.zarr")
+        info = export_soaring_cube(
+            finest_wrfout, cube_path, model=model,
+            cycle=str(cycle) if cycle else "", date=str(date) if date else "")
+        print(f"  Soaring cube: {cube_path}  {info}")
+    except Exception as e:
+        print(f"  WARNING: soaring-cube export failed (non-fatal): {e}")
+
     sites = _load_sites(sites_csv) if sites_csv else []
     if not sites:
         print("  No sites provided — skipping windgram rendering")
