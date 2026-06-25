@@ -4,7 +4,7 @@ version = "0.4.7"
 description = "Soaring forecast windgram renderer for WRF output"
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 authors = [
     { name = "James Willis" },
 ]
@@ -28,6 +28,9 @@ dependencies = [
 
 [project.optional-dependencies]
 yaml = ["pyyaml>=6.0"]
+# V2 soaring-cube exporter (rasp.export_cube). Needs Python >= 3.11 (Zarr v3);
+# installed in the windgram image now that it's on ubuntu 24.04 / py3.12.
+cube = ["zarr>=3", "numcodecs", "pyproj"]
 
 [project.scripts]
 rasp = "rasp.cli:main"
