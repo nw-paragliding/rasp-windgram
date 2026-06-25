@@ -10,7 +10,7 @@
 #   docker buildx build --platform linux/arm64,linux/amd64 \
 #     -f docker/Dockerfile.wrf -t ghcr.io/nw-paragliding/wrf-compiled:4.5.2 --push .
 
-FROM ubuntu:22.04 AS wrf-builder
+FROM ubuntu:24.04 AS wrf-builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
@@ -102,15 +102,18 @@ RUN echo "=== WRF + WPS build OK ===" && \
     ls -lh /build/WPS/ungrib/src/ungrib.exe /build/WPS/metgrid/src/metgrid.exe /build/WPS/geogrid/src/geogrid.exe
 
 # ── Export stage — just the binaries + support files ─────────────────────────
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Runtime libs only (what the binaries link against)
+# Runtime libs only (what the binaries link against). Use the stable -dev
+# package names rather than versioned sonames — ubuntu 24.04's 64-bit time_t
+# (t64) transition renamed many runtime sonames, but the -dev names are stable
+# and pull the correct runtime libs.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libnetcdf19 libnetcdff7 libhdf5-103-1 libhdf5-hl-100 \
-    libpng16-16 zlib1g libgomp1 \
-    openmpi-bin libopenmpi3 \
+    libnetcdf-dev libnetcdff-dev libhdf5-dev \
+    libpng-dev zlib1g libgomp1 \
+    openmpi-bin \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy compiled binaries

@@ -40,9 +40,12 @@ ENV LANG=en_US.UTF-8
 COPY pyproject.toml ${BASEDIR}/pyproject.toml
 COPY rasp/ ${BASEDIR}/rasp/
 # Create empty README so pyproject.toml doesn't error during pip install
+# ubuntu 24.04 base → Python 3.12; install with the cube extra (Zarr v3 +
+# pyproj) for the V2 soaring-cube exporter. wrf-python dropped (unused; no
+# py3.12 wheel). --break-system-packages for 24.04's PEP-668 managed env.
 RUN touch ${BASEDIR}/README.md && \
-    pip3 install --no-cache-dir ${BASEDIR}/ && \
-    pip3 install --no-cache-dir --no-deps wrf-python pyyaml
+    pip3 install --no-cache-dir --break-system-packages ${BASEDIR}/[cube] && \
+    pip3 install --no-cache-dir --no-deps --break-system-packages pyyaml
 
 # ── Scripts and examples ───────────────────────────────────────────────────
 COPY scripts/run_wps.sh        ${BASEDIR}/scripts/run_wps.sh
