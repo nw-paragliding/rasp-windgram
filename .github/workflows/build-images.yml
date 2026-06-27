@@ -10,10 +10,22 @@ on:
         description: 'Image to build (wrf, windgram, or both)'
         required: false
         default: 'windgram'
+      tag:
+        description: 'Custom windgram tag (e.g. strictfp-test). When set, publishes ONLY this tag and does NOT touch :latest — use for testing candidate images.'
+        required: false
+        default: ''
+      wrf_tag:
+        description: 'Custom wrf-compiled tag (e.g. strictfp). When set, builds+pushes wrf-compiled under this tag instead of v4.5.2 (does not clobber prod), and windgram builds FROM it. The WRF git ref stays v4.5.2.'
+        required: false
+        default: ''
 
 env:
   REGISTRY: ghcr.io/${{ github.repository_owner }}
+  # WRF_VERSION is the upstream git ref (the WRF release tag we compile).
   WRF_VERSION: v4.5.2
+  # WRF_TAG is the image tag we publish/consume — overridable for test builds
+  # so a candidate WRF binary never clobbers prod wrf-compiled:v4.5.2.
+  WRF_TAG: ${{ inputs.wrf_tag || 'v4.5.2' }}
 
 jobs:
   # Check if wrf-compiled image already exists — skip rebuild if so
@@ -25,8 +37,10 @@ jobs:
     steps:
       - id: force
         run: |
+          # Force a WRF rebuild for target wrf/both, or whenever a custom
+          # wrf_tag is requested (a test tag should always build fresh).
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && \
-             ([ "${{ inputs.target }}" = "wrf" ] || [ "${{ inputs.target }}" = "both" ]); then
+             ([ "${{ inputs.target }}" = "wrf" ] || [ "${{ inputs.target }}" = "both" ] || [ -n "${{ inputs.wrf_tag }}" ]); then
             echo "force=true" >> $GITHUB_OUTPUT
           else
             echo "force=false" >> $GITHUB_OUTPUT
@@ -34,12 +48,12 @@ jobs:
 
       - id: check
         run: |
-          if docker manifest inspect "${REGISTRY}/wrf-compiled:${WRF_VERSION}" > /dev/null 2>&1; then
+          if docker manifest inspect "${REGISTRY}/wrf-compiled:${WRF_TAG}" > /dev/null 2>&1; then
             echo "exists=true" >> $GITHUB_OUTPUT
-            echo "wrf-compiled:${WRF_VERSION} already exists — skipping rebuild"
+            echo "wrf-compiled:${WRF_TAG} already exists — skipping rebuild"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
-            echo "wrf-compiled:${WRF_VERSION} not found — will build"
+            echo "wrf-compiled:${WRF_TAG} not found — will build"
           fi
 
   # Build wrf-compiled for each arch natively (no QEMU)
@@ -74,7 +88,7 @@ jobs:
             --platform ${{ matrix.platform }} \
             -f docker/Dockerfile.wrf \
             --build-arg WRF_VERSION="${WRF_VERSION}" \
-            -t "${REGISTRY}/wrf-compiled:${WRF_VERSION}-${{ matrix.suffix }}" \
+            -t "${REGISTRY}/wrf-compiled:${WRF_TAG}-${{ matrix.suffix }}" \
             --push .
 
   # Create multi-arch manifest for wrf-compiled
@@ -95,9 +109,9 @@ jobs:
       - name: Create multi-arch manifest (if built)
         if: needs.build-wrf.result == 'success'
         run: |
-          docker buildx imagetools create -t "${REGISTRY}/wrf-compiled:${WRF_VERSION}" \
-            "${REGISTRY}/wrf-compiled:${WRF_VERSION}-amd64" \
-            "${REGISTRY}/wrf-compiled:${WRF_VERSION}-arm64"
+          docker buildx imagetools create -t "${REGISTRY}/wrf-compiled:${WRF_TAG}" \
+            "${REGISTRY}/wrf-compiled:${WRF_TAG}-amd64" \
+            "${REGISTRY}/wrf-compiled:${WRF_TAG}-arm64"
 
   # Build windgram for each arch natively
   build-windgram:
@@ -127,13 +141,14 @@ jobs:
 
       - name: Build and push windgram (${{ matrix.suffix }})
         run: |
-          VERSION=$(cat VERSION | tr -d '[:space:]')
+          TAG="${{ inputs.tag }}"
+          [ -z "$TAG" ] && TAG=$(cat VERSION | tr -d '[:space:]')
           docker buildx build \
             --platform ${{ matrix.platform }} \
             -f docker/Dockerfile.windgram \
-            --build-arg WRF_IMAGE="${REGISTRY}/wrf-compiled:${WRF_VERSION}-${{ matrix.suffix }}" \
-            --build-arg VERSION="${VERSION}" \
-            -t "${REGISTRY}/windgram:${VERSION}-${{ matrix.suffix }}" \
+            --build-arg WRF_IMAGE="${REGISTRY}/wrf-compiled:${WRF_TAG}-${{ matrix.suffix }}" \
+            --build-arg VERSION="${TAG}" \
+            -t "${REGISTRY}/windgram:${TAG}-${{ matrix.suffix }}" \
             --push .
 
   # Create multi-arch manifest for windgram
@@ -155,10 +170,15 @@ jobs:
 
       - name: Create multi-arch manifests
         run: |
-          VERSION=$(cat VERSION | tr -d '[:space:]')
-          docker buildx imagetools create -t "${REGISTRY}/windgram:${VERSION}" \
-            "${REGISTRY}/windgram:${VERSION}-amd64" \
-            "${REGISTRY}/windgram:${VERSION}-arm64"
-          docker buildx imagetools create -t "${REGISTRY}/windgram:latest" \
-            "${REGISTRY}/windgram:${VERSION}-amd64" \
-            "${REGISTRY}/windgram:${VERSION}-arm64"
+          TAG="${{ inputs.tag }}"
+          [ -z "$TAG" ] && TAG=$(cat VERSION | tr -d '[:space:]')
+          docker buildx imagetools create -t "${REGISTRY}/windgram:${TAG}" \
+            "${REGISTRY}/windgram:${TAG}-amd64" \
+            "${REGISTRY}/windgram:${TAG}-arm64"
+          # Only move :latest for real release builds (no custom tag) — a custom
+          # tag means a candidate/test image that must not touch prod.
+          if [ -z "${{ inputs.tag }}" ]; then
+            docker buildx imagetools create -t "${REGISTRY}/windgram:latest" \
+              "${REGISTRY}/windgram:${TAG}-amd64" \
+              "${REGISTRY}/windgram:${TAG}-arm64"
+          fi
