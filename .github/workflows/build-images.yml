@@ -10,6 +10,10 @@ on:
         description: 'Image to build (wrf, windgram, or both)'
         required: false
         default: 'windgram'
+      tag:
+        description: 'Custom windgram tag (e.g. cfl-test). When set, publishes ONLY this tag and does NOT touch :latest — use for testing candidate images.'
+        required: false
+        default: ''
 
 env:
   REGISTRY: ghcr.io/${{ github.repository_owner }}
@@ -127,13 +131,14 @@ jobs:
 
       - name: Build and push windgram (${{ matrix.suffix }})
         run: |
-          VERSION=$(cat VERSION | tr -d '[:space:]')
+          TAG="${{ inputs.tag }}"
+          [ -z "$TAG" ] && TAG=$(cat VERSION | tr -d '[:space:]')
           docker buildx build \
             --platform ${{ matrix.platform }} \
             -f docker/Dockerfile.windgram \
             --build-arg WRF_IMAGE="${REGISTRY}/wrf-compiled:${WRF_VERSION}-${{ matrix.suffix }}" \
-            --build-arg VERSION="${VERSION}" \
-            -t "${REGISTRY}/windgram:${VERSION}-${{ matrix.suffix }}" \
+            --build-arg VERSION="${TAG}" \
+            -t "${REGISTRY}/windgram:${TAG}-${{ matrix.suffix }}" \
             --push .
 
   # Create multi-arch manifest for windgram
@@ -155,10 +160,15 @@ jobs:
 
       - name: Create multi-arch manifests
         run: |
-          VERSION=$(cat VERSION | tr -d '[:space:]')
-          docker buildx imagetools create -t "${REGISTRY}/windgram:${VERSION}" \
-            "${REGISTRY}/windgram:${VERSION}-amd64" \
-            "${REGISTRY}/windgram:${VERSION}-arm64"
-          docker buildx imagetools create -t "${REGISTRY}/windgram:latest" \
-            "${REGISTRY}/windgram:${VERSION}-amd64" \
-            "${REGISTRY}/windgram:${VERSION}-arm64"
+          TAG="${{ inputs.tag }}"
+          [ -z "$TAG" ] && TAG=$(cat VERSION | tr -d '[:space:]')
+          docker buildx imagetools create -t "${REGISTRY}/windgram:${TAG}" \
+            "${REGISTRY}/windgram:${TAG}-amd64" \
+            "${REGISTRY}/windgram:${TAG}-arm64"
+          # Only move :latest for real release builds (no custom tag) — a
+          # custom tag means a candidate/test image that must not touch prod.
+          if [ -z "${{ inputs.tag }}" ]; then
+            docker buildx imagetools create -t "${REGISTRY}/windgram:latest" \
+              "${REGISTRY}/windgram:${TAG}-amd64" \
+              "${REGISTRY}/windgram:${TAG}-arm64"
+          fi
