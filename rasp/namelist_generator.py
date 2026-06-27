@@ -376,9 +376,12 @@ def estimate_runtime(domains, ncores=4):
     Returns estimated minutes.
     """
     total_cost = 0
+    # Match the CFL factor used in generate_namelist_input: fine nests (<=1 km)
+    # use a 4*dx step for stability headroom, coarser nests use 6*dx.
+    cfl_factor = 4 if domains[-1]["dx_km"] <= 1.1 else 6
     for d in domains:
         points = d["e_we"] * d["e_sn"]
-        dt = max(6 * d["dx_km"], 1)  # time step in seconds
+        dt = max(cfl_factor * d["dx_km"], 1)  # time step in seconds
         # Assume 6-hour simulation, steps = 6*3600/dt
         steps = 6 * 3600 / dt
         cost = points * steps / 10000  # core-seconds
@@ -509,8 +512,17 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
             return ", ".join(str(v) for v in val)
         return ", ".join([str(val)] * n)
 
-    # Time step: ~6 * dx_km for the outer domain
-    dt = int(6 * domains[0]["dx_km"])
+    # Time step for the outer domain; nests inherit dt/parent_time_step_ratio.
+    # dt <= 6*dx_km is WRF's CFL ceiling, NOT a safe value. The HRRR 1km nest
+    # ran at exactly 6*dx (=6 s) — marginally stable, which is why w_damping was
+    # needed (#9). The ubuntu-24.04 WRF rebuild (#12) shifted the numerics just
+    # enough to tip that marginal nest into blow-up on long integrations (deep
+    # forecast hours -> w* collapses to the 9.8 gravity fill -> garbage). Give
+    # fine nests (<=1 km, i.e. HRRR) CFL headroom with a 4*dx step; coarser
+    # nests (NAM's 1.33 km) keep 6*dx so NAM's stable behaviour is unchanged.
+    finest_dx_km = domains[-1]["dx_km"]
+    cfl_factor = 4 if finest_dx_km <= 1.1 else 6
+    dt = int(cfl_factor * domains[0]["dx_km"])
 
     # Vertical levels (e_vert) — configurable via domain YAML, default 45
     e_vert = int(config.get("e_vert", 45))
