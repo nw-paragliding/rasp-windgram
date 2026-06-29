@@ -67,16 +67,16 @@ RUN sed -i \
     -e 's/-ffixed-form/-ffixed-form -fallow-argument-mismatch -fallow-invalid-boz/g' \
     configure.wrf
 
-# Strict IEEE floating point for the optimized dynamics. The HRRR 1km nest runs
-# at dt = 6*dx, exactly WRF's CFL ceiling (marginally stable — hence w_damping).
-# Newer gfortran (ubuntu 24.04) emits more aggressive FP — FMA contraction of
-# a*b+c and fast-math reassociation — whose ~1e-15 rounding shifts are enough to
-# tip that CFL-edge integration into blow-up on long runs (deep forecast hours
-# -> NaN winds -> the 9.8 w* fill -> garbage windgrams). Forcing -ffp-contract=off
-# -fno-fast-math restores conservative, strictly-rounded arithmetic (FMA off,
-# no unsafe reassociation) with negligible perf cost (vectorization kept). The
-# grep makes the build log show the patched flags so we can confirm they applied.
-RUN sed -i '/^FCOPTIM[[:space:]]*=/ s/$/ -ffp-contract=off -fno-fast-math/' configure.wrf && \
+# Conservative build for the optimized dynamics. The HRRR 1km nest runs at
+# dt = 6*dx, exactly WRF's CFL ceiling (marginally stable — hence w_damping).
+# The ubuntu-24.04 gfortran (13/14) destabilized it on long (deep-fhr) runs ->
+# NaN winds -> the 9.8 w* fill -> garbage. A strict-FP build (-ffp-contract=off
+# -fno-fast-math at -O2 with vectorization) did NOT fix it, so escalate to the
+# most conservative codegen that's still usable: -O1 (no aggressive loop opts)
+# + -fno-tree-vectorize (the most likely remaining numeric differentiator
+# between the 22.04 and 24.04 builds) + strict FP. Slower WRF, but a definitive
+# test: if even this blows up, the cause isn't compiler optimization.
+RUN sed -i '/^FCOPTIM[[:space:]]*=/ s/=.*/= -O1 -fno-tree-vectorize -ffp-contract=off -fno-fast-math/' configure.wrf && \
     echo "Patched FCOPTIM:" && grep -E '^FCOPTIM' configure.wrf
 
 RUN ./compile em_real 2>&1 | tee /build/compile.log && \
