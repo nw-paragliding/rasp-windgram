@@ -21,7 +21,7 @@ Usage:
 import numpy as np
 from netCDF4 import Dataset
 
-from .soaring import calc_wstar, calc_hcrit
+from .soaring import calc_wstar, calc_hcrit, soaring_day_mask
 
 LEVEL_CAP = 22          # lowest N model levels (~surface to ~6 km AGL / ~20,000 ft)
 WRF_RADIUS = 6370000.0  # WRF spherical earth radius (m)
@@ -76,7 +76,7 @@ def _read_wrf(wrfout_path):
     def f(a):
         return np.ma.filled(np.asarray(a), np.nan).astype("f4")
 
-    return {
+    d = {
         "xlat": f(xlat), "xlon": f(xlon), "hours": hours, "Y": Y, "X": X,
         "ntimes": ntimes, "nlev": ptot.shape[1], "proj": proj,
         "gh_ft": f(z * 3.28084), "tc": f(tc), "td": f(td), "rh": f(rh),
@@ -85,6 +85,18 @@ def _read_wrf(wrfout_path):
         "sfcp_mb": f(ptot[:, 0]), "terrain_ft": f(ter * 3.28084),
         "tol_ft": f(tol_ft), "wstar_ms": f(wstar), "ubl_kt": f(ubl), "vbl_kt": f(vbl),
     }
+
+    # Clip the cube to the target soaring day's daytime window (8a-8p local), so
+    # v2's time slider + in-browser windgram don't include the previous evening
+    # that a deep (e.g. 00z) cycle's lead-in hours would otherwise add. Mirrors
+    # the windgram PNG renderer. Time-independent keys are left untouched.
+    time_strings = ["".join(c.decode() for c in times_raw[t]) for t in range(ntimes)]
+    keep = soaring_day_mask(time_strings)
+    for k in ("hours", "gh_ft", "tc", "td", "rh", "u_kt", "v_kt", "hfx", "lh",
+              "pblh_m", "t2_k", "sfcp_mb", "tol_ft", "wstar_ms", "ubl_kt", "vbl_kt"):
+        d[k] = d[k][keep]
+    d["ntimes"] = int(keep.sum())
+    return d
 
 
 def _projection(d):

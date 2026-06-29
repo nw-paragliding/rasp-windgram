@@ -39,6 +39,43 @@ _ALPHA5 = 0.1126           # base height fraction offset
 
 
 # ---------------------------------------------------------------------------
+# Time windowing
+# ---------------------------------------------------------------------------
+
+def soaring_day_mask(time_strings, utc_offset=-7, start_hour=8, end_hour=20):
+    """Boolean mask selecting the *target soaring day's* daytime timesteps.
+
+    A WRF cube can span more than one local day — e.g. a 00z run covers the
+    prior evening (5pm) through the target afternoon (8pm next day). Selecting
+    "every local hour >= start_hour" would bleed that previous evening (5p-11p)
+    into the windgram. Instead, pin to a single day: the local date of the LAST
+    timestep (the target afternoon), keeping start_hour..end_hour local.
+
+    Args:
+        time_strings: WRF "Times" values, e.g. "2026-06-29_00:00:00" (UTC).
+        utc_offset:   hours to add to UTC for local time (default -7, PDT).
+        start_hour/end_hour: inclusive local-hour window (default 8a-8p).
+
+    Returns a numpy bool array (one per timestep). Falls back to
+    "local hour >= start_hour" if the timestamps can't be parsed.
+    """
+    import datetime as _dt
+    try:
+        local = [_dt.datetime.strptime(s[:19], "%Y-%m-%d_%H:%M:%S")
+                 + _dt.timedelta(hours=utc_offset) for s in time_strings]
+        target = local[-1].date()
+        mask = np.array([(ld.date() == target and start_hour <= ld.hour <= end_hour)
+                         for ld in local])
+        if mask.any():
+            return mask
+    except Exception:
+        pass
+    hours = np.array([int(s[11:13]) for s in time_strings])
+    m = ((hours + utc_offset) % 24) >= start_hour
+    return m if m.any() else np.ones(len(time_strings), dtype=bool)
+
+
+# ---------------------------------------------------------------------------
 # Core soaring indices
 # ---------------------------------------------------------------------------
 
