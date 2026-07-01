@@ -1,6 +1,6 @@
 [project]
 name = "rasp-windgram"
-version = "0.4.7"
+version = "0.4.9"
 description = "Soaring forecast windgram renderer for WRF output"
 readme = "README.md"
 license = "MIT"

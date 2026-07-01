@@ -254,11 +254,18 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     else:
         d = _extract_site_data(wrfout_path, lat, lon)
 
-    # Filter to local hours >= start_hour (skip pre-dawn)
-    local_all = (d["hours_utc"] + utc_offset) % 24
-    keep = local_all >= start_hour
-    if not np.any(keep):
-        keep = np.ones(len(local_all), dtype=bool)  # fallback: keep all
+    # Filter to the target soaring day's daytime window (8a-8p local). A cube can
+    # span >1 day (a 00z run covers the prior evening through the target
+    # afternoon); keeping every hour >= start_hour would bleed that evening
+    # (5p-11p of the previous day) into the chart. See soaring_day_mask.
+    from .soaring import soaring_day_mask
+    ts = d.get("time_strings")
+    if ts is not None and len(ts) == d["ntimes"]:
+        keep = soaring_day_mask(ts, utc_offset=utc_offset, start_hour=start_hour)
+    else:
+        keep = ((d["hours_utc"] + utc_offset) % 24) >= start_hour
+        if not np.any(keep):
+            keep = np.ones(d["ntimes"], dtype=bool)  # fallback: keep all
 
     # Slice all time-dependent arrays
     for key in ["ptot", "p_mid", "z_ft", "tk", "tc", "td", "rh",
