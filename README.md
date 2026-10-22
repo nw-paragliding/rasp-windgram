@@ -138,6 +138,23 @@ projection from `met_em`). Without the block, namelists are byte-identical to
 Note: 0.6.x ignores an unknown `lattice:` key silently and produces unaligned
 centre-based grids, so domain files using it need rasp-windgram >= 0.7.0.
 
+### GRIB downloads (NOMADS throttling, mirrors)
+
+Each run downloads its own parent-model GRIB. Models with an `.idx` sidecar
+(RRFS, HRRR through the DrJack chain) fetch only the records they need via HTTP
+Range requests; `RASP_IDX_SUBSET=0` forces full files.
+
+Since 0.7.2 the downloader treats HTTP 302/429/502/503/504 and dropped
+connections as throttling, not as a missing file: it retries with jittered
+exponential backoff (15 → 30 → 60 → 120 → 240 s, 6 attempts, under 10 min) and
+logs every attempt with its status. A throttled `.idx` no longer triggers a
+full-file download; only a 404 `.idx` does. A 404 on the file itself fails at
+once. `RASP_DOWNLOAD_BACKOFF="15,30,60"` overrides the delays.
+
+`RASP_<MODEL>_ROOT` replaces a model's data root (`{root}` in its URL
+pattern), e.g. to read HRRR/RRFS from NOAA's Open Data mirrors on AWS
+(`https://noaa-hrrr-bdp-pds.s3.amazonaws.com`) instead of NOMADS.
+
 ## Docker
 
 The CLI wraps Docker. Images support `linux/arm64` and `linux/amd64`.

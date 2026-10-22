@@ -17,6 +17,7 @@ import argparse
 import fnmatch
 import math
 import os
+import random
 import re
 import shutil
 import subprocess
@@ -104,25 +105,32 @@ def _resolve_model_urls(model_cfg, model):
 
 
 def _remote_exists(url, timeout=5):
-    """HEAD a URL; True if NOMADS reports it present."""
+    """HEAD a URL; True only on HTTP 200 (a throttling 302 is not "present")."""
     try:
         r = subprocess.run(
-            ["curl", "--http1.1", "-sfI", "--max-time", str(timeout), url],
-            capture_output=True, timeout=timeout + 3,
+            ["curl", "--http1.1", "-sI", "-o", "/dev/null", "-w", "%{http_code}",
+             "--max-time", str(timeout), url],
+            capture_output=True, text=True, timeout=timeout + 3,
         )
-        return r.returncode == 0
+        return r.returncode == 0 and r.stdout.strip() == "200"
     except Exception:
         return False
 
 
 def _cycle_files_ready(model_cfg, date_compact, cycle, fhrs):
-    """True if every needed file (main + surface, if any) exists for these fhrs."""
-    patterns = [model_cfg["url_pattern"]]
+    """True if every needed file (main + surface, if any) exists for these fhrs.
+
+    For .idx-subset files the sidecar must be there too: the AWS mirrors publish
+    it 10-30 s after the GRIB, and a missing .idx means a full-file download.
+    """
+    patterns = [(model_cfg["url_pattern"], model_cfg.get("idx_subset"))]
     if model_cfg.get("sfc_url_pattern"):
-        patterns.append(model_cfg["sfc_url_pattern"])
+        patterns.append((model_cfg["sfc_url_pattern"], model_cfg.get("sfc_idx_subset")))
+    subset = os.environ.get("RASP_IDX_SUBSET", "1") != "0"
     for fhr in fhrs:
-        for pat in patterns:
-            if not _remote_exists(pat.format(date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr)):
+        for pat, idx in patterns:
+            url = pat.format(date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr)
+            if not _remote_exists(url) or (idx and subset and not _remote_exists(url + ".idx")):
                 return False
     return True
 
@@ -175,6 +183,61 @@ def _idx_ranges(recs, patterns, max_gap=0):
     return merged
 
 
+# ── Throttling-aware retries ────────────────────────────────────────────────
+# When many runners hit NOMADS at once it answers 302 (redirect to a "busy"
+# page), 429 or 503, or drops the connection. That means "come back later", not
+# "file missing": back off exponentially (jittered) instead of failing within
+# seconds, and never answer it with a full-file download (that only adds load).
+# Only a 404 on the .idx means "no sidecar here" and justifies the full file.
+
+_THROTTLE_STATUSES = {302, 429, 502, 503, 504}
+_BACKOFF_S = (15, 30, 60, 120, 240)     # 6 attempts, <= ~9.5 min of sleep with jitter
+
+
+class _NotFound(RuntimeError):
+    """HTTP 404: the file (or .idx sidecar) is not on the server."""
+
+
+class _Throttled(RuntimeError):
+    """Server kept throttling (302/429/5xx/connection reset) through the whole backoff schedule."""
+
+
+def _backoff_schedule():
+    """Delays between attempts; RASP_DOWNLOAD_BACKOFF="15,30,60" overrides the default."""
+    env = os.environ.get("RASP_DOWNLOAD_BACKOFF")
+    if env:
+        return tuple(float(x) for x in env.split(",") if x.strip())
+    return _BACKOFF_S
+
+
+def _sleep(seconds):
+    time.sleep(seconds)                 # indirection so tests can skip the waits
+
+
+def _with_backoff(what, attempt_fn):
+    """Call attempt_fn() until it returns, backing off on throttling.
+
+    attempt_fn returns the result, raises _NotFound (no retry), or raises any
+    other exception, which counts as throttling/transient and is retried on the
+    jittered schedule. Raises _Throttled once the schedule is exhausted.
+    """
+    delays = _backoff_schedule()
+    attempts = len(delays) + 1
+    t0 = time.time()
+    for attempt in range(1, attempts + 1):
+        try:
+            return attempt_fn()
+        except _NotFound:
+            raise
+        except Exception as ex:          # noqa: BLE001 — throttled or transient
+            if attempt == attempts:
+                raise _Throttled(f"{what}: still failing after {attempts} attempts over "
+                                 f"{time.time() - t0:.0f}s (last: {ex})") from ex
+            wait = delays[attempt - 1] * random.uniform(0.8, 1.2)
+            print(f"    {what}: {ex} — attempt {attempt}/{attempts}, retrying in {wait:.0f}s", flush=True)
+            _sleep(wait)
+
+
 class _RangeClient:
     """Minimal keep-alive HTTP/1.1 client for .idx + Range requests.
 
@@ -203,43 +266,50 @@ class _RangeClient:
                 pass
             self.conn = None
 
-    def get(self, path, byte_range=None, retries=3):
-        """GET path (optionally one byte range). Returns bytes; raises on failure."""
+    def _get_once(self, path, headers, byte_range):
+        try:
+            self._connect()
+            self.conn.request("GET", path, headers=headers)
+            resp = self.conn.getresponse()
+            data = resp.read()                    # drain fully so the connection can be reused
+        except Exception:
+            self.close()                          # connection reset / timeout: reconnect next time
+            raise
+        if resp.getheader("Connection", "").lower() == "close":
+            self.close()
+        want = 206 if byte_range is not None else 200
+        if resp.status == 404:
+            raise _NotFound(f"HTTP 404 for {path}")
+        if resp.status != want:
+            self.close()
+            raise RuntimeError(f"HTTP {resp.status} (expected {want})")
+        if byte_range is not None and byte_range[1] is not None:
+            expect = byte_range[1] - byte_range[0] + 1
+            if len(data) != expect:
+                self.close()
+                raise RuntimeError(f"short range: got {len(data)} of {expect} bytes")
+        return data
+
+    def get(self, path, byte_range=None):
+        """GET path (optionally one byte range). Returns bytes.
+
+        Raises _NotFound on 404, _Throttled when the backoff schedule runs out.
+        """
         headers = {"User-Agent": "rasp-windgram", "Connection": "keep-alive"}
         if byte_range is not None:
             s, e = byte_range
             headers["Range"] = f"bytes={s}-{'' if e is None else e}"
-        last = None
-        for attempt in range(retries):
-            try:
-                self._connect()
-                self.conn.request("GET", path, headers=headers)
-                resp = self.conn.getresponse()
-                data = resp.read()                    # drain fully so the connection can be reused
-                want = 206 if byte_range is not None else 200
-                if resp.status != want:
-                    raise RuntimeError(f"HTTP {resp.status} (expected {want}) for {headers.get('Range', path)}")
-                if byte_range is not None and byte_range[1] is not None:
-                    expect = byte_range[1] - byte_range[0] + 1
-                    if len(data) != expect:
-                        raise RuntimeError(f"short range: got {len(data)} of {expect} bytes")
-                if resp.getheader("Connection", "").lower() == "close":
-                    self.close()
-                return data
-            except Exception as ex:          # noqa: BLE001 — retry any transport/HTTP error
-                last = ex
-                self.close()
-                if attempt + 1 < retries:
-                    time.sleep(2 * (attempt + 1))
-        raise RuntimeError(str(last))
+        what = path.rsplit("/", 1)[-1] + (f" [{headers['Range']}]" if byte_range is not None else "")
+        return _with_backoff(what, lambda: self._get_once(path, headers, byte_range))
 
 
 def _fetch_grib_subset(url, dest, patterns, max_gap):
     """Download only the .idx-selected byte ranges of `url` into `dest`.
 
     Returns True on success. Returns False (and leaves no partial file) when the
-    .idx is missing, nothing matches, or any range request fails, so the caller
-    can fall back to a full download.
+    .idx is genuinely missing (404) or nothing matches, so the caller can fall
+    back to a full download. Raises _Throttled when the server kept throttling:
+    a full download would only make that worse.
     """
     dest = Path(dest)
     tmp = dest.with_name(dest.name + ".part")
@@ -247,7 +317,7 @@ def _fetch_grib_subset(url, dest, patterns, max_gap):
     try:
         try:
             idx_text = client.get(client.u.path + ".idx").decode("utf-8", "replace")
-        except Exception as ex:
+        except _NotFound as ex:
             print(f"    no .idx for {dest.name} ({ex}); falling back to full download")
             return False
 
@@ -270,9 +340,13 @@ def _fetch_grib_subset(url, dest, patterns, max_gap):
             raise RuntimeError(f"assembled file invalid ({got} bytes, magic {magic!r})")
         tmp.replace(dest)
         print(f"    subset: {len(ranges)} ranges, {got // 1_000_000}MB of ~{file_size // 1_000_000}MB "
-              f"in {time.time() - t0:.0f}s")
+              f"in {time.time() - t0:.0f}s from {client.u.hostname}")
         return True
-    except Exception as ex:          # noqa: BLE001 — any failure means "fall back"
+    except _Throttled:
+        if tmp.exists():
+            tmp.unlink()
+        raise
+    except Exception as ex:          # noqa: BLE001 — e.g. a 404 on a range or a bad assembly
         print(f"    range download failed for {dest.name} ({ex}); falling back to full download")
         if tmp.exists():
             tmp.unlink()
@@ -281,8 +355,28 @@ def _fetch_grib_subset(url, dest, patterns, max_gap):
         client.close()
 
 
+def _curl_once(url, dest):
+    """One full-file curl download. Returns on success, raises _NotFound/RuntimeError."""
+    # No -L: a 302 from NOMADS is throttling, not a mirror to follow.
+    result = subprocess.run(
+        ["curl", "--http1.1", "-sS", "-o", str(dest), "-w", "%{http_code}", url],
+        stdout=subprocess.PIPE, stderr=sys.stderr, text=True,
+    )
+    status = (result.stdout or "").strip()[-3:]
+    ok = result.returncode == 0 and status == "200" and dest.exists() and dest.stat().st_size > 1_000_000
+    if ok:
+        return
+    if dest.exists():
+        dest.unlink()
+    if status == "404":
+        raise _NotFound(f"HTTP 404 for {url}")
+    if result.returncode != 0:
+        raise RuntimeError(f"curl exit {result.returncode} (HTTP {status or '000'})")
+    raise RuntimeError(f"HTTP {status}" if status != "200" else "HTTP 200 but file < 1MB")
+
+
 def _fetch_grib(url, dest, patterns=None, max_gap=0):
-    """Download one GRIB file (subset via .idx when patterns are given), with retries."""
+    """Download one GRIB file (subset via .idx when patterns are given), with backoff."""
     dest = Path(dest)
     fname = dest.name
     if dest.exists() and dest.stat().st_size > 1_000_000:
@@ -290,27 +384,18 @@ def _fetch_grib(url, dest, patterns=None, max_gap=0):
         return True
 
     print(f"  Downloading {fname}...", flush=True)
-    if patterns and os.environ.get("RASP_IDX_SUBSET", "1") != "0":
-        if _fetch_grib_subset(url, dest, patterns, max_gap):
-            print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB, subset)")
-            return True
+    try:
+        if patterns and os.environ.get("RASP_IDX_SUBSET", "1") != "0":
+            if _fetch_grib_subset(url, dest, patterns, max_gap):
+                print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB, subset)")
+                return True
 
-    for attempt in range(1, 4):
-        result = subprocess.run(
-            ["curl", "--http1.1", "-fsSL", "--retry", "2", "--retry-delay", "5",
-             "--progress-bar", url, "-o", str(dest)],
-            stdout=sys.stdout, stderr=sys.stderr,
-        )
-        if result.returncode == 0 and dest.exists() and dest.stat().st_size > 1_000_000:
-            print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB)")
-            return True
-        print(f"  Attempt {attempt} failed, retrying in 10s...")
-        if dest.exists():
-            dest.unlink()
-        time.sleep(10)
-
-    print(f"  ERROR: {fname} download failed after 3 attempts")
-    return False
+        _with_backoff(fname, lambda: _curl_once(url, dest))
+        print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB)")
+        return True
+    except (_NotFound, _Throttled) as ex:
+        print(f"  ERROR: {fname} download failed: {ex}")
+        return False
 
 
 def _download_grib(model_cfg, date, cycle, fhours, dest_dir):

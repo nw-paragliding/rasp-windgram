@@ -59,12 +59,15 @@ MODELS = {
         "cycles": [0, 6, 12, 18],      # major cycles only (go to 48h; others only 18h)
         "coverage": "CONUS",
         "source": "nomads",
-        "url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfprsf{fhr:02d}.grib2",
+        # {root}: RASP_HRRR_ROOT env var, else "root" below. NOAA's Open Data
+        # mirror https://noaa-hrrr-bdp-pds.s3.amazonaws.com has the same layout.
+        "root": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod",
+        "url_pattern": "{root}/hrrr.{date}/conus/hrrr.t{cycle}z.wrfprsf{fhr:02d}.grib2",
         # Direct reader: skip WPS/WRF, read HRRR GRIB output directly.
         # HRRR IS a WRF model at 3km — re-running WRF loses cloud state
         # and produces false soaring forecasts on cloudy days.
         "direct_reader": True,
-        "sfc_url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr.{date}/conus/hrrr.t{cycle}z.wrfsfcf{fhr:02d}.grib2",
+        "sfc_url_pattern": "{root}/hrrr.{date}/conus/hrrr.t{cycle}z.wrfsfcf{fhr:02d}.grib2",
         # WRF nesting path (direct_reader: false):
         # Pass 1: wrf_vtable extracts atmosphere + hydrometeors (QC/QR/QI/QS/QG)
         #   for cloud state initialization (avoids cloud spin-up on cloudy days)
@@ -796,8 +799,7 @@ def generate_namelists(config_path, date, cycle, output_dir=None,
         if hrrr_levels == "native":
             MODELS["hrrr"]["vtable"] = "Vtable.raphrrr"
             MODELS["hrrr"]["url_pattern"] = (
-                "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/"
-                "hrrr.{date}/conus/hrrr.t{cycle}z.wrfnatf{fhr:02d}.grib2"
+                "{root}/hrrr.{date}/conus/hrrr.t{cycle}z.wrfnatf{fhr:02d}.grib2"
             )
 
     domains = compute_nest_chain(config)
