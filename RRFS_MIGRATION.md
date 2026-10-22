@@ -13,6 +13,10 @@ pnw-soaring main — PR opened). Until then, pairs start from a tagged push ther
 fixture** (`ab/phoenix.yaml`, not shipped in the image, not a site product); it appears only on the unlisted lab page. Dev pairs here run on
 demand with `[ab phoenix ...]`.
 
+**Decision 2026-10-21 (James): acceptance testing is concluded after pair 1; proceed to release.**
+Phase 1 goes to `main` as a PR, then tag `v0.6.0` so `windgram:latest` (what the site pins)
+carries RRFS; daily lab pairs continue as review material, not as a gate. Phase 2 (site) follows.
+
 **First pair (2026-10-21, Phoenix, 18z → soaring day Oct 22): reviewed by James, "looks right".**
 Both arms completed on the arm runners in ~25 min (vs ~45 min per arm in the local 5 GiB VM);
 the local NAM and RRFS arms each reproduce their runner counterparts exactly (zero difference in
