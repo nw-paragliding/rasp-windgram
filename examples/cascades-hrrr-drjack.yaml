@@ -14,23 +14,27 @@
 #       --sites examples/issaquah-sites.csv --date 2026-10-21 --cycle 12 \
 #       --target-date 2026-10-21 --output-dir ./out/hrrr
 #
-# Initial state is NAM-like: ungrib reads Vtable.RAP.pressure.ncep (T/U/V/RH/HGT
-# on 40 pressure levels + near-surface and surface fields) instead of the
-# nest's Vtable.HRRR.full, so NO hydrometeors (QC/QR/QI/QS/QG) are handed to
-# WRF -- the Ferrier/YSU chain spins up its own clouds, as it does from NAM.
-# The second ungrib pass (Vtable.raphrrr, registry default) still supplies the
-# 9-level RUC soil from wrfprs; real.exe interpolates it onto Noah's 4 layers,
-# exactly as for the nest and for RRFS.
+# Initial state is NAM-like: one ungrib pass with Vtable.HRRR.pressure (vtables/;
+# T/U/V/RH/HGT on 40 pressure levels, 2 m T/RH, 10 m wind, surface fields and
+# the 9-level RUC soil, all from wrfprs) instead of the nest's Vtable.HRRR.full,
+# so NO hydrometeors (QC/QR/QI/QS/QG) are handed to WRF -- the Ferrier/YSU chain
+# spins up its own clouds, as it does from NAM. real.exe interpolates the soil
+# onto Noah's 4 layers, exactly as for the nest and for RRFS.
+#
+# Humidity is RH only, never SPFH (0.6.2): the stock Vtable.RAP.pressure.ncep +
+# Vtable.raphrrr pair used in 0.6.1 both read 2 m SPFH, which makes real.exe take
+# QV from specific humidity on every level and start WRF with a bone-dry column
+# (HRRR_DRJACK_AB.md section 6). Do not add SPFH back to the lists below.
 name: cascades-hrrr-drjack
 model: hrrr
 direct_reader: false              # HRRR defaults to the direct reader; run WPS/WRF
-vtable: Vtable.RAP.pressure.ncep  # atmosphere pass (registry: Vtable.HRRR.full)
-sfc_vtable: Vtable.raphrrr        # soil pass (registry default, stated for clarity)
+vtable: Vtable.HRRR.pressure      # single pass (registry: Vtable.HRRR.full)
+sfc_vtable: null                  # no soil pass: the Vtable above reads the soil
 
-# .idx byte-range downloads: only the records the two Vtables above read.
+# .idx byte-range downloads: only the records the Vtable above reads.
 # Measured on a live wrfprs: 420 MB -> ~215 MB in ~40 ranges (T/U/V/RH/HGT on
 # 40 levels, 2 m/10 m fields, surface fields, 9-level TSOIL/SOILW); wrfsfc
-# 148 MB -> ~20 MB (the Vtables read nothing from wrfsfc that wrfprs lacks; the
+# 148 MB -> ~20 MB (the Vtable reads nothing from wrfsfc that wrfprs lacks; the
 # file is kept so the input set matches the nest). A missing .idx or a failed
 # range falls back to the full file; RASP_IDX_SUBSET=0 forces full files.
 idx_max_gap_mb: 2
@@ -42,7 +46,6 @@ idx_subset:
   - "HGT:* mb"
   - "TMP:2 m above ground"
   - "RH:2 m above ground"
-  - "SPFH:2 m above ground"
   - "UGRD:10 m above ground"
   - "VGRD:10 m above ground"
   - "PRES:surface"
@@ -59,7 +62,6 @@ idx_subset:
 sfc_idx_subset:
   - "TMP:2 m above ground"
   - "RH:2 m above ground"
-  - "SPFH:2 m above ground"
   - "UGRD:10 m above ground"
   - "VGRD:10 m above ground"
   - "PRES:surface"
