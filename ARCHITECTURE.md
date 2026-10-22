@@ -115,6 +115,65 @@ Warnings emitted for:
 - <1km: LES territory (PBL schemes outside design range)
 - <500m: extreme compute cost
 
+### Shared lattice (`lattice:`)
+
+**Why.** The production site runs several 120 km tiles over Washington as
+separate WRF runs (4 km → 1.33 km, ratio 3). v2 wants to write all tiles into a
+single statewide Icechunk/zarr store, chunk-aligned, with no regridding. That
+needs every tile to be an offset window on ONE 1.33 km lattice: same
+projection, grid points coincident where tiles overlap. Centre-based domains
+(the default) each have their own projection, so they never align.
+
+**YAML.** `lattice: {truelat1, truelat2, stand_lon, ref_lat, ref_lon}` -- all
+five keys required, unknown keys rejected (`rasp.lattice.parse_lattice`). The
+fallback YAML parser (`_parse_simple_yaml`, used only without PyYAML) now
+reads one level of nested blocks, so `physics:` and `lattice:` work there too.
+
+**Placement** (`rasp/lattice.py`, pure Python, no new dependency):
+
+1. Projection: spherical Lambert conformal conic, earth radius 6370 km, cone
+   factor computed exactly as WPS `lc_cone` does (checked against pyproj in
+   `tests/test_lattice.py`). x/y are metres from the lattice origin.
+2. d01: with the requested centre at (xc, yc), the origin's mass index is
+   `e_we/2 - xc/dx` (WPS places the domain centre at mass coordinate
+   `e_we/2`). It is rounded to the nearest integer `ref_x` (same for y), which
+   moves the domain by at most dx/2. `namelist.wps` gets
+   `ref_lat/ref_lon` = the origin, `ref_x/ref_y` = those integers.
+3. Nests: unchanged. WPS puts nest mass point k at parent mass coordinate
+   `i_parent_start + (k - (r+1)/2)/r` (`find_known_latlon`), i.e. at parent
+   point + `(k - (r+1)/2)·dx/r`. With an odd ratio, every nest mass point is
+   on the parent lattice refined by r, and so is the origin. By induction the
+   finest grid of every tile is `origin + m·dx_finest`.
+
+**ref_x/ref_y convention** (WPS v4.5 geogrid source): they are coordinates on
+the mass (unstaggered) grid. Mass point (i, j) is at exactly (i, j)
+(`llxy_module.F: xytoll` shifts only U/V/corner points by -0.5); the default
+is `(e_we/2, e_sn/2)`, the centre of mass points 1..e_we-1
+(`gridinfo_module.F`). `map_set`/`set_lc` only use them to place the
+projection pole (`polei = knowni - rsw·sin(...)`) and do not range-check them.
+So the generator uses the origin as the reference point for every tile
+(identical `ref_lat/ref_lon`, integer `ref_x/ref_y` that may be outside the
+domain, e.g. `ref_y = -12` for the Baker tile). No tile depends on a lat/lon
+round-trip through our projection code: WPS's own Lambert maths places every
+tile relative to the same point.
+
+**Log / API.** `generate_namelists()` prints the nominal vs snapped centre
+and the origin's (i, j) in every grid, and returns the placement under
+`"lattice"`. `origin_ij[-1]` gives the tile's position on the statewide fine
+lattice: finest mass point (i, j) = lattice point `(i, j) - origin_ij[-1]`.
+
+**Tests.** `tests/test_lattice.py`: namelists for every `examples/*.yaml` and
+`ab/phoenix.yaml` are byte-identical to the 0.6.1 output (`tests/golden/`);
+for the seven Washington tiles, every overlapping pair has fine-grid offsets
+that are integer multiples of dx/3 (within 1e-6) and each snapped centre is
+within dx/2 of the request. `scripts/lattice_geogrid_check.py` repeats the
+check on real `geo_em` files after geogrid.
+
+**For v2.** `rasp.export_cube` currently builds its pyproj CRS with
+`lat_0 = MOAD_CEN_LAT`, which is each tile's own d01 centre. For a shared store
+use the lattice origin (`ref_lat`) as `lat_0` (or index by `origin_ij`), so x/y
+are comparable across tiles.
+
 ### HRRR-specific options
 
 ```yaml
