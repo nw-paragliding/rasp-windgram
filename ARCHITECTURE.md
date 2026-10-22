@@ -338,7 +338,9 @@ Visual elements per
 - Wind barbs (green < 9kts, white ≥ 9kts)
 - Paraglider crescent markers at soaring ceiling (min of hcrit, LCL)
 - LCL cloud markers (bottom of cloud anchored at LCL height)
-- Diagonal hatching for moisture (RH > 94%, denser > 97%)
+- White cross-hatching for moisture where RH > 94% on the raw hourly grid
+  (TJ Olney's `rhcut`; no cloud-fraction bands, no time smoothing; the
+  JS/canvas port in pnw-soaring/windgram-ts uses the same rule)
 - Temperature isolines (°F) with prominent 32°F freezing line
 - w* climb rate labels above chart
 - Auto chart ceiling from max PBL height + headroom
