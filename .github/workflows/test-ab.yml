@@ -15,6 +15,10 @@ name: A/B pair
 #                        e.g. `hrrr=cascades-hrrr-drjack` (HRRR through the DrJack
 #                        chain vs the NAM base). The label names the artifacts
 #                        (ab-<domain>-<label>) and the compare columns.
+#   ...@<wrf-tag>        either form with a different WRF base image for that arm:
+#                        ghcr.io/nw-paragliding/wrf-compiled:<wrf-tag>-arm64 instead
+#                        of $WRF_IMAGE, e.g. `o1=nam@v4.5.2 o2=nam@v4.5.2-o2` (the
+#                        same NAM config through the -O1 and the -O2 WRF builds).
 #
 # Two ways to start a pair:
 #   * workflow_dispatch with inputs (only available once this file is on main).
@@ -23,6 +27,8 @@ name: A/B pair
 #       [ab cascades 2026-10-21 18 2026-10-22]  -> domain, cycle date, cycle, soaring date
 #       [ab cascades 2026-10-21 12 2026-10-21 nam hrrr=cascades-hrrr-drjack]
 #                                               -> ... plus the two arms
+#       [ab baker 2026-10-22 12 2026-10-22 o1=nam@v4.5.2 o2=nam@v4.5.2-o2]
+#                                               -> one model, two WRF base images
 #     Domains: examples/<domain>.yaml (production) or ab/<domain>.yaml (test-only).
 #     (GitHub only registers workflow_dispatch for workflows on the default branch.)
 
@@ -48,7 +54,7 @@ on:
         required: false
         default: ''
       arms:
-        description: 'Two arms: <model> (base domain, model swapped) or [<label>=]<config> (examples/ or ab/ file as-is)'
+        description: 'Two arms: <model> (base domain, model swapped) or [<label>=]<config> (examples/ or ab/ file as-is); suffix @<wrf-tag> for another WRF base'
         required: false
         default: 'nam rrfs'
       max_hours:
@@ -57,7 +63,7 @@ on:
         default: ''
 
 env:
-  WRF_IMAGE: ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-arm64
+  WRF_IMAGE: ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-o2-arm64
   GEOG_URL: https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_low_res_mandatory.tar.gz
 
 jobs:
@@ -87,9 +93,9 @@ jobs:
           TARGET_DATE="${{ inputs.target_date }}"; MAX_HOURS="${{ inputs.max_hours }}"; ARMS="${{ inputs.arms }}"
           if [ "${{ github.event_name }}" = "push" ]; then
             # [ab] or [ab <domain> [<cycle_date> <cycle> [<target_date> [<arm> <arm>]]]]
-            # Strict form (letters/digits/dashes/'=' only) and LAST occurrence, so
+            # Strict form (letters/digits/dashes/'=', '@', '.' only) and LAST occurrence, so
             # prose like "[ab ...]" earlier in the message cannot be mistaken for the tag.
-            TAG=$(printf '%s' "$MSG" | grep -o -E '\[ab( [A-Za-z0-9=-]+)*\]' | tail -1 | tr -d '[]')
+            TAG=$(printf '%s' "$MSG" | grep -o -E '\[ab( [A-Za-z0-9=@.-]+)*\]' | tail -1 | tr -d '[]')
             read -r _ DOMAIN CYCLE_DATE CYCLE TARGET_DATE ARMS <<< "$TAG"
           fi
           [ -z "$DOMAIN" ] && DOMAIN=cascades
@@ -119,13 +125,20 @@ jobs:
           [ $# -eq 2 ] || { echo "::error::need exactly two arms, got '$ARMS'"; exit 1; }
           MATRIX=""; LABELS=""
           for ARM in "$@"; do
+            # Optional @<wrf-tag>: this arm runs on wrf-compiled:<wrf-tag>-arm64.
+            AIMG=""
+            case "$ARM" in *@*)
+              WTAG="${ARM##*@}"; ARM="${ARM%@*}"
+              printf '%s' "$WTAG" | grep -qE '^[A-Za-z0-9][A-Za-z0-9._-]*$' || { echo "::error::bad wrf tag '$WTAG'"; exit 1; }
+              AIMG="ghcr.io/nw-paragliding/wrf-compiled:$WTAG-arm64" ;;
+            esac
             LABEL="${ARM%%=*}"; SPEC="${ARM#*=}"
             if   [ -f "ab/$SPEC.yaml" ];       then AYAML="ab/$SPEC.yaml";       AMODEL=""
             elif [ -f "examples/$SPEC.yaml" ]; then AYAML="examples/$SPEC.yaml"; AMODEL=""
             else                                    AYAML="$YAML";               AMODEL="$SPEC"; fi
-            MATRIX="$MATRIX${MATRIX:+,}{\"label\":\"$LABEL\",\"model\":\"$AMODEL\",\"yaml\":\"$AYAML\"}"
+            MATRIX="$MATRIX${MATRIX:+,}{\"label\":\"$LABEL\",\"model\":\"$AMODEL\",\"yaml\":\"$AYAML\",\"wrf_image\":\"$AIMG\"}"
             LABELS="$LABELS $LABEL"
-            echo "arm $LABEL: $AYAML ${AMODEL:+(model: $AMODEL)}"
+            echo "arm $LABEL: $AYAML ${AMODEL:+(model: $AMODEL)} ${AIMG:+(WRF base: $AIMG)}"
           done
           read -r LABEL_A LABEL_B <<< "$LABELS"
           [ "$LABEL_A" != "$LABEL_B" ] || { echo "::error::arm labels must differ ('$ARMS')"; exit 1; }
@@ -156,6 +169,7 @@ jobs:
       SITES: ${{ needs.params.outputs.sites }}
       ARM_YAML: ${{ matrix.yaml }}
       ARM_MODEL: ${{ matrix.model }}
+      ARM_WRF_IMAGE: ${{ matrix.wrf_image }}
     steps:
       - uses: actions/checkout@v4
 
@@ -214,7 +228,9 @@ jobs:
 
       - name: Build windgram image from this branch
         run: |
-          docker build -f docker/Dockerfile.windgram --build-arg WRF_IMAGE=$WRF_IMAGE \
+          BASE="${ARM_WRF_IMAGE:-$WRF_IMAGE}"
+          echo "WRF base image: $BASE"
+          docker build -f docker/Dockerfile.windgram --build-arg WRF_IMAGE="$BASE" \
             -t rasp-windgram:ab .
 
       - name: Run pipeline (${{ matrix.label }})

@@ -4,11 +4,12 @@
 # =============================================================================
 #
 # Heavy build layer. Rarely changes (only when WRF/WPS version bumps).
-# Published to GHCR as ghcr.io/nw-paragliding/wrf-compiled:<version>
+# Published to GHCR as ghcr.io/nw-paragliding/wrf-compiled:<WRF_TAG>-<arch>
+# (WRF_TAG in .github/workflows/build-images.yml, e.g. v4.5.2-o2).
 #
 # Build:
 #   docker buildx build --platform linux/arm64,linux/amd64 \
-#     -f docker/Dockerfile.wrf -t ghcr.io/nw-paragliding/wrf-compiled:4.5.2 --push .
+#     -f docker/Dockerfile.wrf -t ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-o2 --push .
 
 FROM ubuntu:24.04 AS wrf-builder
 
@@ -67,15 +68,27 @@ RUN sed -i \
     -e 's/-ffixed-form/-ffixed-form -fallow-argument-mismatch -fallow-invalid-boz/g' \
     configure.wrf
 
-# Conservative build for the optimized dynamics. The HRRR 1km nest runs at
-# dt = 6*dx, exactly WRF's CFL ceiling (marginally stable — hence w_damping).
-# The ubuntu-24.04 gfortran (13/14) destabilized it on long (deep-fhr) runs ->
-# NaN winds -> the 9.8 w* fill / empty renders -> garbage. Root cause is
-# aggressive auto-vectorization: -ffp-contract=off -fno-fast-math at -O2 did NOT
-# fix it, but -O1 -fno-tree-vectorize does (validated on a deep 00z/fhr-0-27 run
-# — real climb through the afternoon, no blow-up). ~1.6x slower WRF (~3.3h for a
-# 27h run), well inside the forecast budget.
-RUN sed -i '/^FCOPTIM[[:space:]]*=/ s/=.*/= -O1 -fno-tree-vectorize -ffp-contract=off -fno-fast-math/' configure.wrf && \
+# Optimisation: WRF's stock gfortran FCOPTIM (configure.defaults, both the
+# aarch64 option 3 and the x86_64 option 34 stanzas: -O2 -ftree-vectorize
+# -funroll-loops) plus -ffp-contract=off.
+#
+# History: 0.5.x-0.7.3 shipped -O1 -fno-tree-vectorize ("the 9.8 fix", PR #15)
+# because the 1 km nest NaN'd on deep runs and an -O1 rebuild made it stop, at
+# ~1.6x the WRF wall time. The real cause (PR #22, 0.7.3) was a weakly damped
+# acoustic mode of the vertically implicit solver over steep terrain, fixed by
+# `dynamics: {epssm: 0.5}` in the domain YAML; runs sitting at that stability
+# limit were merely sensitive to the rounding differences between builds. With
+# epssm the -O2 build is stable on the steepest tile (ab/baker.yaml A/B, 0.7.4),
+# so -O1 is gone.
+#
+# -ffp-contract=off is kept on purpose: gfortran on aarch64 defaults to
+# -ffp-contract=fast and fuses a*b+c into FMA, while the x86_64 baseline ISA has
+# no FMA, so the arm64 (production, A/B) and amd64 images would round
+# differently at every multiply-add. WRF's own aarch64 GCC stanza suppresses the
+# fusion for the same reason (-fno-expensive-optimizations +
+# -DAARCH64_X86_CORRECTNESS_FIX). It does not stop vectorisation (gfortran never
+# reassociates FP without -ffast-math), so it costs little.
+RUN sed -i '/^FCOPTIM[[:space:]]*=/ s/=.*/= -O2 -ftree-vectorize -funroll-loops -ffp-contract=off/' configure.wrf && \
     echo "Patched FCOPTIM:" && grep -E '^FCOPTIM' configure.wrf
 
 RUN ./compile em_real 2>&1 | tee /build/compile.log && \

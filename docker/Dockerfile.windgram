@@ -9,10 +9,10 @@
 # Build:
 #   docker buildx build --platform linux/arm64,linux/amd64 \
 #     -f docker/Dockerfile.windgram \
-#     --build-arg WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2 \
+#     --build-arg WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-o2 \
 #     -t ghcr.io/nw-paragliding/windgram:0.1.0 --push .
 
-ARG WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2
+ARG WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-o2
 FROM ${WRF_IMAGE}
 
 ENV DEBIAN_FRONTEND=noninteractive

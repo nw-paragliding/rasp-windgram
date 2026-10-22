@@ -204,7 +204,15 @@ The CLI wraps Docker. Images support `linux/arm64` and `linux/amd64`.
 | Image | Description |
 |---|---|
 | `ghcr.io/nw-paragliding/windgram:latest` | Full pipeline (WPS + WRF + renderer) |
-| `ghcr.io/nw-paragliding/wrf-compiled:v4.5.2` | Pre-compiled WRF + WPS (base layer) |
+| `ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-o2` | Pre-compiled WRF + WPS (base layer; WRF stock `-O2`, see ARCHITECTURE.md) |
+
+WRF build flags (0.7.4): the base image is compiled with WRF's stock gfortran
+optimisation, `-O2 -ftree-vectorize -funroll-loops`, plus `-ffp-contract=off` so
+the arm64 and amd64 images round alike (no FMA fusion on arm). 0.5.x-0.7.3 used
+`-O1 -fno-tree-vectorize` (base `wrf-compiled:v4.5.2`, ~1.6x slower WRF) to stop
+the 1 km nest NaNs; the real cause was the steep-terrain acoustic mode that
+`dynamics: {epssm: 0.5}` fixes (above), so -O1 is gone. Details and the A/B
+evidence: ARCHITECTURE.md, "Docker Images".
 
 ```bash
 # Direct Docker usage (without the rasp CLI)

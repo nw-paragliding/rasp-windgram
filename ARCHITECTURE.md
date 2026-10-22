@@ -60,8 +60,32 @@ Two-layer architecture. Users pull `windgram`, never compile WRF.
 ### `ghcr.io/nw-paragliding/wrf-compiled:{version}`
 
 Heavy compile layer. WRF 4.5.2 + WPS 4.5 with MPI support.
-Multi-arch (arm64 + amd64). Rebuilt only when WRF version changes.
-Tagged by WRF version: `v4.5.2`.
+Multi-arch (arm64 + amd64). Rebuilt only when the WRF version or the build
+itself changes; each such change gets a new tag (`WRF_TAG` in
+`build-images.yml`), because `check-wrf` skips the compile when the tag exists.
+
+| Tag | FCOPTIM | Used by |
+|---|---|---|
+| `v4.5.2-o2` | `-O2 -ftree-vectorize -funroll-loops -ffp-contract=off` (WRF's stock gfortran flags + no FMA contraction) | 0.7.4+ |
+| `v4.5.2` | `-O1 -fno-tree-vectorize -ffp-contract=off -fno-fast-math` | 0.5.x-0.7.3 (kept for A/B) |
+
+**Why -O1 is gone.** PR #15 (July 2026) dropped to -O1 because the 1 km nest
+went NaN after some hours and an -O1 rebuild made it stop, at ~1.6x the WRF
+wall time. The real cause (PR #22, 0.7.3) was a weakly damped acoustic mode of
+WRF's vertically implicit solver over steep terrain, fixed by
+`dynamics: {epssm: 0.5}` at no cost; runs sitting at that stability limit were
+merely sensitive to the rounding differences between builds. With epssm the
+stock -O2 build is stable on the steepest production tile (`ab/baker.yaml`,
+PR for 0.7.4).
+
+**Why `-ffp-contract=off` stays.** gfortran on aarch64 defaults to
+`-ffp-contract=fast` (fuses `a*b+c` into FMA); the x86_64 baseline has no FMA.
+Without it the arm64 image (production + A/B runners) and the amd64 image
+round differently at every multiply-add. WRF's own aarch64 GCC stanza
+suppresses the fusion for the same reason. It does not block vectorisation.
+
+A/B a base image against another: arm `<model>@<wrf-tag>` in `test-ab.yml`,
+e.g. `[ab baker 2026-10-22 12 2026-10-22 o1=nam@v4.5.2 o2=nam@v4.5.2-o2]`.
 
 ### `ghcr.io/nw-paragliding/windgram:{version}`
 
@@ -74,7 +98,9 @@ Tagged with semver from `VERSION` file: `0.1.0`, `latest`.
 - **ci.yml**: runs on every PR and push to main — Python import tests,
   namelist generation test, Docker build test
 - **build-images.yml**: runs on `v*` tags — builds and publishes multi-arch
-  images to GHCR. Skips WRF compile if image already exists.
+  images to GHCR. Skips WRF compile if `wrf-compiled:${WRF_TAG}` already exists.
+  `workflow_dispatch` with `target=wrf` (any branch) builds and pushes only the
+  base image under `WRF_TAG`, never `windgram:*`.
   arm64 on `ubuntu-24.04-arm`, amd64 on `ubuntu-24.04` (both native, no QEMU).
 
 ### Building Locally
@@ -82,12 +108,12 @@ Tagged with semver from `VERSION` file: `0.1.0`, `latest`.
 ```bash
 # User-facing image (fast, ~2 min)
 docker buildx build -f docker/Dockerfile.windgram \
-  --build-arg WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2 \
+  --build-arg WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-o2 \
   -t ghcr.io/nw-paragliding/windgram:latest .
 
-# Base WRF image (slow, ~30 min — only when WRF version changes)
+# Base WRF image (slow — only when WRF or its build flags change; new WRF_TAG)
 docker buildx build -f docker/Dockerfile.wrf \
-  -t ghcr.io/nw-paragliding/wrf-compiled:v4.5.2 .
+  -t ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-o2 .
 ```
 
 ---

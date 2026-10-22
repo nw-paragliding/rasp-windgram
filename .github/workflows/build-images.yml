@@ -7,13 +7,24 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: 'Image to build (wrf, windgram, or both)'
+        # wrf      : (re)build + push wrf-compiled:${WRF_TAG} only -- never touches
+        #            windgram:* (use it from a branch to publish a new base image)
+        # windgram : windgram:<VERSION> + :latest on the existing base
+        # both     : rebuild the base, then windgram:<VERSION> + :latest
+        description: 'Image to build (wrf = base image only, windgram, or both)'
         required: false
         default: 'windgram'
 
 env:
   REGISTRY: ghcr.io/${{ github.repository_owner }}
-  WRF_VERSION: v4.5.2
+  WRF_VERSION: v4.5.2          # WRF git tag that Dockerfile.wrf clones
+  # Base-image tag: wrf-compiled:${WRF_TAG} (+ -amd64/-arm64). A new tag whenever
+  # the build itself changes (flags, compiler), so check-wrf does not skip it.
+  #   v4.5.2     -O1 -fno-tree-vectorize (0.5.x-0.7.3, kept in GHCR for A/B)
+  #   v4.5.2-o2  stock -O2 -ftree-vectorize -funroll-loops -ffp-contract=off (0.7.4+)
+  # Also referenced by: Dockerfile.windgram (ARG default), test-ab.yml + ci.yml
+  # (WRF_IMAGE), scripts/build-images.sh, and pnw-soaring ab-pairs.yml (WRF_IMAGE).
+  WRF_TAG: v4.5.2-o2
 
 jobs:
   # Check if wrf-compiled image already exists — skip rebuild if so
@@ -34,12 +45,12 @@ jobs:
 
       - id: check
         run: |
-          if docker manifest inspect "${REGISTRY}/wrf-compiled:${WRF_VERSION}" > /dev/null 2>&1; then
+          if docker manifest inspect "${REGISTRY}/wrf-compiled:${WRF_TAG}" > /dev/null 2>&1; then
             echo "exists=true" >> $GITHUB_OUTPUT
-            echo "wrf-compiled:${WRF_VERSION} already exists — skipping rebuild"
+            echo "wrf-compiled:${WRF_TAG} already exists — skipping rebuild"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
-            echo "wrf-compiled:${WRF_VERSION} not found — will build"
+            echo "wrf-compiled:${WRF_TAG} not found — will build"
           fi
 
   # Build wrf-compiled for each arch natively (no QEMU)
@@ -74,7 +85,7 @@ jobs:
             --platform ${{ matrix.platform }} \
             -f docker/Dockerfile.wrf \
             --build-arg WRF_VERSION="${WRF_VERSION}" \
-            -t "${REGISTRY}/wrf-compiled:${WRF_VERSION}-${{ matrix.suffix }}" \
+            -t "${REGISTRY}/wrf-compiled:${WRF_TAG}-${{ matrix.suffix }}" \
             --push .
 
   # Create multi-arch manifest for wrf-compiled
@@ -95,14 +106,15 @@ jobs:
       - name: Create multi-arch manifest (if built)
         if: needs.build-wrf.result == 'success'
         run: |
-          docker buildx imagetools create -t "${REGISTRY}/wrf-compiled:${WRF_VERSION}" \
-            "${REGISTRY}/wrf-compiled:${WRF_VERSION}-amd64" \
-            "${REGISTRY}/wrf-compiled:${WRF_VERSION}-arm64"
+          docker buildx imagetools create -t "${REGISTRY}/wrf-compiled:${WRF_TAG}" \
+            "${REGISTRY}/wrf-compiled:${WRF_TAG}-amd64" \
+            "${REGISTRY}/wrf-compiled:${WRF_TAG}-arm64"
 
   # Build windgram for each arch natively
   build-windgram:
     needs: [manifest-wrf]
-    if: always() && needs.manifest-wrf.result != 'failure'
+    # target=wrf publishes the base image only (windgram:latest untouched).
+    if: always() && needs.manifest-wrf.result != 'failure' && !(github.event_name == 'workflow_dispatch' && inputs.target == 'wrf')
     strategy:
       matrix:
         include:
@@ -131,7 +143,7 @@ jobs:
           docker buildx build \
             --platform ${{ matrix.platform }} \
             -f docker/Dockerfile.windgram \
-            --build-arg WRF_IMAGE="${REGISTRY}/wrf-compiled:${WRF_VERSION}-${{ matrix.suffix }}" \
+            --build-arg WRF_IMAGE="${REGISTRY}/wrf-compiled:${WRF_TAG}-${{ matrix.suffix }}" \
             --build-arg VERSION="${VERSION}" \
             -t "${REGISTRY}/windgram:${VERSION}-${{ matrix.suffix }}" \
             --push .
@@ -139,7 +151,7 @@ jobs:
   # Create multi-arch manifest for windgram
   manifest-windgram:
     needs: [build-windgram]
-    if: always() && !contains(needs.build-windgram.result, 'failure')
+    if: always() && needs.build-windgram.result == 'success'
     runs-on: ubuntu-24.04
     permissions:
       contents: read
