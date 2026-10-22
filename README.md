@@ -64,7 +64,7 @@ Configuration via environment variables:
 | Wind barbs | Wind speed and direction (green < 9kts, white >= 9kts) |
 | Paraglider crescents | Max soaring height (225 fpm sink rate, DrJack nonlinear model) |
 | Cloud symbols | Potential cloud base (LCL), bottom of cloud at LCL height |
-| Diagonal hatching | High humidity / actual clouds (RH > 94%) |
+| White cross-hatching | Near-saturated air, stratus likely (RH > 94%) |
 | Numbers at top | Thermal climb rate w* (m/s) |
 | Cyan 32°F line | Freezing level |
 

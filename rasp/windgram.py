@@ -8,8 +8,8 @@ Produces a vertical time-series chart for a single lat/lon point showing:
 - w* labels at top
 - Paraglider wing markers for max soaring height (min of hcrit, LCL)
 - Snowflake markers at freezing level
-- Cloud markers where RH > 99%
-- Condensation cross-hatching where RH > 95%
+- Cloud markers at the surface LCL (where cumulus would form)
+- White cross-hatching where RH > 94% (TJ Olney's rhcut), raw hourly grid
 
 Usage:
     python -m rasp.windgram wrfout_d02_2026-04-01_12:00:00 \\
@@ -24,9 +24,9 @@ import argparse
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
-# Hatching for cloud-fraction overlay — white lines, moderate weight
+# Moisture cross-hatch (RH > RH_HATCH_PCT) — fine white lines
 matplotlib.rcParams["hatch.color"] = "white"
-matplotlib.rcParams["hatch.linewidth"] = 0.5
+matplotlib.rcParams["hatch.linewidth"] = 0.4
 import matplotlib.pyplot as plt
 import matplotlib.patheffects
 from matplotlib.colors import ListedColormap, BoundaryNorm
@@ -74,6 +74,14 @@ LAPSE_COLORS = [
     (0.80, 0.80, 0.80),   # 0 to 0.5: grey — weak inversion
     (0.60, 0.60, 0.60),   # > 0.5: dark grey — strong inversion
 ]
+
+# TJ Olney's moisture hatch (windgrams.ncl `rhcut`; get_windgrams.sh sets 94):
+# one fine white cross-hatch wherever the grid-cell RH exceeds this, drawn on
+# the raw hourly grid. Marks stratus / marine layers; by design it stays out of
+# the mixed layer under cumulus base. Keep in sync with
+# pnw-soaring/windgram-ts (the JS/canvas port).
+RH_HATCH_PCT = 94.0
+RH_HATCH_PATTERN = "xxx"
 
 
 def _extract_site_data(wrfout_path, lat, lon):
@@ -336,32 +344,27 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     ax.contourf(t_fine, p_levels_mid, lapse_smooth,
                 levels=LAPSE_LEVELS, colors=LAPSE_COLORS, extend="both")
 
-    # --- Cloud fraction hatching — derived from RH via Sundqvist-like scheme ---
-    # cldfra ≈ clip((RH - RHcrit) / (1 - RHcrit), 0, 1) with RHcrit=0.75
-    # Matches DrJack RASP's graduated cross-hatching based on 3D cloud fraction.
-    # We don't have WRF CLDFRA field directly (not in default wrfout), so derive
-    # from RH. Good enough proxy for visual cloud indication.
+    # --- Moisture cross-hatching: RH > 94% on the raw hourly grid ---
+    # TJ Olney's rule (windgrams.ncl: hum_res@cnLevels = (/ rhcut /), rhcut=94
+    # in production, NCL fill pattern 6 at scale 0.3): one fine white
+    # cross-hatch wherever the grid-cell RH exceeds the cutoff, i.e. the air is
+    # close enough to saturation that stratus is likely. The explicit level at
+    # 100.01 keeps a fully saturated cell inside the hatched band.
+    #
+    # No time interpolation: cubic smoothing overshoots a sharp hourly RH jump
+    # and hatches hours that never crossed the threshold. No graduated
+    # cloud-fraction bands either: the per-level RH proxy that started at
+    # 77.5% (commit 069a673) painted the whole mixed layer under cumulus base,
+    # where RH climbs to 100% at the LCL by definition. WRF's own CLDFRA is the
+    # principled upgrade (rasp-windgram issue #24).
     rh = d["rh"]
     rh_grid = rh[:, :ptop_idx].T  # (levels, time)
     p_levels_full = ptot[0, :ptop_idx]
-
-    # Smooth RH along time axis like lapse rate
-    rh_smooth = np.zeros((rh_grid.shape[0], len(t_fine)))
-    for k in range(rh_grid.shape[0]):
-        f = interp1d(taus, rh_grid[k, :], kind="cubic",
-                     bounds_error=False, fill_value="extrapolate")
-        rh_smooth[k, :] = f(t_fine)
-
-    # Sundqvist-style cloud fraction from RH (RH is 0-100 scale)
-    rh_crit = 75.0
-    cldfra = np.clip((rh_smooth - rh_crit) / (100.0 - rh_crit), 0.0, 1.0)
-
-    # Graduated cross-hatch: 5 levels → 4 bands, increasing density.
-    # Hatch color/width set globally via matplotlib.rcParams at module load.
-    cldfra_levels = [0.1, 0.3, 0.5, 0.7, 1.01]
-    cldfra_hatches = [".", "//", "x", "xx"]
-    ax.contourf(t_fine, p_levels_full, cldfra, levels=cldfra_levels,
-                colors="none", hatches=cldfra_hatches)
+    ax.contourf(taus, p_levels_full, rh_grid, levels=[RH_HATCH_PCT, 100.01],
+                colors="none", hatches=[RH_HATCH_PATTERN])
+    ax.text(1.0, -0.055, f"hatch: RH > {RH_HATCH_PCT:.0f}%",
+            transform=ax.transAxes, ha="right", va="top",
+            fontsize=8, color="white")
 
     # --- Cloud markers at LCL height (where cumulus would form) ---
     # Per TJ Olney: "Small clouds represent the expected LCL (lowest
