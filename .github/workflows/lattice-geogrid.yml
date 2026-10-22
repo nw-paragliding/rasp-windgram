@@ -1,0 +1,89 @@
+name: lattice geogrid check (temporary)
+
+# TEMPORARY evidence workflow for the shared-lattice PR: generate namelist.wps
+# for the seven Washington tiles, run ONLY geogrid.exe for each in the compiled
+# WRF image, and check XLAT_M/XLONG_M agree at shared lattice points.
+# Deleted before the PR is marked ready; the run link is in the PR body.
+
+on:
+  push:
+    branches: ['feat/shared-lattice']
+
+env:
+  WRF_IMAGE: ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-arm64
+  GEOG_URL: https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_low_res_mandatory.tar.gz
+
+jobs:
+  geogrid:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Restore GEOG cache
+        id: geog
+        uses: actions/cache/restore@v4
+        with:
+          path: geog/
+          key: wps-geog-lowres-plus-30s-v1
+
+      - name: Download GEOG (cache miss)
+        if: steps.geog.outputs.cache-hit != 'true'
+        run: |
+          curl -fL --retry 3 -sS "$GEOG_URL" -o geog.tar.gz
+          mkdir -p geog && tar xzf geog.tar.gz -C geog --strip-components=1 && rm geog.tar.gz
+          for t in topo_gmted2010_30s modis_landuse_20class_30s_with_lakes; do
+            curl -fL --retry 3 -sS "https://www2.mmm.ucar.edu/wrf/src/wps_files/$t.tar.bz2" -o add.tar.bz2
+            tar xjf add.tar.bz2 -C geog && rm add.tar.bz2
+          done
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Unit tests
+        run: uv run pytest -q
+
+      - name: Generate namelists (seven tiles)
+        run: uv run python scripts/lattice_geogrid_check.py gen work
+
+      - name: geogrid.exe per tile
+        run: |
+          docker pull -q "$WRF_IMAGE"
+          for d in work/*/; do
+            t=$(basename "$d")
+            echo "::group::$t"
+            grep -E 'ref_|truelat|stand_lon|e_we|parent_start' "$d/namelist.wps"
+            docker run --rm -v "$PWD/geog:/mnt/geog:ro" -v "$PWD/$d:/work" -w /work \
+              --entrypoint bash "$WRF_IMAGE" -c '
+                ln -sf /opt/wrf/wps/geogrid geogrid
+                /opt/wrf/wps/geogrid.exe > geogrid.out 2>&1; ec=$?
+                tail -5 geogrid.out; exit $ec'
+            grep -E 'REF_X|REF_Y|REF_LAT|REF_LON|TRUELAT|STAND_LON' "$d/geogrid.log" | head -12 || true
+            grep -q 'Successful completion of geogrid' "$d/geogrid.out"
+            echo "::endgroup::"
+          done
+          sudo chown -R "$(id -u)" work
+
+      - name: Compare XLAT_M/XLONG_M at shared points
+        run: |
+          uv run --with xarray --with netcdf4 python scripts/lattice_geogrid_check.py check work \
+            | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload geo_em + namelists
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lattice-geogrid
+          path: |
+            work/*/namelist.wps
+            work/*/lattice.json
+            work/*/geogrid.log
+            work/*/geo_em.d0*.nc
+          retention-days: 7

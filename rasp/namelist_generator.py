@@ -19,6 +19,8 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from .lattice import lattice_placement, parse_lattice
+
 try:
     import yaml
 except ImportError:
@@ -169,6 +171,12 @@ def load_domain_config(config_path):
         physics:                # optional overrides
           cu_physics: 0
           bl_pbl_physics: 2
+        lattice:                # optional shared projection + grid lattice
+          truelat1: 46.0        # (rasp.lattice); tiles with the same block
+          truelat2: 49.0        # get coincident grid points where they overlap
+          stand_lon: -120.5
+          ref_lat: 47.5         # lattice origin: a mass point of every
+          ref_lon: -120.5       # tile's finest grid
         # Optional overrides of the model-registry entry (rasp.pipeline
         # DOMAIN_MODEL_OVERRIDES); absent keys keep the registry behaviour:
         direct_reader: false            # force WPS/WRF (HRRR defaults to the direct reader)
@@ -224,6 +232,15 @@ def load_domain_config(config_path):
     if config.get("idx_max_gap_mb") is not None:
         config["idx_max_gap_mb"] = float(config["idx_max_gap_mb"])
 
+    # Shared lattice (rasp.lattice). Absent / null -> centre-based grid, unchanged.
+    if config.get("lattice") is not None:
+        config["lattice"] = parse_lattice(config["lattice"])
+        if config["nest_ratio"] % 2 == 0:
+            raise ValueError("lattice: nest_ratio must be odd so nest mass points "
+                             "stay on the lattice")
+    else:
+        config.pop("lattice", None)
+
     if config["model"] not in MODEL_DX:
         raise ValueError(
             f"Unknown model: {config['model']}. "
@@ -234,14 +251,21 @@ def load_domain_config(config_path):
 
 
 def _parse_simple_yaml(text):
-    """Minimal parser for flat key: value YAML (no nested structures)."""
+    """Minimal parser for key: value YAML with one level of nested blocks.
+
+    A key with no value followed by indented ``key: value`` lines becomes a
+    dict (``physics:``, ``lattice:``). Lists and deeper nesting are not
+    supported; PyYAML (a dependency) is the normal path.
+    """
     result = {}
-    for line in text.strip().splitlines():
-        line = line.strip()
+    block = None            # dict of the open nested block, if any
+    for raw in text.strip().splitlines():
+        line = raw.strip()
         if not line or line.startswith("#"):
             continue
         if ":" not in line:
             continue
+        indented = raw[:1] in (" ", "\t")
         key, _, val = line.partition(":")
         key = key.strip()
         val = val.strip()
@@ -258,6 +282,13 @@ def _parse_simple_yaml(text):
                 val = float(val)
             except ValueError:
                 pass
+        if indented and block is not None:
+            block[key] = val
+            continue
+        if val == "":
+            block = result[key] = {}
+            continue
+        block = None
         result[key] = val
     return result
 
@@ -504,6 +535,28 @@ def generate_namelist_wps(config, domains, date, cycle, geog_path="/mnt/geog",
     dx = domains[0]["dx"]
     dy = domains[0]["dx"]
 
+    if config.get("lattice"):
+        # Shared lattice: one projection for every tile, d01 placed so the
+        # lattice origin is its mass point (ref_x, ref_y) -- see rasp.lattice.
+        lp = lattice_placement(config, domains)
+        proj_lines = (
+            f" map_proj = 'lambert',\n"
+            f" ref_lat  = {lp['ref_lat']:.6f},\n"
+            f" ref_lon  = {lp['ref_lon']:.6f},\n"
+            f" ref_x    = {lp['ref_x']:.1f},\n"
+            f" ref_y    = {lp['ref_y']:.1f},\n"
+            f" truelat1 = {lp['truelat1']:.6f},\n"
+            f" truelat2 = {lp['truelat2']:.6f},\n"
+            f" stand_lon = {lp['stand_lon']:.6f},\n")
+    else:
+        proj_lines = (
+            f" map_proj = 'lambert',\n"
+            f" ref_lat  = {config['center_lat']:.4f},\n"
+            f" ref_lon  = {config['center_lon']:.4f},\n"
+            f" truelat1 = {config['center_lat']:.4f},\n"
+            f" truelat2 = {config['center_lat']:.4f},\n"
+            f" stand_lon = {config['center_lon']:.4f},\n")
+
     # Determine GEOG resolution — configurable from domain YAML
     geog_res = config.get("geog_data_res")
     if not geog_res:
@@ -533,13 +586,7 @@ def generate_namelist_wps(config, domains, date, cycle, geog_path="/mnt/geog",
  geog_data_res     = {rep(f"'{geog_res}'")},
  dx = {dx:.1f},
  dy = {dy:.1f},
- map_proj = 'lambert',
- ref_lat  = {config['center_lat']:.4f},
- ref_lon  = {config['center_lon']:.4f},
- truelat1 = {config['center_lat']:.4f},
- truelat2 = {config['center_lat']:.4f},
- stand_lon = {config['center_lon']:.4f},
- geog_data_path = '{geog_path}',
+{proj_lines} geog_data_path = '{geog_path}',
 /
 
 &ungrib
@@ -771,6 +818,11 @@ def generate_namelists(config_path, date, cycle, output_dir=None,
               f"({d['extent_km']:.0f} km)")
     print(f"\n  Estimated runtime: ~{est_minutes} min on 4 cores")
 
+    lattice = None
+    if config.get("lattice"):
+        lattice = lattice_placement(config, domains)
+        print_lattice_summary(lattice)
+
     if warnings:
         print(f"\n  Warnings:")
         for w in warnings:
@@ -808,7 +860,25 @@ def generate_namelists(config_path, date, cycle, output_dir=None,
         "namelist_input": str(input_path),
         "warnings": warnings,
         "domains": domains,
+        "lattice": lattice,
     }
+
+
+def print_lattice_summary(lp):
+    """Log the lattice snap so the pipeline output shows where the tile landed."""
+    (nlat, nlon), (slat, slon) = lp["nominal_center"], lp["snapped_center"]
+    sx, sy = lp["center_shift_m"]
+    print(f"\n  Shared lattice: lambert truelat1={lp['truelat1']} "
+          f"truelat2={lp['truelat2']} stand_lon={lp['stand_lon']}, "
+          f"origin {lp['ref_lat']}, {lp['ref_lon']}")
+    print(f"    Nominal center: {nlat:.5f}, {nlon:.5f}")
+    print(f"    Snapped center: {slat:.5f}, {slon:.5f}  "
+          f"(shift {sx:+.0f} m E, {sy:+.0f} m N)")
+    for n, (i, j) in enumerate(lp["origin_ij"], start=1):
+        print(f"    Origin at d{n:02d} mass (i, j) = ({i}, {j})")
+    fi, fj = lp["fine_offset"]
+    print(f"    Finest grid (dx {lp['fine_dx']:.2f} m): mass point (1, 1) = "
+          f"lattice ({fi}, {fj})")
 
 
 def main():
