@@ -316,7 +316,8 @@ def _fetch_grib(url, dest, patterns=None, max_gap=0):
 def _download_grib(model_cfg, date, cycle, fhours, dest_dir):
     """Download GRIB files using the model's URL pattern(s).
 
-    Models with "idx_subset" / "sfc_idx_subset" (RRFS) get byte-range subsetting
+    Models with "idx_subset" / "sfc_idx_subset" (RRFS in the registry; any model
+    through the domain YAML, see DOMAIN_MODEL_OVERRIDES) get byte-range subsetting
     through the .grib2.idx sidecar; anything else is a full-file download.
     """
     print(f"\n{'='*60}")
@@ -376,6 +377,30 @@ def _detect_latest_cycle(model, date=None, model_cfg=None):
     return date, "00"
 
 
+# Model-registry keys a domain YAML may override. An absent key leaves the
+# registry entry untouched, so existing domains run exactly as before.
+#   direct_reader: false     force the WPS/WRF path (HRRR defaults to the direct reader)
+#   vtable: Vtable.X         ungrib Vtable for the atmosphere pass; wins over the
+#                            registry's wrf_vtable (e.g. Vtable.RAP.pressure.ncep to
+#                            initialise WRF from HRRR without hydrometeors, like NAM)
+#   sfc_vtable: Vtable.Y     second (soil) ungrib pass; `null` skips it
+#   idx_subset / sfc_idx_subset / idx_max_gap_mb
+#                            .idx byte-range download patterns (see _fetch_grib_subset)
+DOMAIN_MODEL_OVERRIDES = ("direct_reader", "vtable", "sfc_vtable",
+                          "idx_subset", "sfc_idx_subset", "idx_max_gap_mb")
+
+
+def _apply_domain_overrides(model_cfg, config):
+    """Copy the domain YAML's overrides of registry keys into model_cfg (in place)."""
+    for key in DOMAIN_MODEL_OVERRIDES:
+        if key in config:
+            model_cfg[key] = config[key]
+            if key == "vtable":
+                # The atmosphere pass reads wrf_vtable first (HRRR: Vtable.HRRR.full).
+                model_cfg["wrf_vtable"] = config[key]
+    return model_cfg
+
+
 def _utc_offset_from_lon(lon):
     """Estimate UTC offset from longitude (rough, ignores DST)."""
     # -122 → -8 (PST), -121 → -8, etc.
@@ -395,11 +420,8 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     """Run the full forecast pipeline."""
     config = load_domain_config(config_path)
     model = config["model"]
-    model_cfg = dict(MODELS[model])  # copy so domain overrides don't mutate global
-
-    # Domain YAML can override direct_reader (e.g. direct_reader: false to force WRF)
-    if "direct_reader" in config:
-        model_cfg["direct_reader"] = config["direct_reader"]
+    # Copy so domain overrides don't mutate the global registry.
+    model_cfg = _apply_domain_overrides(dict(MODELS[model]), config)
 
     # Resolve {root} in URL patterns (RRFS para -> prod switch via env var)
     _resolve_model_urls(model_cfg, model)

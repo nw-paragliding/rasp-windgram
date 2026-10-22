@@ -165,6 +165,14 @@ def load_domain_config(config_path):
         physics:                # optional overrides
           cu_physics: 0
           bl_pbl_physics: 2
+        # Optional overrides of the model-registry entry (rasp.pipeline
+        # DOMAIN_MODEL_OVERRIDES); absent keys keep the registry behaviour:
+        direct_reader: false            # force WPS/WRF (HRRR defaults to the direct reader)
+        vtable: Vtable.RAP.pressure.ncep  # ungrib Vtable for the atmosphere pass
+        sfc_vtable: Vtable.raphrrr      # soil pass Vtable; null skips the pass
+        idx_subset: ["TMP:* mb", ...]   # .idx byte-range patterns (main / surface file)
+        sfc_idx_subset: [...]
+        idx_max_gap_mb: 2
     """
     path = Path(config_path)
     if not path.exists():
@@ -198,6 +206,19 @@ def load_domain_config(config_path):
     config["model"] = config["model"].lower()
     if config.get("utc_offset") is not None:
         config["utc_offset"] = int(config["utc_offset"])
+
+    # Registry overrides (see rasp.pipeline DOMAIN_MODEL_OVERRIDES)
+    for key in ("vtable", "sfc_vtable"):
+        v = config.get(key)
+        if v is not None and (not isinstance(v, str) or not v.strip() or "/" in v):
+            raise ValueError(f"{key}: expected a Vtable file name (no path), got {v!r}")
+    for key in ("idx_subset", "sfc_idx_subset"):
+        v = config.get(key)
+        if v is not None and (not isinstance(v, list) or not v
+                              or not all(isinstance(p, str) and p for p in v)):
+            raise ValueError(f"{key}: expected a non-empty list of 'VAR:LEVEL' patterns")
+    if config.get("idx_max_gap_mb") is not None:
+        config["idx_max_gap_mb"] = float(config["idx_max_gap_mb"])
 
     if config["model"] not in MODEL_DX:
         raise ValueError(

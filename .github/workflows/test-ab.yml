@@ -1,17 +1,28 @@
-name: A/B (NAM vs RRFS)
+name: A/B pair
 
-# Acceptance test for the RRFS migration (RRFS_MIGRATION.md, section 5): run the
-# SAME domain, sites and cycle through the DrJack WRF chain twice, once with NAM
-# and once with RRFS as the boundary/initial-condition source, then compare.
-# Output is for human review (James accepts/rejects); nothing is promoted here.
+# Dev harness for model A/B acceptance tests (RRFS_MIGRATION.md §5,
+# HRRR_DRJACK_AB.md): run the SAME domain, sites and pinned cycle through the
+# DrJack WRF chain twice -- two "arms" that differ only in the input model (or
+# in a candidate config) -- then compare the cubes and windgrams. Output is for
+# human review (James accepts/rejects); nothing is promoted here.
 #
 # The image is built from this branch so unreleased changes are exercised.
+#
+# Arms (exactly two):
+#   <model>              the base domain file with its `model:` line swapped
+#                        (default `nam rrfs`: the NAM-vs-RRFS acceptance pair)
+#   [<label>=]<config>   examples/<config>.yaml or ab/<config>.yaml run AS-IS,
+#                        e.g. `hrrr=cascades-hrrr-drjack` (HRRR through the DrJack
+#                        chain vs the NAM base). The label names the artifacts
+#                        (ab-<domain>-<label>) and the compare columns.
 #
 # Two ways to start a pair:
 #   * workflow_dispatch with inputs (only available once this file is on main).
 #   * push to a feat/** branch with a commit message containing
-#       [ab]                                    -> cascades, latest complete major cycle
+#       [ab]                                    -> cascades, latest complete major cycle, nam vs rrfs
 #       [ab cascades 2026-10-21 18 2026-10-22]  -> domain, cycle date, cycle, soaring date
+#       [ab cascades 2026-10-21 12 2026-10-21 nam hrrr=cascades-hrrr-drjack]
+#                                               -> ... plus the two arms
 #     Domains: examples/<domain>.yaml (production) or ab/<domain>.yaml (test-only).
 #     (GitHub only registers workflow_dispatch for workflows on the default branch.)
 
@@ -36,6 +47,10 @@ on:
         description: 'Soaring date YYYY-MM-DD (blank = cycle_date)'
         required: false
         default: ''
+      arms:
+        description: 'Two arms: <model> (base domain, model swapped) or [<label>=]<config> (examples/ or ab/ file as-is)'
+        required: false
+        default: 'nam rrfs'
       max_hours:
         description: 'Debug: truncate WRF to N hours (blank = full soaring day)'
         required: false
@@ -59,6 +74,9 @@ jobs:
       max_hours: ${{ steps.p.outputs.max_hours }}
       sites: ${{ steps.p.outputs.sites }}
       utc_offset: ${{ steps.p.outputs.utc_offset }}
+      matrix: ${{ steps.p.outputs.matrix }}
+      label_a: ${{ steps.p.outputs.label_a }}
+      label_b: ${{ steps.p.outputs.label_b }}
     steps:
       - uses: actions/checkout@v4
       - id: p
@@ -66,15 +84,16 @@ jobs:
           MSG: ${{ github.event.head_commit.message }}
         run: |
           DOMAIN="${{ inputs.domain }}"; CYCLE_DATE="${{ inputs.cycle_date }}"; CYCLE="${{ inputs.cycle }}"
-          TARGET_DATE="${{ inputs.target_date }}"; MAX_HOURS="${{ inputs.max_hours }}"
+          TARGET_DATE="${{ inputs.target_date }}"; MAX_HOURS="${{ inputs.max_hours }}"; ARMS="${{ inputs.arms }}"
           if [ "${{ github.event_name }}" = "push" ]; then
-            # [ab] or [ab <domain> [<cycle_date> <cycle> [<target_date>]]]
-            # Strict form (letters/digits/dashes only) and LAST occurrence, so prose
-            # like "[ab ...]" earlier in the message cannot be mistaken for the tag.
-            TAG=$(printf '%s' "$MSG" | grep -o -E '\[ab( [A-Za-z0-9-]+)*\]' | tail -1 | tr -d '[]')
-            read -r _ DOMAIN CYCLE_DATE CYCLE TARGET_DATE _ <<< "$TAG"
+            # [ab] or [ab <domain> [<cycle_date> <cycle> [<target_date> [<arm> <arm>]]]]
+            # Strict form (letters/digits/dashes/'=' only) and LAST occurrence, so
+            # prose like "[ab ...]" earlier in the message cannot be mistaken for the tag.
+            TAG=$(printf '%s' "$MSG" | grep -o -E '\[ab( [A-Za-z0-9=-]+)*\]' | tail -1 | tr -d '[]')
+            read -r _ DOMAIN CYCLE_DATE CYCLE TARGET_DATE ARMS <<< "$TAG"
           fi
           [ -z "$DOMAIN" ] && DOMAIN=cascades
+          [ -z "$ARMS" ] && ARMS="nam rrfs"
           if [ -z "$CYCLE" ]; then
             # Latest 00/06/12/18z cycle initialised >= 4 h ago (f84 publishes ~3.5 h after init).
             E=$(( ( $(date -u +%s) - 4*3600 ) / 21600 * 21600 ))
@@ -94,17 +113,35 @@ jobs:
           fi
           [ -f "$YAML" ] || { echo "::error::no domain config for '$DOMAIN' (ab/ or examples/)"; exit 1; }
           OFF=$(grep -E '^utc_offset:' "$YAML" | awk '{print $2}'); OFF=${OFF:--7}
-          echo "domain=$DOMAIN yaml=$YAML sites=$SITES utc=$OFF cycle=$CYCLE_DATE ${CYCLE}z target=$TARGET_DATE max_hours=${MAX_HOURS:-full}"
+          # Arms -> matrix. "<model>" swaps the model line of the base file;
+          # "[<label>=]<config>" runs ab/<config>.yaml or examples/<config>.yaml as-is.
+          set -- $ARMS
+          [ $# -eq 2 ] || { echo "::error::need exactly two arms, got '$ARMS'"; exit 1; }
+          MATRIX=""; LABELS=""
+          for ARM in "$@"; do
+            LABEL="${ARM%%=*}"; SPEC="${ARM#*=}"
+            if   [ -f "ab/$SPEC.yaml" ];       then AYAML="ab/$SPEC.yaml";       AMODEL=""
+            elif [ -f "examples/$SPEC.yaml" ]; then AYAML="examples/$SPEC.yaml"; AMODEL=""
+            else                                    AYAML="$YAML";               AMODEL="$SPEC"; fi
+            MATRIX="$MATRIX${MATRIX:+,}{\"label\":\"$LABEL\",\"model\":\"$AMODEL\",\"yaml\":\"$AYAML\"}"
+            LABELS="$LABELS $LABEL"
+            echo "arm $LABEL: $AYAML ${AMODEL:+(model: $AMODEL)}"
+          done
+          read -r LABEL_A LABEL_B <<< "$LABELS"
+          [ "$LABEL_A" != "$LABEL_B" ] || { echo "::error::arm labels must differ ('$ARMS')"; exit 1; }
+          echo "domain=$DOMAIN yaml=$YAML sites=$SITES utc=$OFF cycle=$CYCLE_DATE ${CYCLE}z target=$TARGET_DATE max_hours=${MAX_HOURS:-full} arms=$ARMS"
           echo "yaml=$YAML" >> "$GITHUB_OUTPUT"
           { echo "domain=$DOMAIN"; echo "cycle_date=$CYCLE_DATE"; echo "cycle=$CYCLE"; echo "target_date=$TARGET_DATE";
-            echo "max_hours=$MAX_HOURS"; echo "sites=$SITES"; echo "utc_offset=$OFF"; } >> "$GITHUB_OUTPUT"
+            echo "max_hours=$MAX_HOURS"; echo "sites=$SITES"; echo "utc_offset=$OFF";
+            echo "matrix=[$MATRIX]"; echo "label_a=$LABEL_A"; echo "label_b=$LABEL_B"; } >> "$GITHUB_OUTPUT"
 
   run:
     needs: params
+    name: run (${{ matrix.label }})
     strategy:
       fail-fast: false
       matrix:
-        model: [nam, rrfs]
+        include: ${{ fromJSON(needs.params.outputs.matrix) }}
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 180
     permissions:
@@ -112,12 +149,13 @@ jobs:
       packages: read
     env:
       DOMAIN: ${{ needs.params.outputs.domain }}
-      YAML: ${{ needs.params.outputs.yaml }}
       CYCLE_DATE: ${{ needs.params.outputs.cycle_date }}
       CYCLE: ${{ needs.params.outputs.cycle }}
       TARGET_DATE: ${{ needs.params.outputs.target_date }}
       MAX_HOURS: ${{ needs.params.outputs.max_hours }}
       SITES: ${{ needs.params.outputs.sites }}
+      ARM_YAML: ${{ matrix.yaml }}
+      ARM_MODEL: ${{ matrix.model }}
     steps:
       - uses: actions/checkout@v4
 
@@ -128,14 +166,20 @@ jobs:
           docker system prune -af >/dev/null 2>&1 || true
           df -h /
 
-      - name: Prepare domain config (${{ matrix.model }})
+      - name: Prepare domain config (${{ matrix.label }})
         run: |
-          # Same file for both arms; only the model line changes.
-          sed -E "s/^model: *[a-z]+.*/model: ${{ matrix.model }}/" "$YAML" > ab-domain.yaml
+          if [ -n "$ARM_MODEL" ]; then
+            # Same base file for both arms; only the model line changes.
+            sed -E "s/^model: *[a-z]+.*/model: $ARM_MODEL/" "$ARM_YAML" > ab-domain.yaml
+          else
+            # A candidate config, run exactly as committed.
+            cp "$ARM_YAML" ab-domain.yaml
+          fi
           # The runner has the low-res GEOG package + 30s terrain/landuse add-ons
           # (see the GEOG step); domains that don't say so need this resolution key.
           grep -q '^geog_data_res:' ab-domain.yaml || echo "geog_data_res: gmted2010_30s+modis_30s_lake+lowres" >> ab-domain.yaml
-          grep -n -E '^(model|geog_data_res|utc_offset):' ab-domain.yaml
+          echo "arm ${{ matrix.label }}: $ARM_YAML"
+          grep -n -E '^(name|model|direct_reader|vtable|sfc_vtable|geog_data_res|utc_offset):' ab-domain.yaml
 
       - name: Restore GEOG cache
         id: geog
@@ -173,11 +217,11 @@ jobs:
           docker build -f docker/Dockerfile.windgram --build-arg WRF_IMAGE=$WRF_IMAGE \
             -t rasp-windgram:ab .
 
-      - name: Run pipeline (${{ matrix.model }})
+      - name: Run pipeline (${{ matrix.label }})
         run: |
           mkdir -p output wrfout-debug
           MAXH=""; [ -n "$MAX_HOURS" ] && MAXH="--max-hours $MAX_HOURS"
-          echo "$DOMAIN / ${{ matrix.model }}: cycle $CYCLE_DATE ${CYCLE}z -> soaring day $TARGET_DATE $MAXH"
+          echo "$DOMAIN / ${{ matrix.label }} ($ARM_YAML): cycle $CYCLE_DATE ${CYCLE}z -> soaring day $TARGET_DATE $MAXH"
           docker run --rm \
             -v "$PWD/geog:/mnt/geog:ro" \
             -v "$PWD/output:/mnt/output:rw" \
@@ -199,7 +243,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ab-${{ needs.params.outputs.domain }}-${{ matrix.model }}
+          name: ab-${{ needs.params.outputs.domain }}-${{ matrix.label }}
           path: output/
           retention-days: 14
 
@@ -207,32 +251,36 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ab-debug-${{ needs.params.outputs.domain }}-${{ matrix.model }}
+          name: ab-debug-${{ needs.params.outputs.domain }}-${{ matrix.label }}
           path: wrfout-debug/
           retention-days: 7
 
   compare:
     needs: [params, run]
     runs-on: ubuntu-24.04
+    env:
+      LABEL_A: ${{ needs.params.outputs.label_a }}
+      LABEL_B: ${{ needs.params.outputs.label_b }}
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
       - uses: actions/download-artifact@v4
         with:
-          name: ab-${{ needs.params.outputs.domain }}-nam
-          path: runs/nam
+          name: ab-${{ needs.params.outputs.domain }}-${{ needs.params.outputs.label_a }}
+          path: runs/a
       - uses: actions/download-artifact@v4
         with:
-          name: ab-${{ needs.params.outputs.domain }}-rrfs
-          path: runs/rrfs
+          name: ab-${{ needs.params.outputs.domain }}-${{ needs.params.outputs.label_b }}
+          path: runs/b
       - name: Compare
         run: |
-          echo "## A/B ${{ needs.params.outputs.domain }} — cycle ${{ needs.params.outputs.cycle_date }} ${{ needs.params.outputs.cycle }}z → ${{ needs.params.outputs.target_date }}" >> "$GITHUB_STEP_SUMMARY"
+          LA=$(printf '%s' "$LABEL_A" | tr a-z A-Z); LB=$(printf '%s' "$LABEL_B" | tr a-z A-Z)
+          echo "## A/B ${{ needs.params.outputs.domain }} $LA vs $LB — cycle ${{ needs.params.outputs.cycle_date }} ${{ needs.params.outputs.cycle }}z → ${{ needs.params.outputs.target_date }}" >> "$GITHUB_STEP_SUMMARY"
           uv run --extra cube --with matplotlib python scripts/ab_compare.py \
-            --a runs/nam --b runs/rrfs --labels NAM RRFS --sites "${{ needs.params.outputs.sites }}" \
+            --a runs/a --b runs/b --labels "$LA" "$LB" --sites "${{ needs.params.outputs.sites }}" \
             --utc-offset ${{ needs.params.outputs.utc_offset }} --out compare | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
-          name: ab-compare-${{ needs.params.outputs.domain }}
+          name: ab-compare-${{ needs.params.outputs.domain }}-${{ needs.params.outputs.label_a }}-vs-${{ needs.params.outputs.label_b }}
           path: compare/
           retention-days: 30
