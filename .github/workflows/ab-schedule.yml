@@ -1,0 +1,52 @@
+name: A/B schedule (NAM vs RRFS)
+
+# Daily NAM-vs-RRFS acceptance pairs for the RRFS migration (RRFS_MIGRATION.md §5),
+# Phoenix + Cascades, from the 18z cycle for the next soaring day, until NAM
+# retires on 2026-11-03. This file is inert on main except for dispatching
+# test-ab.yml on the migration branch (GitHub only honours `schedule` and
+# `workflow_dispatch` for workflows that exist on the default branch).
+
+on:
+  schedule:
+    # 22:30 UTC: NAM 18z and RRFS 18z are both complete through f33 by ~20:45Z.
+    # GitHub cron can run hours late; the job recomputes the latest 18z cycle.
+    - cron: '30 22 * * *'
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch whose test-ab.yml to run'
+        required: false
+        default: 'feat/rrfs-model'
+      domains:
+        description: 'Space-separated domains'
+        required: false
+        default: 'phoenix cascades'
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Dispatch one pair per domain
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ inputs.branch || 'feat/rrfs-model' }}
+          DOMAINS: ${{ inputs.domains || 'phoenix cascades' }}
+          LAST_DAY: '2026-11-02'   # last 18z cycle before NAM leaves NOMADS (Nov 3, 12Z)
+        run: |
+          TODAY=$(date -u +%F)
+          if [ "$TODAY" \> "$LAST_DAY" ]; then
+            echo "NAM is retired (after $LAST_DAY); nothing to pair. Remove this schedule."
+            exit 0
+          fi
+          # Latest 18z cycle that is complete (f33 published ~20:45Z): before 21Z use yesterday's.
+          H=$(date -u +%H)
+          if [ "$((10#$H))" -lt 21 ]; then CYCLE_DATE=$(date -u -d "$TODAY -1 day" +%F); else CYCLE_DATE=$TODAY; fi
+          TARGET=$(date -u -d "$CYCLE_DATE +1 day" +%F)
+          for d in $DOMAINS; do
+            echo "dispatch test-ab.yml@$BRANCH: $d cycle $CYCLE_DATE 18z -> $TARGET"
+            gh workflow run test-ab.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH" \
+              -f domain="$d" -f cycle_date="$CYCLE_DATE" -f cycle=18 -f target_date="$TARGET"
+          done

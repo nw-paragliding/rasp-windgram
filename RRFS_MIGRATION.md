@@ -4,11 +4,25 @@ Status: phase 1 IN PROGRESS on branch `feat/rrfs-model` (2026-10-21, 13 days bef
 retirement). Built so far: `MODELS["rrfs"]` registry entry, `vtables/Vtable.RRFS`, the `.idx`
 byte-range downloader (`_fetch_grib_subset`, keep-alive `http.client`), `RASP_RRFS_ROOT` override,
 `utc_offset:` YAML key, `examples/phoenix-ab.yaml` + `phoenix-sites.csv`, `scripts/ab_compare.py`,
-`.github/workflows/test-ab.yml`. First local A/B pair: 18z 2026-10-21 → soaring day 2026-10-22,
-Phoenix, both arms via `~/rasp-data/ab/run_arm.sh <nam|rrfs>` in the locally built arm64 image
-`rasp-windgram:ab` (colima `default` profile, 6 CPU / 5 GiB). Not yet done: direct-reader
-generalization (option B), legacy script cleanup, version bump / image release, any pnw-soaring
-change.
+`.github/workflows/test-ab.yml` (push to `feat/**` with `[ab phoenix 2026-10-21 18 2026-10-22]`
+in the commit message; `workflow_dispatch` only after merge to main).
+
+**Daily pairs (Phoenix + Cascades, 18z → next day) run on the arm runners through Nov 2** via
+`.github/workflows/ab-schedule.yml` (dispatches the branch's `test-ab.yml`; needs both files on
+main — PR opened). Until that merges, pairs start from a tagged push.
+
+**First pair (2026-10-21, Phoenix, 18z → soaring day Oct 22): reviewed by James, "looks right".**
+Both arms completed on the arm runners in ~25 min (vs ~45 min per arm in the local 5 GiB VM);
+the local NAM arm reproduces the runner NAM arm exactly (zero difference in every metric). RRFS
+arm: ungrib/metgrid/real all clean with `Vtable.RRFS`, 46 metgrid levels, 9 soil levels, 13
+hours, 7/7 windgrams, no NaNs. Pooled afternoon RRFS − NAM: BL top median |Δ| 698 ft (bias
++562), w* 47 fpm (+17), ceiling 495 ft (+357), BL wind 3 kt / 9°, 2 m T +2 °F, sfc LCL +1280 ft
+(RRFS warmer and drier at the surface). Largest site divergence at McDowell Mtn (RRFS ceiling
+~5,000 ft vs NAM pinned at terrain mid-afternoon), traceable to the parents disagreeing on
+afternoon cloud cover on a moist day. Results: `~/rasp-data/ab/pairs/phoenix-20261021-18z-runner/`
+(compare.md, diffmap_tol.png, montage_<site>.png). Not yet done: more pairs (plan: ≥ 4 incl.
+Cascades), direct-reader generalization (option B), legacy script cleanup, version bump / image
+release, any pnw-soaring change.
 
 Decisions locked 2026-10-21:
 
