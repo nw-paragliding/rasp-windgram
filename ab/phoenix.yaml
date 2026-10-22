@@ -1,0 +1,47 @@
+# Phoenix A/B acceptance domain (RRFS_MIGRATION.md, section 5).
+#
+# A copy of the Cascades production chain (examples/cascades.yaml) moved to the
+# Sonoran desert, where late-October thermals are still strong, so NAM-driven
+# and RRFS-driven generation can be compared on real convective days before
+# NAM retires on 2026-11-03.
+#
+# Run the SAME file twice, changing only `model:` (nam | rrfs). Everything else
+# -- grid, physics, levels, boundary interval, sites -- stays identical.
+#
+#   python3 -m rasp.pipeline ab/phoenix.yaml --sites ab/phoenix-sites.csv \
+#       --target-date 2026-10-25 --output-dir /mnt/output/nam
+#
+name: phoenix
+model: nam            # A/B: set to `rrfs` for the B arm (sed-friendly, keep on one line)
+
+center_lat: 33.5
+center_lon: -112.0
+
+# Arizona has no DST; the longitude heuristic would compute UTC-6.
+utc_offset: -7
+
+# GEOG: the UCAR "low-res mandatory" package plus the 30-arc-second terrain and
+# landuse add-ons (topo_gmted2010_30s, modis_landuse_20class_30s_with_lakes).
+# geogrid takes the FIRST listed key each field has: real 30s ridges for HGT_M
+# and LANDUSEF, lowres (5') for the rest. The generator's default
+# ('default+lowres') needs the full 29 GB high-res package.
+geog_data_res: gmted2010_30s+modis_30s_lake+lowres
+
+# Same nest chain as the Cascades: parent 3 km (RRFS) or 12 km (NAM)
+# -> WRF 4 km (230 km) -> WRF 1.33 km (150 km).
+outer_dx_km: 4.0
+target_dx_km: 1.33
+inner_extent_km: 150
+nest_ratio: 3
+
+# DrJack RASP vertical resolution
+e_vert: 52
+
+# Physics identical to examples/cascades.yaml (DrJack raspnw-v2 calibration).
+physics:
+  mp_physics: 5         # Eta Ferrier
+  ra_lw_physics: 1      # RRTM
+  ra_sw_physics: 1      # Dudhia
+  radt: 10
+  sf_sfclay_physics: 1  # MM5 similarity / Monin-Obukhov
+  bl_pbl_physics: 1     # YSU non-local PBL

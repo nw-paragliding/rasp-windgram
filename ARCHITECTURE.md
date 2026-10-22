@@ -144,7 +144,15 @@ The pipeline auto-detects several parameters:
 
 ## Supported Models
 
-### NAM (working)
+### RRFS (NAM replacement — see RRFS_MIGRATION.md)
+- 3km FV3-LAM, CONUS subset on the HRRR Lambert grid; hourly cycles, 00/06/12/18z to 84h
+- Source: NOMADS `rrfs/v1.0` (parallel feed) → `rrfs/prod` from 2026-11-03; `RASP_RRFS_ROOT` overrides
+- Two files per forecast hour: `prslev` (isobaric 3-D) + `2dfld` (surface, soil, fluxes), both linked
+  into one ungrib pass with the custom `vtables/Vtable.RRFS` (NAM rows + RAP/HRRR 9-level soil)
+- Byte-range subsetting via `.grib2.idx` (`idx_subset` / `sfc_idx_subset` in the registry)
+- Same DrJack WRF chain as NAM (3km parent → 4km → 1.33km); hydrometeor init off
+
+### NAM (working; retired by NCEP 2026-11-03)
 - 12km, North America, 4 cycles/day, 84h forecast
 - Source: NOMADS
 - Auto-download with retry, smart forecast hour selection

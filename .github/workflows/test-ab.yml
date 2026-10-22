@@ -1,0 +1,238 @@
+name: A/B (NAM vs RRFS)
+
+# Acceptance test for the RRFS migration (RRFS_MIGRATION.md, section 5): run the
+# SAME domain, sites and cycle through the DrJack WRF chain twice, once with NAM
+# and once with RRFS as the boundary/initial-condition source, then compare.
+# Output is for human review (James accepts/rejects); nothing is promoted here.
+#
+# The image is built from this branch so unreleased changes are exercised.
+#
+# Two ways to start a pair:
+#   * workflow_dispatch with inputs (only available once this file is on main).
+#   * push to a feat/** branch with a commit message containing
+#       [ab]                                    -> cascades, latest complete major cycle
+#       [ab cascades 2026-10-21 18 2026-10-22]  -> domain, cycle date, cycle, soaring date
+#     Domains: examples/<domain>.yaml (production) or ab/<domain>.yaml (test-only).
+#     (GitHub only registers workflow_dispatch for workflows on the default branch.)
+
+on:
+  push:
+    branches: ['feat/**']
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Domain: examples/<domain>.yaml (production) or ab/<domain>.yaml (test-only)'
+        required: true
+        default: 'cascades'
+      cycle_date:
+        description: 'Cycle date YYYY-MM-DD (blank = today UTC)'
+        required: false
+        default: ''
+      cycle:
+        description: 'Cycle hour, pinned so both arms use the same one (00/06/12/18)'
+        required: true
+        default: '12'
+      target_date:
+        description: 'Soaring date YYYY-MM-DD (blank = cycle_date)'
+        required: false
+        default: ''
+      max_hours:
+        description: 'Debug: truncate WRF to N hours (blank = full soaring day)'
+        required: false
+        default: ''
+
+env:
+  WRF_IMAGE: ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-arm64
+  GEOG_URL: https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_low_res_mandatory.tar.gz
+
+jobs:
+  params:
+    # One place that turns inputs / the commit-message tag into run parameters.
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[ab')
+    outputs:
+      domain: ${{ steps.p.outputs.domain }}
+      yaml: ${{ steps.p.outputs.yaml }}
+      cycle_date: ${{ steps.p.outputs.cycle_date }}
+      cycle: ${{ steps.p.outputs.cycle }}
+      target_date: ${{ steps.p.outputs.target_date }}
+      max_hours: ${{ steps.p.outputs.max_hours }}
+      sites: ${{ steps.p.outputs.sites }}
+      utc_offset: ${{ steps.p.outputs.utc_offset }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: p
+        env:
+          MSG: ${{ github.event.head_commit.message }}
+        run: |
+          DOMAIN="${{ inputs.domain }}"; CYCLE_DATE="${{ inputs.cycle_date }}"; CYCLE="${{ inputs.cycle }}"
+          TARGET_DATE="${{ inputs.target_date }}"; MAX_HOURS="${{ inputs.max_hours }}"
+          if [ "${{ github.event_name }}" = "push" ]; then
+            # [ab] or [ab <domain> [<cycle_date> <cycle> [<target_date>]]]
+            # Strict form (letters/digits/dashes only) and LAST occurrence, so prose
+            # like "[ab ...]" earlier in the message cannot be mistaken for the tag.
+            TAG=$(printf '%s' "$MSG" | grep -o -E '\[ab( [A-Za-z0-9-]+)*\]' | tail -1 | tr -d '[]')
+            read -r _ DOMAIN CYCLE_DATE CYCLE TARGET_DATE _ <<< "$TAG"
+          fi
+          [ -z "$DOMAIN" ] && DOMAIN=cascades
+          if [ -z "$CYCLE" ]; then
+            # Latest 00/06/12/18z cycle initialised >= 4 h ago (f84 publishes ~3.5 h after init).
+            E=$(( ( $(date -u +%s) - 4*3600 ) / 21600 * 21600 ))
+            CYCLE_DATE=$(date -u -d @$E +%F); CYCLE=$(date -u -d @$E +%H)
+          fi
+          [ -z "$CYCLE_DATE" ] && CYCLE_DATE=$(date -u +%F)
+          if [ -z "$TARGET_DATE" ]; then
+            # 8am local is ~15Z: cycles up to 12z can cover the same day, later ones the next.
+            if [ "$((10#$CYCLE))" -le 12 ]; then TARGET_DATE="$CYCLE_DATE"; else TARGET_DATE=$(date -u -d "$CYCLE_DATE +1 day" +%F); fi
+          fi
+          # Production domains live in examples/ (shipped in the image); test-only
+          # A/B domains live in ab/<domain>.yaml + ab/<domain>-sites.csv (not shipped).
+          if [ -f "ab/$DOMAIN.yaml" ]; then
+            YAML="ab/$DOMAIN.yaml"; SITES="ab/$DOMAIN-sites.csv"
+          else
+            YAML="examples/$DOMAIN.yaml"; SITES="examples/issaquah-sites.csv"
+          fi
+          [ -f "$YAML" ] || { echo "::error::no domain config for '$DOMAIN' (ab/ or examples/)"; exit 1; }
+          OFF=$(grep -E '^utc_offset:' "$YAML" | awk '{print $2}'); OFF=${OFF:--7}
+          echo "domain=$DOMAIN yaml=$YAML sites=$SITES utc=$OFF cycle=$CYCLE_DATE ${CYCLE}z target=$TARGET_DATE max_hours=${MAX_HOURS:-full}"
+          echo "yaml=$YAML" >> "$GITHUB_OUTPUT"
+          { echo "domain=$DOMAIN"; echo "cycle_date=$CYCLE_DATE"; echo "cycle=$CYCLE"; echo "target_date=$TARGET_DATE";
+            echo "max_hours=$MAX_HOURS"; echo "sites=$SITES"; echo "utc_offset=$OFF"; } >> "$GITHUB_OUTPUT"
+
+  run:
+    needs: params
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [nam, rrfs]
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 180
+    permissions:
+      contents: read
+      packages: read
+    env:
+      DOMAIN: ${{ needs.params.outputs.domain }}
+      YAML: ${{ needs.params.outputs.yaml }}
+      CYCLE_DATE: ${{ needs.params.outputs.cycle_date }}
+      CYCLE: ${{ needs.params.outputs.cycle }}
+      TARGET_DATE: ${{ needs.params.outputs.target_date }}
+      MAX_HOURS: ${{ needs.params.outputs.max_hours }}
+      SITES: ${{ needs.params.outputs.sites }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup \
+            /opt/hostedtoolcache /usr/local/share/boost 2>/dev/null || true
+          docker system prune -af >/dev/null 2>&1 || true
+          df -h /
+
+      - name: Prepare domain config (${{ matrix.model }})
+        run: |
+          # Same file for both arms; only the model line changes.
+          sed -E "s/^model: *[a-z]+.*/model: ${{ matrix.model }}/" "$YAML" > ab-domain.yaml
+          # The runner has the low-res GEOG package + 30s terrain/landuse add-ons
+          # (see the GEOG step); domains that don't say so need this resolution key.
+          grep -q '^geog_data_res:' ab-domain.yaml || echo "geog_data_res: gmted2010_30s+modis_30s_lake+lowres" >> ab-domain.yaml
+          grep -n -E '^(model|geog_data_res|utc_offset):' ab-domain.yaml
+
+      - name: Restore GEOG cache
+        id: geog
+        uses: actions/cache/restore@v4
+        with:
+          path: geog/
+          key: wps-geog-lowres-plus-30s-v1
+
+      - name: Download GEOG (low-res package + 30s terrain/landuse, ~0.6 GB)
+        if: steps.geog.outputs.cache-hit != 'true'
+        run: |
+          curl -fL --retry 3 -sS "$GEOG_URL" -o geog.tar.gz
+          mkdir -p geog && tar xzf geog.tar.gz -C geog --strip-components=1 && rm geog.tar.gz
+          for t in topo_gmted2010_30s modis_landuse_20class_30s_with_lakes; do
+            curl -fL --retry 3 -sS "https://www2.mmm.ucar.edu/wrf/src/wps_files/$t.tar.bz2" -o add.tar.bz2
+            tar xjf add.tar.bz2 -C geog && rm add.tar.bz2
+          done
+          du -sh geog; ls geog
+
+      - name: Save GEOG cache
+        if: steps.geog.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: geog/
+          key: wps-geog-lowres-plus-30s-v1
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build windgram image from this branch
+        run: |
+          docker build -f docker/Dockerfile.windgram --build-arg WRF_IMAGE=$WRF_IMAGE \
+            -t rasp-windgram:ab .
+
+      - name: Run pipeline (${{ matrix.model }})
+        run: |
+          mkdir -p output wrfout-debug
+          MAXH=""; [ -n "$MAX_HOURS" ] && MAXH="--max-hours $MAX_HOURS"
+          echo "$DOMAIN / ${{ matrix.model }}: cycle $CYCLE_DATE ${CYCLE}z -> soaring day $TARGET_DATE $MAXH"
+          docker run --rm \
+            -v "$PWD/geog:/mnt/geog:ro" \
+            -v "$PWD/output:/mnt/output:rw" \
+            -v "$PWD/wrfout-debug:/mnt/wrfout:rw" \
+            -v "$PWD/ab-domain.yaml:/opt/rasp/domain.yaml:ro" \
+            -v "$PWD/$SITES:/opt/rasp/sites.csv:ro" \
+            --entrypoint bash rasp-windgram:ab -c "
+              python3 -m rasp.pipeline domain.yaml --sites sites.csv --output-dir /mnt/output \
+                --num-procs 4 --date $CYCLE_DATE --cycle $CYCLE --target-date $TARGET_DATE $MAXH; EC=\$?
+              cp /opt/rasp/runs/*/rsl.error.0000 /opt/rasp/runs/*/rsl.out.0000 /opt/rasp/runs/*/namelist.input \
+                 /opt/rasp/wps/namelist.wps /opt/rasp/wps/*.log /mnt/wrfout/ 2>/dev/null || true
+              exit \$EC"
+          echo "Rendered $(ls output/*.png 2>/dev/null | wc -l) windgrams"
+          # The pipeline also copies wrfout_* into /mnt/wrfout; their names contain
+          # colons, which upload-artifact rejects, and they are hundreds of MB.
+          rm -f wrfout-debug/wrfout_*
+
+      - name: Upload run output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ab-${{ needs.params.outputs.domain }}-${{ matrix.model }}
+          path: output/
+          retention-days: 14
+
+      - name: Upload debug (namelists, rsl, WPS logs)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ab-debug-${{ needs.params.outputs.domain }}-${{ matrix.model }}
+          path: wrfout-debug/
+          retention-days: 7
+
+  compare:
+    needs: [params, run]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: ab-${{ needs.params.outputs.domain }}-nam
+          path: runs/nam
+      - uses: actions/download-artifact@v4
+        with:
+          name: ab-${{ needs.params.outputs.domain }}-rrfs
+          path: runs/rrfs
+      - name: Compare
+        run: |
+          echo "## A/B ${{ needs.params.outputs.domain }} — cycle ${{ needs.params.outputs.cycle_date }} ${{ needs.params.outputs.cycle }}z → ${{ needs.params.outputs.target_date }}" >> "$GITHUB_STEP_SUMMARY"
+          uv run --extra cube --with matplotlib python scripts/ab_compare.py \
+            --a runs/nam --b runs/rrfs --labels NAM RRFS --sites "${{ needs.params.outputs.sites }}" \
+            --utc-offset ${{ needs.params.outputs.utc_offset }} --out compare | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ab-compare-${{ needs.params.outputs.domain }}
+          path: compare/
+          retention-days: 30

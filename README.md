@@ -75,14 +75,23 @@ WRF nesting chain:
 
 ```yaml
 name: cascades
-model: nam              # NAM, GFS, or HRRR
+model: rrfs             # RRFS, NAM (retires 2026-11-03), HRRR, or GFS
 center_lat: 47.6
 center_lon: -121.4
-target_dx_km: 1.33      # 12km → 4km → 1.33km (auto)
+target_dx_km: 1.33      # parent → 4km → 1.33km (auto)
 inner_extent_km: 150
+utc_offset: -8          # optional; default guessed from longitude (+1 for DST)
 ```
 
 See [examples/](examples/) for sample configs and site lists.
+
+**RRFS** (the 3 km FV3 model replacing NAM on 2026-11-03) is read from the
+`prslev` + `2dfld` CONUS files with a custom `Vtable.RRFS`, subset by byte
+range through the `.grib2.idx` sidecar (~850 MB → ~360 MB per forecast hour).
+Set `RASP_RRFS_ROOT` to move between the parallel feed (`…/rrfs/v1.0`, the
+default) and production (`…/rrfs/prod`). See [RRFS_MIGRATION.md](RRFS_MIGRATION.md)
+for the migration plan and the NAM-vs-RRFS A/B tooling (`scripts/ab_compare.py`,
+`.github/workflows/test-ab.yml`).
 
 ## Docker
 
