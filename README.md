@@ -176,9 +176,26 @@ instability is acoustic, not the time step).
 Unknown keys and wrong types are rejected; the adaptive-only keys require
 `use_adaptive_time_step: true`. Per-domain lists need one value per domain.
 Without the block (or with `dynamics:` empty) namelists are byte-identical to
-0.7.1 (`tests/golden/`). Terrain smoothing of the nest (`smooth_cg_topo`) is
+0.7.2 (`tests/golden/`). Terrain smoothing of the nest (`smooth_cg_topo`) is
 deliberately not offered: it only blends d01's outer boundary rows toward the
 driving model, not the interior peaks of the nest.
+
+### GRIB downloads (NOMADS throttling, mirrors)
+
+Each run downloads its own parent-model GRIB. Models with an `.idx` sidecar
+(RRFS, HRRR through the DrJack chain) fetch only the records they need via HTTP
+Range requests; `RASP_IDX_SUBSET=0` forces full files.
+
+Since 0.7.2 the downloader treats HTTP 302/429/502/503/504 and dropped
+connections as throttling, not as a missing file: it retries with jittered
+exponential backoff (15 → 30 → 60 → 120 → 240 s, 6 attempts, under 10 min) and
+logs every attempt with its status. A throttled `.idx` no longer triggers a
+full-file download; only a 404 `.idx` does. A 404 on the file itself fails at
+once. `RASP_DOWNLOAD_BACKOFF="15,30,60"` overrides the delays.
+
+`RASP_<MODEL>_ROOT` replaces a model's data root (`{root}` in its URL
+pattern), e.g. to read HRRR/RRFS from NOAA's Open Data mirrors on AWS
+(`https://noaa-hrrr-bdp-pds.s3.amazonaws.com`) instead of NOMADS.
 
 ## Docker
 
