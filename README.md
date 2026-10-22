@@ -144,15 +144,18 @@ The generator's WRF dynamics defaults (outer `time_step = 6 * dx_km`, nests
 divided by `parent_time_step_ratio` = `nest_ratio`, `w_damping = 1`,
 `diff_6th_opt = 0`, `hybrid_opt = 0`, WRF's default `epssm` = 0.1) are stable for
 the 150 km Cascades nest but not for 1.33 km nests over the highest volcanoes
-(Rainier, Baker): the vertical Courant number exceeds 5 within minutes and WRF
-integrates NaNs (see ARCHITECTURE.md, "Dynamics overrides"). An optional
-`dynamics:` block overrides them per domain file:
+(Rainier, Baker): within 3 minutes an acoustic instability drives w to 42 m/s
+(w-cfl 5.75) and WRF then integrates NaNs (see ARCHITECTURE.md, "Dynamics overrides"). An optional
+`dynamics:` block overrides them per domain file. For 1.33 km nests over the
+volcanoes, this is the fix (A/B-proven on the issaquah tile, no run-time cost):
 
 ```yaml
 dynamics:               # optional; needs rasp-windgram >= 0.7.3
-  time_step: 16         # s, outer domain (nests follow parent_time_step_ratio)
   epssm: 0.5            # sound-wave off-centering, 0..1 (scalar or per-domain list)
 ```
+
+A smaller `time_step` or the adaptive step alone does not fix it (the
+instability is acoustic, not the time step).
 
 | Key | Group | Values | Default if absent |
 |---|---|---|---|

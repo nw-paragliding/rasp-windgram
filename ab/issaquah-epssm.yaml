@@ -1,6 +1,7 @@
 # A/B copy of pnw-soaring domains/issaquah.yaml @ fe7ca4f (main), PLUS a dynamics: block:
 # the 120 km tile whose 1.33 km nest holds Mt Rainier and blows up (NaN)
-# with the default 6*dx time step; this arm: epssm 0.5 only (default 24 s step).
+# with the default 6*dx time step; this arm: epssm 0.5 only (default 24 s step)
+# = THE FIX (clean, no run-time cost; PR for 0.7.3).
 #
 # WA region tile: issaquah -- Home tile: Tiger / Issaquah Alps / North Bend / Snoqualmie Pass, Rainier NW.
 #

@@ -174,6 +174,50 @@ check on real `geo_em` files after geogrid.
 use the lattice origin (`ref_lat`) as `lat_0` (or index by `origin_ij`), so x/y
 are comparable across tiles.
 
+
+### Dynamics overrides (`dynamics:`, 0.7.3)
+
+**Why.** Four of the seven 120 km Washington tiles (issaquah with Rainier in
+its nest, chelan, baker, methow) produced NaN within minutes on every run while
+the 150 km Cascades nest (no Rainier/Baker) stayed stable with identical
+physics. The issaquah rsl (rank 0, NAM 2026-10-22 00z, start 15:00) shows the
+signature 2 min 56 s in: `29 points exceeded v_cfl = 2 in domain d02`,
+`Max W: 45 13 6 W: -14.82 w-cfl: 5.49`, then `W: 42.08 w-cfl: 5.75` and
+`WARN5: NaN temperature` -- on the south flank of Rainier, at an 8 s nest step.
+WRF then integrates NaNs to the end (`SUCCESS COMPLETE WRF`), so the job takes
+its usual time and the windgrams show the 9.8 fill value.
+
+**Root cause (A/B, same cycle, six arms).** Not the 6*dx time step: a fixed
+16 s step (5.3 s nest) and the adaptive step (down to 3 s on d01 / 1 s on d02)
+both stay below w-cfl 2 and still produce NaN (15:03:17 and 15:18:04). Every arm
+with `epssm: 0.5` is clean, including the unchanged 24 s step. The instability
+is the weakly damped vertically propagating acoustic mode of the split-explicit
+solver over very steep sigma-coordinate terrain (99.9th-percentile slope
+0.45-0.47 in the failing nests vs 0.31-0.41 in the healthy ones); the large w
+and the v_cfl messages are its symptom. `epssm` off-centres the vertically
+implicit acoustic step (WRF default 0.1) and damps that mode; raising it to 0.5 is the standard WRF remedy for
+steep-terrain instability.
+
+**Cost.** `epssm` is free (WRF 24.2 vs 23.7 min); 16 s costs about 1.5x
+(35.8 min); adaptive + epssm 24.2 min. 16 s + epssm vs 24 s + epssm differ by
+1 fpm median w* and 0 ft median soaring ceiling (`scripts/ab_compare.py`), so
+the step size does not change the forecast.
+
+**Defaults unchanged.** The generator keeps `time_step = 6 * dx_km` and does
+not write `epssm`; namelists without a `dynamics:` block are byte-identical
+(`tests/golden/`). Tiles over the volcanoes opt in with `dynamics: {epssm: 0.5}`.
+
+**Keys** (`DYNAMICS_KEYS` in `rasp/namelist_generator.py`; see README for
+types): `time_step`, `epssm`, `w_damping`, `zadvect_implicit`,
+`diff_6th_opt`, `diff_6th_factor`, `hybrid_opt`, and the adaptive-step set
+`use_adaptive_time_step`, `step_to_output_time` (implied true), `target_cfl`,
+`target_hcfl`, `max_step_increase_pct`, `starting/max/min_time_step`,
+`adaptation_domain`. Scalar WRF options are written once, per-domain ones
+repeated (or taken from a list with one value per domain). `epssm`,
+`zadvect_implicit` and the adaptive keys are written only when set.
+`smooth_cg_topo` is not offered: it only blends d01's outer boundary rows.
+A/B arms: `ab/issaquah*.yaml`, `tests/test_dynamics.py`.
+
 ### HRRR-specific options
 
 ```yaml

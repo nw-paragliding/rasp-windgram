@@ -116,9 +116,11 @@ def test_simple_yaml_fallback(tmp_path):
                                                   "w_damping": 1}
 
 
-def test_ab_arms_differ_only_in_dynamics():
+@pytest.mark.parametrize("arm", sorted(p.stem for p in ROOT.glob("ab/issaquah-*.yaml")))
+def test_ab_arms_differ_only_in_dynamics(arm):
     base = (ROOT / "ab/issaquah.yaml").read_text()
-    cand = (ROOT / "ab/issaquah-stable.yaml").read_text()
+    cand = (ROOT / f"ab/{arm}.yaml").read_text()
+    load_domain_config(ROOT / f"ab/{arm}.yaml")
     strip = lambda t: [l for l in t.splitlines() if l.strip() and not l.lstrip().startswith("#")]
     extra = strip(cand)[len(strip(base)):]
     assert strip(cand)[:len(strip(base))] == strip(base)
