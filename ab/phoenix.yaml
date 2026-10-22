@@ -8,7 +8,7 @@
 # Run the SAME file twice, changing only `model:` (nam | rrfs). Everything else
 # -- grid, physics, levels, boundary interval, sites -- stays identical.
 #
-#   python3 -m rasp.pipeline phoenix-ab.yaml --sites phoenix-sites.csv \
+#   python3 -m rasp.pipeline ab/phoenix.yaml --sites ab/phoenix-sites.csv \
 #       --target-date 2026-10-25 --output-dir /mnt/output/nam
 #
 name: phoenix

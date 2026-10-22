@@ -3,13 +3,15 @@
 Status: phase 1 IN PROGRESS on branch `feat/rrfs-model` (2026-10-21, 13 days before NAM
 retirement). Built so far: `MODELS["rrfs"]` registry entry, `vtables/Vtable.RRFS`, the `.idx`
 byte-range downloader (`_fetch_grib_subset`, keep-alive `http.client`), `RASP_RRFS_ROOT` override,
-`utc_offset:` YAML key, `examples/phoenix-ab.yaml` + `phoenix-sites.csv`, `scripts/ab_compare.py`,
+`utc_offset:` YAML key, `ab/phoenix.yaml` + `phoenix-sites.csv`, `scripts/ab_compare.py`,
 `.github/workflows/test-ab.yml` (push to `feat/**` with `[ab phoenix 2026-10-21 18 2026-10-22]`
 in the commit message; `workflow_dispatch` only after merge to main).
 
-**Daily pairs (Phoenix + Cascades, 18z → next day) run on the arm runners through Nov 2** via
+**Daily Cascades pairs (18z → next day) run on the arm runners through Nov 2** via
 `.github/workflows/ab-schedule.yml` (dispatches the branch's `test-ab.yml`; needs both files on
-main — PR opened). Until that merges, pairs start from a tagged push.
+main — PR opened). Until that merges, pairs start from a tagged push. **Phoenix is a test-only
+fixture** (`ab/phoenix.yaml`, not shipped in the image, never scheduled); Phoenix pairs run on
+demand with `[ab phoenix ...]`.
 
 **First pair (2026-10-21, Phoenix, 18z → soaring day Oct 22): reviewed by James, "looks right".**
 Both arms completed on the arm runners in ~25 min (vs ~45 min per arm in the local 5 GiB VM);
@@ -186,14 +188,14 @@ on Nov 3.
 
 **Domains.** Two, both run in A (NAM) and B (RRFS) arms with everything else identical:
 
-- `examples/phoenix-ab.yaml` — a copy of `cascades.yaml` (outer 4 km, target 1.33 km,
+- `ab/phoenix.yaml` — a copy of `cascades.yaml` (outer 4 km, target 1.33 km,
   inner 150 km, `e_vert 52`, DrJack physics) with `name: phoenix`, `center_lat: 33.5`,
   `center_lon: -112.0`. Sonoran desert in late October: highs 85–90 °F, deep dry BL, strong
   thermals, little cloud. Inner 1.33 km domain spans ~32.8–34.2 N, ~112.8–111.2 W.
 - `domains/cascades.yaml` — the production domain, for stability on the grid we actually ship.
   Thermals will be weak; this arm is about completing cleanly and tracking winds/BL top.
 
-**Test points.** `examples/phoenix-sites.csv`: 6–8 points spanning desert floor and ridge
+**Test points.** `ab/phoenix-sites.csv`: 6–8 points spanning desert floor and ridge
 terrain, not necessarily launches. Candidates (approximate, confirm at implementation): Phoenix
 metro floor (~33.45, −112.07), South Mountain ridge (~33.34, −112.06), Superstition foothills
 (~33.40, −111.45), Estrella Mountains (~33.30, −112.35), Wickenburg desert (~33.97, −112.73),
@@ -271,7 +273,7 @@ runs in the spring.
    drops from ~17 GB to ~6 GB of GRIB.
 4. **Pipeline plumbing** — model-driven direct-reader globs (`prs_glob`/`sfc_glob`) instead of
    `*wrfprs*`/`*wrfsfc*`; `{root}` substitution; 3-digit fhr is already handled by the format spec.
-5. **Phoenix A/B assets** — `examples/phoenix-ab.yaml`, `examples/phoenix-sites.csv`,
+5. **Phoenix A/B assets** — `ab/phoenix.yaml`, `ab/phoenix-sites.csv`,
    `scripts/ab_compare.py`, `.github/workflows/test-ab.yml` (matrix over model × domain + compare
    job). Add a `utc_offset` key to the domain yaml so Phoenix doesn't depend on a CLI flag.
 6. **Direct reader generalization** (option B) — `hrrr_reader.py` → `grib_reader.py`, 3-D from the

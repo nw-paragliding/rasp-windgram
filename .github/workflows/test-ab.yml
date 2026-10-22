@@ -10,8 +10,9 @@ name: A/B (NAM vs RRFS)
 # Two ways to start a pair:
 #   * workflow_dispatch with inputs (only available once this file is on main).
 #   * push to a feat/** branch with a commit message containing
-#       [ab]                                   -> phoenix, latest complete major cycle
-#       [ab phoenix 2026-10-21 18 2026-10-22]  -> domain, cycle date, cycle, soaring date
+#       [ab]                                    -> cascades, latest complete major cycle
+#       [ab cascades 2026-10-21 18 2026-10-22]  -> domain, cycle date, cycle, soaring date
+#     Domains: examples/<domain>.yaml (production) or ab/<domain>.yaml (test-only).
 #     (GitHub only registers workflow_dispatch for workflows on the default branch.)
 
 on:
@@ -20,9 +21,9 @@ on:
   workflow_dispatch:
     inputs:
       domain:
-        description: 'phoenix (thermic, AZ) or cascades (production grid)'
+        description: 'Domain: examples/<domain>.yaml (production) or ab/<domain>.yaml (test-only)'
         required: true
-        default: 'phoenix'
+        default: 'cascades'
       cycle_date:
         description: 'Cycle date YYYY-MM-DD (blank = today UTC)'
         required: false
@@ -51,6 +52,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[ab')
     outputs:
       domain: ${{ steps.p.outputs.domain }}
+      yaml: ${{ steps.p.outputs.yaml }}
       cycle_date: ${{ steps.p.outputs.cycle_date }}
       cycle: ${{ steps.p.outputs.cycle }}
       target_date: ${{ steps.p.outputs.target_date }}
@@ -58,6 +60,7 @@ jobs:
       sites: ${{ steps.p.outputs.sites }}
       utc_offset: ${{ steps.p.outputs.utc_offset }}
     steps:
+      - uses: actions/checkout@v4
       - id: p
         env:
           MSG: ${{ github.event.head_commit.message }}
@@ -71,7 +74,7 @@ jobs:
             TAG=$(printf '%s' "$MSG" | grep -o -E '\[ab( [A-Za-z0-9-]+)*\]' | tail -1 | tr -d '[]')
             read -r _ DOMAIN CYCLE_DATE CYCLE TARGET_DATE _ <<< "$TAG"
           fi
-          [ -z "$DOMAIN" ] && DOMAIN=phoenix
+          [ -z "$DOMAIN" ] && DOMAIN=cascades
           if [ -z "$CYCLE" ]; then
             # Latest 00/06/12/18z cycle initialised >= 4 h ago (f84 publishes ~3.5 h after init).
             E=$(( ( $(date -u +%s) - 4*3600 ) / 21600 * 21600 ))
@@ -82,11 +85,17 @@ jobs:
             # 8am local is ~15Z: cycles up to 12z can cover the same day, later ones the next.
             if [ "$((10#$CYCLE))" -le 12 ]; then TARGET_DATE="$CYCLE_DATE"; else TARGET_DATE=$(date -u -d "$CYCLE_DATE +1 day" +%F); fi
           fi
-          case "$DOMAIN" in
-            cascades) SITES=examples/issaquah-sites.csv; OFF=-7 ;;
-            *)        SITES=examples/phoenix-sites.csv;  OFF=-7 ;;
-          esac
-          echo "domain=$DOMAIN cycle=$CYCLE_DATE ${CYCLE}z target=$TARGET_DATE max_hours=${MAX_HOURS:-full}"
+          # Production domains live in examples/ (shipped in the image); test-only
+          # A/B domains live in ab/<domain>.yaml + ab/<domain>-sites.csv (not shipped).
+          if [ -f "ab/$DOMAIN.yaml" ]; then
+            YAML="ab/$DOMAIN.yaml"; SITES="ab/$DOMAIN-sites.csv"
+          else
+            YAML="examples/$DOMAIN.yaml"; SITES="examples/issaquah-sites.csv"
+          fi
+          [ -f "$YAML" ] || { echo "::error::no domain config for '$DOMAIN' (ab/ or examples/)"; exit 1; }
+          OFF=$(grep -E '^utc_offset:' "$YAML" | awk '{print $2}'); OFF=${OFF:--7}
+          echo "domain=$DOMAIN yaml=$YAML sites=$SITES utc=$OFF cycle=$CYCLE_DATE ${CYCLE}z target=$TARGET_DATE max_hours=${MAX_HOURS:-full}"
+          echo "yaml=$YAML" >> "$GITHUB_OUTPUT"
           { echo "domain=$DOMAIN"; echo "cycle_date=$CYCLE_DATE"; echo "cycle=$CYCLE"; echo "target_date=$TARGET_DATE";
             echo "max_hours=$MAX_HOURS"; echo "sites=$SITES"; echo "utc_offset=$OFF"; } >> "$GITHUB_OUTPUT"
 
@@ -103,6 +112,7 @@ jobs:
       packages: read
     env:
       DOMAIN: ${{ needs.params.outputs.domain }}
+      YAML: ${{ needs.params.outputs.yaml }}
       CYCLE_DATE: ${{ needs.params.outputs.cycle_date }}
       CYCLE: ${{ needs.params.outputs.cycle }}
       TARGET_DATE: ${{ needs.params.outputs.target_date }}
@@ -120,10 +130,6 @@ jobs:
 
       - name: Prepare domain config (${{ matrix.model }})
         run: |
-          case "$DOMAIN" in
-            cascades) YAML=examples/cascades.yaml ;;
-            *)        YAML=examples/phoenix-ab.yaml ;;
-          esac
           # Same file for both arms; only the model line changes.
           sed -E "s/^model: *[a-z]+.*/model: ${{ matrix.model }}/" "$YAML" > ab-domain.yaml
           # The runner has the low-res GEOG package + 30s terrain/landuse add-ons

@@ -1,8 +1,9 @@
 name: A/B schedule (NAM vs RRFS)
 
-# Daily NAM-vs-RRFS acceptance pairs for the RRFS migration (RRFS_MIGRATION.md §5),
-# Phoenix + Cascades, from the 18z cycle for the next soaring day, until NAM
-# retires on 2026-11-03. This file is inert on main except for dispatching
+# Daily NAM-vs-RRFS acceptance pairs for the RRFS migration (RRFS_MIGRATION.md §5)
+# on the production Cascades domain, from the 18z cycle for the next soaring
+# day, until NAM retires on 2026-11-03. Test-only domains (ab/) are run on
+# demand, never scheduled. This file is inert on main except for dispatching
 # test-ab.yml on the migration branch (GitHub only honours `schedule` and
 # `workflow_dispatch` for workflows that exist on the default branch).
 
@@ -18,9 +19,9 @@ on:
         required: false
         default: 'feat/rrfs-model'
       domains:
-        description: 'Space-separated domains'
+        description: 'Space-separated domains (examples/<d>.yaml or ab/<d>.yaml on that branch)'
         required: false
-        default: 'phoenix cascades'
+        default: 'cascades'
 
 jobs:
   dispatch:
@@ -33,7 +34,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           BRANCH: ${{ inputs.branch || 'feat/rrfs-model' }}
-          DOMAINS: ${{ inputs.domains || 'phoenix cascades' }}
+          DOMAINS: ${{ inputs.domains || 'cascades' }}
           LAST_DAY: '2026-11-02'   # last 18z cycle before NAM leaves NOMADS (Nov 3, 12Z)
         run: |
           TODAY=$(date -u +%F)
