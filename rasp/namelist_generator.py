@@ -66,6 +66,53 @@ MODELS = {
         "wrf_vtable": "Vtable.HRRR.full",
         "sfc_vtable": "Vtable.raphrrr",
     },
+    "rrfs": {
+        # NAM's replacement (NAM retires 2026-11-03, SCN 26-47/26-48). Used as
+        # the boundary/initial-condition source for the SAME DrJack WRF chain
+        # as NAM (4 km -> 1.33 km, see examples/cascades.yaml); RRFS is a 3 km
+        # FV3-LAM, so a 3 km parent feeds the 4 km outer domain. See
+        # RRFS_MIGRATION.md.
+        "name": "RRFS (Rapid Refresh Forecast System)",
+        "dx": 3000.0,
+        # Custom Vtable: Vtable.NAM atmosphere/surface rows + RAP/HRRR-style
+        # 9-level RUC soil (RRFS encodes soil like HRRR, not like NAM).
+        # Atmosphere lives in the prslev file, everything 2-D in the 2dfld file;
+        # both are linked into one ungrib pass (ungrib merges by valid time).
+        "vtable": "Vtable.RRFS",
+        "interval_seconds": 10800,     # 3h boundaries like NAM (hourly output exists)
+        "forecast_hours": list(range(0, 85)),   # 00/06/12/18z reach 84h; others 18h
+        "cycles": [0, 6, 12, 18],
+        "coverage": "CONUS subset (3 km Lambert, same grid as HRRR) of the NA domain",
+        "source": "nomads",
+        # {root} is resolved at run time: RASP_RRFS_ROOT env var, else "root"
+        # below. Pre-cutover parallel feed is rrfs/v1.0 (also rrfs/para);
+        # from 2026-11-03 the documented production path is rrfs/prod.
+        "root": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/rrfs/v1.0",
+        "url_pattern": "{root}/rrfs.{date}/{cycle}/rrfs.t{cycle}z.prslev.3km.f{fhr:03d}.conus.grib2",
+        "sfc_url_pattern": "{root}/rrfs.{date}/{cycle}/rrfs.t{cycle}z.2dfld.3km.f{fhr:03d}.conus.grib2",
+        # Byte-range subsetting via the .grib2.idx sidecar (no NOMADS grib
+        # filter exists for RRFS). Patterns are fnmatch'd against "VAR:LEVEL"
+        # from the .idx. Measured on a live file: with gaps <= 2 MB merged,
+        # prslev 558 MB -> ~305 MB in ~51 ranges, 2dfld 334 MB -> ~55 MB in
+        # ~7 ranges (vs 90+17 ranges unmerged; NOMADS rate-limits hits).
+        # Keep in sync with Vtable.RRFS.
+        "idx_max_gap_mb": 2,
+        "idx_subset": [
+            "TMP:* mb", "UGRD:* mb", "VGRD:* mb", "RH:* mb", "HGT:* mb",
+        ],
+        "sfc_idx_subset": [
+            "TMP:2 m above ground", "RH:2 m above ground",
+            "UGRD:10 m above ground", "VGRD:10 m above ground",
+            "PRES:surface", "MSLET:mean sea level", "HGT:surface",
+            "TMP:surface", "WEASD:surface", "SNOD:surface", "CNWAT:surface",
+            "LAND:surface", "ICEC:surface",
+            "TSOIL:*", "SOILW:*",
+        ],
+        # Direct reader (fallback, like HRRR): profiles from prslev, surface
+        # fields from 2dfld.
+        "prs_glob": "*prslev*.grib2",
+        "sfc_glob": "*2dfld*.grib2",
+    },
     "gfs": {
         "name": "GFS (Global Forecast System)",
         "dx": 25000.0,
@@ -113,6 +160,8 @@ def load_domain_config(config_path):
         outer_extent_km: 600    # optional, auto-sized if omitted
         nest_ratio: 3           # optional, default 3
         hrrr_levels: pressure   # optional, HRRR only: 'pressure' (default) or 'native'
+        utc_offset: -7          # optional; default is estimated from center_lon
+                                # (+1 for DST). Set for zones without DST (Arizona).
         physics:                # optional overrides
           cu_physics: 0
           bl_pbl_physics: 2
@@ -147,6 +196,8 @@ def load_domain_config(config_path):
     config["inner_extent_km"] = float(config["inner_extent_km"])
     config["nest_ratio"] = int(config["nest_ratio"])
     config["model"] = config["model"].lower()
+    if config.get("utc_offset") is not None:
+        config["utc_offset"] = int(config["utc_offset"])
 
     if config["model"] not in MODEL_DX:
         raise ValueError(

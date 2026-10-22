@@ -14,6 +14,7 @@ Usage:
 """
 
 import argparse
+import fnmatch
 import math
 import os
 import re
@@ -55,6 +56,17 @@ def _run_exe(args, desc, cwd):
     return result.returncode
 
 
+def _tail_log(path, lines=15):
+    """Print the last lines of a WPS/WRF log file, if it exists."""
+    try:
+        text = Path(path).read_text().rstrip().splitlines()
+    except OSError:
+        return
+    print(f"  --- {Path(path).name} (last {min(lines, len(text))} lines) ---")
+    for ln in text[-lines:]:
+        print(f"  {ln}")
+
+
 def _cleanup_files(paths, label):
     """Delete intermediate files to reclaim disk mid-pipeline.
 
@@ -75,96 +87,264 @@ def _cleanup_files(paths, label):
         print(f"  Freed {freed / 1e9:.1f}GB ({removed} files): {label}", flush=True)
 
 
+def _resolve_model_urls(model_cfg, model):
+    """Substitute {root} in the model's URL patterns (in place) and return model_cfg.
+
+    Models whose NOMADS path moves (RRFS: rrfs/v1.0 parallel feed now, rrfs/prod
+    from 2026-11-03) carry a "root" key; RASP_<MODEL>_ROOT overrides it so the
+    switch needs no code change.
+    """
+    root = os.environ.get(f"RASP_{model.upper()}_ROOT", model_cfg.get("root", "")).rstrip("/")
+    for key in ("url_pattern", "sfc_url_pattern"):
+        if model_cfg.get(key) and "{root}" in model_cfg[key]:
+            model_cfg[key] = model_cfg[key].replace("{root}", root)
+    if root:
+        print(f"  Data root: {root}")
+    return model_cfg
+
+
+def _remote_exists(url, timeout=5):
+    """HEAD a URL; True if NOMADS reports it present."""
+    try:
+        r = subprocess.run(
+            ["curl", "--http1.1", "-sfI", "--max-time", str(timeout), url],
+            capture_output=True, timeout=timeout + 3,
+        )
+        return r.returncode == 0
+    except Exception:
+        return False
+
+
+def _cycle_files_ready(model_cfg, date_compact, cycle, fhrs):
+    """True if every needed file (main + surface, if any) exists for these fhrs."""
+    patterns = [model_cfg["url_pattern"]]
+    if model_cfg.get("sfc_url_pattern"):
+        patterns.append(model_cfg["sfc_url_pattern"])
+    for fhr in fhrs:
+        for pat in patterns:
+            if not _remote_exists(pat.format(date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr)):
+                return False
+    return True
+
+
+# ── .idx byte-range subsetting ──────────────────────────────────────────────
+# NOMADS publishes a .grib2.idx sidecar (wgrib2 inventory: "n:offset:d=...:VAR:
+# LEVEL:FCST:") for RRFS and HRRR. Fetching only the records a run needs cuts an
+# RRFS forecast hour from ~850 MB to ~300 MB. There is no server-side grib
+# filter for RRFS, so this is the only subsetting available.
+
+def _parse_idx(text):
+    """Parse a .idx inventory into [(start, end_or_None, 'VAR:LEVEL:FCST')]."""
+    lines = [ln for ln in text.splitlines() if ln.strip()]
+    recs = []
+    for i, line in enumerate(lines):
+        parts = line.split(":")
+        if len(parts) < 6:
+            continue
+        start = int(parts[1])
+        end = None
+        if i + 1 < len(lines):
+            end = int(lines[i + 1].split(":")[1]) - 1
+        recs.append((start, end, ":".join(parts[3:6])))
+    return recs
+
+
+def _idx_ranges(recs, patterns, max_gap=0):
+    """Merged byte ranges of records whose key matches any fnmatch pattern.
+
+    A pattern with one colon matches "VAR:LEVEL"; with two colons it also
+    constrains the forecast-type field (e.g. "SHTFL:surface:* hour fcst"
+    excludes the hourly-average duplicate). Ranges separated by at most
+    `max_gap` bytes are merged (fewer HTTP requests at the cost of a few
+    unwanted records in between).
+    """
+    selected = []
+    for start, end, key in recs:
+        var_level = ":".join(key.split(":")[:2])
+        for p in patterns:
+            target = key if p.count(":") >= 2 else var_level
+            if fnmatch.fnmatchcase(target, p):
+                selected.append((start, end))
+                break
+    merged = []
+    for s, e in selected:
+        if merged and merged[-1][1] is not None and s - (merged[-1][1] + 1) <= max_gap:
+            merged[-1] = (merged[-1][0], e)
+        else:
+            merged.append((s, e))
+    return merged
+
+
+class _RangeClient:
+    """Minimal keep-alive HTTP/1.1 client for .idx + Range requests.
+
+    curl's --range is global (one range per invocation, not per URL), and NOMADS
+    chokes on HTTP/2, so plain http.client with a persistent connection is the
+    simplest way to pull ~50 ranges per file over one connection.
+    """
+
+    def __init__(self, url, timeout=60):
+        import urllib.parse
+        self.u = urllib.parse.urlsplit(url)
+        self.timeout = timeout
+        self.conn = None
+
+    def _connect(self):
+        import http.client
+        if self.conn is None:
+            cls = http.client.HTTPSConnection if self.u.scheme == "https" else http.client.HTTPConnection
+            self.conn = cls(self.u.hostname, self.u.port, timeout=self.timeout)
+
+    def close(self):
+        if self.conn is not None:
+            try:
+                self.conn.close()
+            except Exception:
+                pass
+            self.conn = None
+
+    def get(self, path, byte_range=None, retries=3):
+        """GET path (optionally one byte range). Returns bytes; raises on failure."""
+        headers = {"User-Agent": "rasp-windgram", "Connection": "keep-alive"}
+        if byte_range is not None:
+            s, e = byte_range
+            headers["Range"] = f"bytes={s}-{'' if e is None else e}"
+        last = None
+        for attempt in range(retries):
+            try:
+                self._connect()
+                self.conn.request("GET", path, headers=headers)
+                resp = self.conn.getresponse()
+                data = resp.read()                    # drain fully so the connection can be reused
+                want = 206 if byte_range is not None else 200
+                if resp.status != want:
+                    raise RuntimeError(f"HTTP {resp.status} (expected {want}) for {headers.get('Range', path)}")
+                if byte_range is not None and byte_range[1] is not None:
+                    expect = byte_range[1] - byte_range[0] + 1
+                    if len(data) != expect:
+                        raise RuntimeError(f"short range: got {len(data)} of {expect} bytes")
+                if resp.getheader("Connection", "").lower() == "close":
+                    self.close()
+                return data
+            except Exception as ex:          # noqa: BLE001 — retry any transport/HTTP error
+                last = ex
+                self.close()
+                if attempt + 1 < retries:
+                    time.sleep(2 * (attempt + 1))
+        raise RuntimeError(str(last))
+
+
+def _fetch_grib_subset(url, dest, patterns, max_gap):
+    """Download only the .idx-selected byte ranges of `url` into `dest`.
+
+    Returns True on success. Returns False (and leaves no partial file) when the
+    .idx is missing, nothing matches, or any range request fails, so the caller
+    can fall back to a full download.
+    """
+    dest = Path(dest)
+    tmp = dest.with_name(dest.name + ".part")
+    client = _RangeClient(url)
+    try:
+        try:
+            idx_text = client.get(client.u.path + ".idx").decode("utf-8", "replace")
+        except Exception as ex:
+            print(f"    no .idx for {dest.name} ({ex}); falling back to full download")
+            return False
+
+        recs = _parse_idx(idx_text)
+        ranges = _idx_ranges(recs, patterns, max_gap)
+        if not ranges:
+            print(f"    .idx matched no records for {dest.name}; falling back to full download")
+            return False
+        total_known = sum(e - s + 1 for s, e in ranges if e is not None)
+        file_size = recs[-1][0] if recs else 0
+
+        t0 = time.time()
+        with tmp.open("wb") as out:
+            for rng in ranges:
+                out.write(client.get(client.u.path, rng))
+        got = tmp.stat().st_size
+        with tmp.open("rb") as fh:
+            magic = fh.read(4)
+        if got < total_known or magic != b"GRIB":
+            raise RuntimeError(f"assembled file invalid ({got} bytes, magic {magic!r})")
+        tmp.replace(dest)
+        print(f"    subset: {len(ranges)} ranges, {got // 1_000_000}MB of ~{file_size // 1_000_000}MB "
+              f"in {time.time() - t0:.0f}s")
+        return True
+    except Exception as ex:          # noqa: BLE001 — any failure means "fall back"
+        print(f"    range download failed for {dest.name} ({ex}); falling back to full download")
+        if tmp.exists():
+            tmp.unlink()
+        return False
+    finally:
+        client.close()
+
+
+def _fetch_grib(url, dest, patterns=None, max_gap=0):
+    """Download one GRIB file (subset via .idx when patterns are given), with retries."""
+    dest = Path(dest)
+    fname = dest.name
+    if dest.exists() and dest.stat().st_size > 1_000_000:
+        print(f"  {fname}: cached ({dest.stat().st_size // 1_000_000}MB)")
+        return True
+
+    print(f"  Downloading {fname}...", flush=True)
+    if patterns and os.environ.get("RASP_IDX_SUBSET", "1") != "0":
+        if _fetch_grib_subset(url, dest, patterns, max_gap):
+            print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB, subset)")
+            return True
+
+    for attempt in range(1, 4):
+        result = subprocess.run(
+            ["curl", "--http1.1", "-fsSL", "--retry", "2", "--retry-delay", "5",
+             "--progress-bar", url, "-o", str(dest)],
+            stdout=sys.stdout, stderr=sys.stderr,
+        )
+        if result.returncode == 0 and dest.exists() and dest.stat().st_size > 1_000_000:
+            print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB)")
+            return True
+        print(f"  Attempt {attempt} failed, retrying in 10s...")
+        if dest.exists():
+            dest.unlink()
+        time.sleep(10)
+
+    print(f"  ERROR: {fname} download failed after 3 attempts")
+    return False
+
+
 def _download_grib(model_cfg, date, cycle, fhours, dest_dir):
-    """Download GRIB files using the model's URL pattern."""
+    """Download GRIB files using the model's URL pattern(s).
+
+    Models with "idx_subset" / "sfc_idx_subset" (RRFS) get byte-range subsetting
+    through the .grib2.idx sidecar; anything else is a full-file download.
+    """
     print(f"\n{'='*60}")
     print(f"  Downloading GRIB data ({model_cfg['name']})")
     print(f"{'='*60}\n", flush=True)
 
     Path(dest_dir).mkdir(parents=True, exist_ok=True)
     date_compact = date.replace("-", "")
-    url_pattern = model_cfg["url_pattern"]
+    max_gap = int(model_cfg.get("idx_max_gap_mb", 4) * 1_000_000)
 
-    downloaded = 0
-    for fhr in fhours:
-        url = url_pattern.format(
-            date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr
-        )
-        fname = url.split("/")[-1]
-        dest = Path(dest_dir) / fname
+    jobs = [("", model_cfg["url_pattern"], model_cfg.get("idx_subset"))]
+    if model_cfg.get("sfc_url_pattern"):
+        jobs.append(("surface ", model_cfg["sfc_url_pattern"], model_cfg.get("sfc_idx_subset")))
 
-        if dest.exists() and dest.stat().st_size > 1_000_000:
-            print(f"  {fname}: cached ({dest.stat().st_size // 1_000_000}MB)")
-            downloaded += 1
-            continue
-
-        print(f"  Downloading {fname}...", flush=True)
-        success = False
-        for attempt in range(1, 4):
-            result = subprocess.run(
-                ["curl", "--http1.1", "-fsSL", "--retry", "2", "--retry-delay", "5",
-                 "--progress-bar", url, "-o", str(dest)],
-                stdout=sys.stdout, stderr=sys.stderr,
-            )
-            if result.returncode == 0 and dest.exists() and dest.stat().st_size > 1_000_000:
-                print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB)")
-                success = True
-                downloaded += 1
-                break
-            print(f"  Attempt {attempt} failed, retrying in 10s...")
-            if dest.exists():
-                dest.unlink()
-            time.sleep(10)
-
-        if not success:
-            print(f"  ERROR: {fname} download failed after 3 attempts")
-            sys.exit(1)
-
-    print(f"\n  Downloaded {downloaded}/{len(fhours)} files to {dest_dir}")
-
-    # Download surface files if model has sfc_url_pattern (e.g. HRRR wrfsfc)
-    sfc_url_pattern = model_cfg.get("sfc_url_pattern")
-    if sfc_url_pattern:
-        print(f"\n  Downloading surface GRIB data...\n")
-        sfc_downloaded = 0
+    for label, pattern, patterns in jobs:
+        if label:
+            print(f"\n  Downloading {label}GRIB data...\n")
+        downloaded = 0
         for fhr in fhours:
-            url = sfc_url_pattern.format(
-                date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr
-            )
-            fname = url.split("/")[-1]
-            dest = Path(dest_dir) / fname
-
-            if dest.exists() and dest.stat().st_size > 1_000_000:
-                print(f"  {fname}: cached ({dest.stat().st_size // 1_000_000}MB)")
-                sfc_downloaded += 1
-                continue
-
-            print(f"  Downloading {fname}...", flush=True)
-            success = False
-            for attempt in range(1, 4):
-                result = subprocess.run(
-                    ["curl", "--http1.1", "-fsSL", "--retry", "2", "--retry-delay", "5",
-                     "--progress-bar", url, "-o", str(dest)],
-                    stdout=sys.stdout, stderr=sys.stderr,
-                )
-                if result.returncode == 0 and dest.exists() and dest.stat().st_size > 1_000_000:
-                    print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB)")
-                    success = True
-                    sfc_downloaded += 1
-                    break
-                print(f"  Attempt {attempt} failed, retrying in 10s...")
-                if dest.exists():
-                    dest.unlink()
-                time.sleep(10)
-
-            if not success:
-                print(f"  ERROR: {fname} download failed after 3 attempts")
+            url = pattern.format(date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr)
+            dest = Path(dest_dir) / url.split("/")[-1]
+            if not _fetch_grib(url, dest, patterns, max_gap):
                 sys.exit(1)
+            downloaded += 1
+        print(f"\n  Downloaded {downloaded}/{len(fhours)} {label}files to {dest_dir}")
 
-        print(f"\n  Downloaded {sfc_downloaded}/{len(fhours)} surface files")
 
-
-def _detect_latest_cycle(model, date=None):
+def _detect_latest_cycle(model, date=None, model_cfg=None):
     """Auto-detect the latest available cycle from NOMADS.
 
     Returns (date_str, cycle_str) e.g. ("2026-04-06", "06").
@@ -173,7 +353,8 @@ def _detect_latest_cycle(model, date=None):
         date = datetime.utcnow().strftime("%Y-%m-%d")
 
     date_compact = date.replace("-", "")
-    model_cfg = MODELS[model]
+    if model_cfg is None:
+        model_cfg = _resolve_model_urls(dict(MODELS[model]), model)
 
     if model_cfg.get("source") != "nomads":
         return date, "00"
@@ -187,16 +368,9 @@ def _detect_latest_cycle(model, date=None):
         for cyc in known_cycles:
             # Check if a low forecast hour file exists (fhr 3 as probe)
             probe_url = url_pattern.format(date=dc, cycle=f"{cyc:02d}", fhr=3)
-            try:
-                result = subprocess.run(
-                    ["curl", "--http1.1", "-sfI", "--max-time", "5", probe_url],
-                    capture_output=True, text=True, timeout=8
-                )
-                if result.returncode == 0 and "200" in (result.stdout + result.stderr):
-                    print(f"  Auto-detected latest cycle: {try_date} {cyc:02d}z")
-                    return try_date, f"{cyc:02d}"
-            except Exception:
-                continue
+            if _remote_exists(probe_url):
+                print(f"  Auto-detected latest cycle: {try_date} {cyc:02d}z")
+                return try_date, f"{cyc:02d}"
 
     print(f"  WARNING: Could not detect cycles, defaulting to {date} 00z")
     return date, "00"
@@ -227,8 +401,15 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     if "direct_reader" in config:
         model_cfg["direct_reader"] = config["direct_reader"]
 
+    # Resolve {root} in URL patterns (RRFS para -> prod switch via env var)
+    _resolve_model_urls(model_cfg, model)
 
-    # Auto-detect UTC offset from domain center longitude
+    # UTC offset: CLI flag > domain YAML (utc_offset:) > longitude heuristic.
+    # The heuristic always adds a DST hour, so zones without DST (Arizona) must
+    # set it in the YAML.
+    if utc_offset is None and config.get("utc_offset") is not None:
+        utc_offset = int(config["utc_offset"])
+        print(f"  UTC offset: {utc_offset} (from domain config)")
     if utc_offset is None:
         utc_offset = _utc_offset_from_lon(config["center_lon"])
         print(f"  UTC offset: {utc_offset} (from center lon {config['center_lon']:.1f})")
@@ -295,16 +476,11 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
 
         print(f"  Target cycle: {date} {target_cyc:02d}z (fhr {download_fhours[0]}-{download_fhours[-1]})")
 
-        # Poll until the LAST needed fhour is published on NOMADS
+        # Poll until the LAST needed fhour (every file kind) is published on NOMADS
         dc = date.replace("-", "")
-        probe_url = url_pattern.format(date=dc, cycle=f"{target_cyc:02d}", fhr=download_fhours[-1])
         elapsed_min = 0
         while elapsed_min < poll_max_min:
-            r = subprocess.run(
-                ["curl", "--http1.1", "-sfI", "--max-time", "10", probe_url],
-                capture_output=True, timeout=15
-            )
-            if r.returncode == 0:
+            if _cycle_files_ready(model_cfg, dc, target_cyc, [download_fhours[-1]]):
                 print(f"  Target cycle ready (waited {elapsed_min} min)")
                 break
             print(f"  Cycle {target_cyc:02d}z fhr {download_fhours[-1]} not ready, sleeping {poll_interval_min} min (elapsed {elapsed_min} min)", flush=True)
@@ -345,26 +521,12 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
 
                 fhr_start = max(fhr_start, 3)
                 if fhr_end <= max_fhr and fhr_start < fhr_end and fhr_start >= 0:
-                    # Verify ALL needed files exist on NOMADS — probe the LAST
-                    # forecast hour (the most likely to still be publishing).
-                    # NOMADS publishes forecast hours progressively, so a cycle
-                    # with fhr 3 available may not yet have fhr 27.
-                    probe_fhrs = [fhr_start, fhr_end]
-                    all_available = True
-                    for pf in probe_fhrs:
-                        probe_url = url_pattern.format(date=dc, cycle=f"{cyc:02d}", fhr=pf)
-                        try:
-                            r = subprocess.run(
-                                ["curl", "--http1.1", "-sfI", "--max-time", "5", probe_url],
-                                capture_output=True, timeout=8
-                            )
-                            if r.returncode != 0:
-                                all_available = False
-                                break
-                        except Exception:
-                            all_available = False
-                            break
-                    if not all_available:
+                    # Verify ALL needed files exist on NOMADS — probe the first
+                    # and LAST forecast hour (the most likely to still be
+                    # publishing), for every file kind the model needs. NOMADS
+                    # publishes forecast hours progressively, so a cycle with
+                    # fhr 3 available may not yet have fhr 27.
+                    if not _cycle_files_ready(model_cfg, dc, cyc, [fhr_start, fhr_end]):
                         continue
                     best_date = try_date
                     best_cycle = f"{cyc:02d}"
@@ -378,7 +540,7 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
             date, cycle, download_fhours = best_date, best_cycle, best_fhours
         else:
             print(f"  WARNING: No cycle covers the soaring window. Using latest available.")
-            auto_date, auto_cycle = _detect_latest_cycle(model, date)
+            auto_date, auto_cycle = _detect_latest_cycle(model, date, model_cfg)
             date, cycle = auto_date, auto_cycle
             fhr_start = 3
             fhr_end = min(max_fhr, 18)
@@ -461,11 +623,11 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     if model_cfg.get("direct_reader"):
         from .hrrr_reader import extract_hrrr_sites_data
 
-        prs_files = sorted(f for f in Path(grib_dir).glob("*wrfprs*.grib2"))
-        sfc_files = sorted(f for f in Path(grib_dir).glob("*wrfsfc*.grib2"))
+        prs_files = sorted(Path(grib_dir).glob(model_cfg.get("prs_glob", "*wrfprs*.grib2")))
+        sfc_files = sorted(Path(grib_dir).glob(model_cfg.get("sfc_glob", "*wrfsfc*.grib2")))
 
         if not prs_files or not sfc_files:
-            print("  ERROR: Missing HRRR wrfprs or wrfsfc files for direct reader")
+            print(f"  ERROR: Missing {model.upper()} pressure-level or surface files for direct reader")
             sys.exit(1)
 
         print(f"\n{'='*60}")
@@ -518,9 +680,18 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     os.chdir(wps_dir)
 
     # 3a. geogrid
+    # WPS executables exit 0 even after an ERROR (e.g. a missing GEOG dataset),
+    # so check for the files each step must produce and stop early instead of
+    # letting real.exe fail later on "file not in directory".
+    ndomains = len(result.get("domains", [])) or 1
     if not Path(f"{wps_dir}/geo_em.d01.nc").exists():
         _run_exe(["./geogrid.exe"], "geogrid", cwd=wps_dir)
-        print(f"  geogrid: OK")
+        geo_em = sorted(Path(wps_dir).glob("geo_em.d0*.nc"))
+        if len(geo_em) < ndomains:
+            print(f"  ERROR: geogrid produced {len(geo_em)}/{ndomains} geo_em files")
+            _tail_log(Path(wps_dir) / "geogrid.log")
+            sys.exit(1)
+        print(f"  geogrid: OK ({len(geo_em)} domains)")
     else:
         print(f"  geogrid: cached (geo_em files exist)")
 
@@ -556,6 +727,10 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     # 3d. ungrib (atmosphere)
     _run_exe(["./ungrib.exe"], "ungrib", cwd=wps_dir)
     file_count = len(list(Path(wps_dir).glob("FILE:*")))
+    if file_count == 0:
+        print("  ERROR: ungrib produced no FILE:* intermediates (Vtable/GRIB mismatch?)")
+        _tail_log(Path(wps_dir) / "ungrib.log")
+        sys.exit(1)
     print(f"  ungrib: OK ({file_count} intermediate files)")
 
     # 3d'. Second ungrib pass — extract soil fields with a different Vtable.
@@ -589,6 +764,10 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     # 3e. metgrid
     _run_exe(["./metgrid.exe"], "metgrid", cwd=wps_dir)
     met_files = sorted(Path(wps_dir).glob("met_em.d0*.nc"))
+    if not met_files:
+        print("  ERROR: metgrid produced no met_em files")
+        _tail_log(Path(wps_dir) / "metgrid.log")
+        sys.exit(1)
     print(f"  metgrid: OK ({len(met_files)} met_em files)")
     for f in met_files:
         print(f"    {f.name}")

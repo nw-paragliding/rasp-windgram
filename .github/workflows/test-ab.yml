@@ -1,0 +1,176 @@
+name: A/B (NAM vs RRFS)
+
+# Acceptance test for the RRFS migration (RRFS_MIGRATION.md, section 5): run the
+# SAME domain, sites and cycle through the DrJack WRF chain twice, once with NAM
+# and once with RRFS as the boundary/initial-condition source, then compare.
+# Output is for human review (James accepts/rejects); nothing is promoted here.
+#
+# The image is built from this branch so unreleased changes are exercised.
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'phoenix (thermic, AZ) or cascades (production grid)'
+        required: true
+        default: 'phoenix'
+      cycle_date:
+        description: 'Cycle date YYYY-MM-DD (blank = today UTC)'
+        required: false
+        default: ''
+      cycle:
+        description: 'Cycle hour, pinned so both arms use the same one (00/06/12/18)'
+        required: true
+        default: '12'
+      target_date:
+        description: 'Soaring date YYYY-MM-DD (blank = cycle_date)'
+        required: false
+        default: ''
+      max_hours:
+        description: 'Debug: truncate WRF to N hours (blank = full soaring day)'
+        required: false
+        default: ''
+
+env:
+  WRF_IMAGE: ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-arm64
+  GEOG_URL: https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_low_res_mandatory.tar.gz
+
+jobs:
+  run:
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [nam, rrfs]
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 180
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup \
+            /opt/hostedtoolcache /usr/local/share/boost 2>/dev/null || true
+          docker system prune -af >/dev/null 2>&1 || true
+          df -h /
+
+      - name: Resolve inputs
+        id: inp
+        run: |
+          CYCLE_DATE="${{ inputs.cycle_date }}"; [ -z "$CYCLE_DATE" ] && CYCLE_DATE=$(date -u +%F)
+          TARGET_DATE="${{ inputs.target_date }}"; [ -z "$TARGET_DATE" ] && TARGET_DATE="$CYCLE_DATE"
+          case "${{ inputs.domain }}" in
+            cascades) YAML=examples/cascades.yaml;   SITES=examples/issaquah-sites.csv ;;
+            *)        YAML=examples/phoenix-ab.yaml; SITES=examples/phoenix-sites.csv ;;
+          esac
+          # Same file for both arms; only the model line changes.
+          sed -E "s/^model: *[a-z]+.*/model: ${{ matrix.model }}/" "$YAML" > ab-domain.yaml
+          # The runner has the low-res GEOG package + 30s terrain/landuse add-ons
+          # (see the GEOG step); domains that don't say so need this resolution key.
+          grep -q '^geog_data_res:' ab-domain.yaml || echo "geog_data_res: gmted2010_30s+modis_30s_lake+lowres" >> ab-domain.yaml
+          grep -n -E '^(model|geog_data_res|utc_offset):' ab-domain.yaml
+          echo "cycle_date=$CYCLE_DATE"   >> "$GITHUB_OUTPUT"
+          echo "target_date=$TARGET_DATE" >> "$GITHUB_OUTPUT"
+          echo "sites=$SITES"             >> "$GITHUB_OUTPUT"
+
+      - name: Restore GEOG cache
+        id: geog
+        uses: actions/cache/restore@v4
+        with:
+          path: geog/
+          key: wps-geog-lowres-plus-30s-v1
+
+      - name: Download GEOG (low-res package + 30s terrain/landuse, ~0.6 GB)
+        if: steps.geog.outputs.cache-hit != 'true'
+        run: |
+          curl -fL --retry 3 -sS "$GEOG_URL" -o geog.tar.gz
+          mkdir -p geog && tar xzf geog.tar.gz -C geog --strip-components=1 && rm geog.tar.gz
+          for t in topo_gmted2010_30s modis_landuse_20class_30s_with_lakes; do
+            curl -fL --retry 3 -sS "https://www2.mmm.ucar.edu/wrf/src/wps_files/$t.tar.bz2" -o add.tar.bz2
+            tar xjf add.tar.bz2 -C geog && rm add.tar.bz2
+          done
+          du -sh geog; ls geog
+
+      - name: Save GEOG cache
+        if: steps.geog.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: geog/
+          key: wps-geog-lowres-plus-30s-v1
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build windgram image from this branch
+        run: |
+          docker build -f docker/Dockerfile.windgram --build-arg WRF_IMAGE=$WRF_IMAGE \
+            -t rasp-windgram:ab .
+
+      - name: Run pipeline (${{ matrix.model }})
+        run: |
+          mkdir -p output wrfout-debug
+          MAXH=""; [ -n "${{ inputs.max_hours }}" ] && MAXH="--max-hours ${{ inputs.max_hours }}"
+          docker run --rm \
+            -v "$PWD/geog:/mnt/geog:ro" \
+            -v "$PWD/output:/mnt/output:rw" \
+            -v "$PWD/wrfout-debug:/mnt/wrfout:rw" \
+            -v "$PWD/ab-domain.yaml:/opt/rasp/domain.yaml:ro" \
+            -v "$PWD/${{ steps.inp.outputs.sites }}:/opt/rasp/sites.csv:ro" \
+            --entrypoint bash rasp-windgram:ab -c "
+              python3 -m rasp.pipeline domain.yaml --sites sites.csv --output-dir /mnt/output \
+                --num-procs 4 --date ${{ steps.inp.outputs.cycle_date }} --cycle ${{ inputs.cycle }} \
+                --target-date ${{ steps.inp.outputs.target_date }} $MAXH; EC=\$?
+              cp /opt/rasp/runs/*/rsl.error.0000 /opt/rasp/runs/*/namelist.input \
+                 /opt/rasp/wps/namelist.wps /opt/rasp/wps/*.log /mnt/wrfout/ 2>/dev/null || true
+              exit \$EC"
+          echo "Rendered $(ls output/*.png 2>/dev/null | wc -l) windgrams"
+
+      - name: Upload run output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ab-${{ inputs.domain }}-${{ matrix.model }}
+          path: output/
+          retention-days: 14
+
+      - name: Upload debug (namelists, rsl, WPS logs)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ab-debug-${{ inputs.domain }}-${{ matrix.model }}
+          path: wrfout-debug/
+          retention-days: 7
+
+  compare:
+    needs: run
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: ab-${{ inputs.domain }}-nam
+          path: runs/nam
+      - uses: actions/download-artifact@v4
+        with:
+          name: ab-${{ inputs.domain }}-rrfs
+          path: runs/rrfs
+      - name: Compare
+        run: |
+          case "${{ inputs.domain }}" in
+            cascades) SITES=examples/issaquah-sites.csv; OFF=-7 ;;
+            *)        SITES=examples/phoenix-sites.csv;  OFF=-7 ;;
+          esac
+          uv run --extra cube --with matplotlib python scripts/ab_compare.py \
+            --a runs/nam --b runs/rrfs --labels NAM RRFS --sites "$SITES" \
+            --utc-offset $OFF --out compare | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ab-compare-${{ inputs.domain }}
+          path: compare/
+          retention-days: 30

@@ -41,6 +41,11 @@ uvx --from build pyproject-build --wheel
 - **WRF nesting**: grid dimensions must satisfy `(e_we - 1) % parent_grid_ratio == 0`
 - **gwd_opt**: cannot be per-domain in WRF 4.5 namelist — causes FATAL. Removed from generated namelists.
 - **NAM GRIB download**: NOMADS requires `--http1.1` for curl (HTTP/2 causes protocol errors)
+- **NAM retires 2026-11-03** (NCEP SCN 26-47/26-48); RRFS replaces it. Plan + decisions in `RRFS_MIGRATION.md`. RRFS feeds the *same* DrJack chain as NAM (`examples/cascades.yaml`); do NOT model new inputs on the HRRR 1km nest (unstable, worse forecasts).
+- **RRFS input**: two files per fhr (`prslev` 3-D + `2dfld` surface/soil) linked into ONE ungrib pass with `vtables/Vtable.RRFS`; soil is 9 RUC levels like HRRR (real.exe interpolates to Noah). Only CONUS Lambert files — ungrib can't read the `.na.` rotated grid. `RASP_RRFS_ROOT` switches `rrfs/v1.0` (para) ↔ `rrfs/prod`.
+- **.idx byte-range downloads**: `idx_subset`/`sfc_idx_subset` in the model registry; `RASP_IDX_SUBSET=0` forces full files. Uses a keep-alive `http.client` connection (curl's `--range` is global, not per-URL).
+- **UTC offset heuristic adds a DST hour** (`_utc_offset_from_lon`); set `utc_offset:` in the domain YAML for zones without DST (Arizona) — the Phoenix A/B domain does.
+- **A/B acceptance (NAM vs RRFS)**: `examples/phoenix-ab.yaml` + `phoenix-sites.csv`, `scripts/ab_compare.py`, `.github/workflows/test-ab.yml`. James accepts/rejects; never self-promote.
 - **Soaring ceiling (hcrit)**: uses DrJack's nonlinear thermal penetration model from `rasp/soaring.py`, NOT the WRF W field (which doesn't resolve thermals at 1.33km)
 - **Pressure conversion**: heights ASL must be converted to AGL before dividing by 32 to get pressure delta. The bug `sfc_p - height_ASL/32` was a major source of incorrect crescent placement.
 
