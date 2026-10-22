@@ -282,7 +282,28 @@ DYNAMICS_KEYS = {
     # Hybrid sigma-pressure vertical coordinate (2): terrain influence on the
     # coordinate surfaces decays with height instead of reaching the model top.
     "hybrid_opt":       ("dynamics", "hybrid",      0),
+    # Adaptive time step (&domains): WRF picks each step from the measured
+    # horizontal and vertical Courant numbers. step_to_output_time keeps
+    # history times on the hour; it is written as .true. whenever
+    # use_adaptive_time_step is on unless set explicitly. Time steps are integer
+    # seconds per domain (-1 = WRF's dx-based default).
+    "use_adaptive_time_step": ("domains", "logical", None),
+    "step_to_output_time":    ("domains", "logical", None),
+    "target_cfl":             ("domains", "pos_dom", None),
+    "target_hcfl":            ("domains", "pos_dom", None),
+    "max_step_increase_pct":  ("domains", "pct_dom", None),
+    "starting_time_step":     ("domains", "step_dom", None),
+    "max_time_step":          ("domains", "step_dom", None),
+    "min_time_step":          ("domains", "step_dom", None),
+    "adaptation_domain":      ("domains", "pos_int", None),
 }
+
+# Optional lines (written only when set, so namelists without a dynamics
+# block stay byte-identical), in WRF Registry order.
+_OPTIONAL_DOMAINS = ("use_adaptive_time_step", "step_to_output_time", "target_cfl",
+                     "target_hcfl", "max_step_increase_pct", "starting_time_step",
+                     "max_time_step", "min_time_step", "adaptation_domain")
+_OPTIONAL_DYNAMICS = ("epssm", "zadvect_implicit")
 
 
 def parse_dynamics(block):
@@ -303,6 +324,13 @@ def parse_dynamics(block):
             raise ValueError(f"dynamics.{key}: expected a single value, got {val!r}")
         checked = []
         for v in vals:
+            if kind == "logical":
+                if isinstance(v, str) and v.lower() in ("true", "false"):
+                    v = v.lower() == "true"     # _parse_simple_yaml fallback
+                if not isinstance(v, bool):
+                    raise ValueError(f"dynamics.{key}: expected true/false, got {v!r}")
+                checked.append(v)
+                continue
             if isinstance(v, bool) and kind != "flag":
                 raise ValueError(f"dynamics.{key}: expected a number, got {v!r}")
             if kind == "pos_int":
@@ -310,6 +338,8 @@ def parse_dynamics(block):
                     raise ValueError(f"dynamics.{key}: expected a positive integer "
                                      f"(seconds), got {v!r}")
             elif kind == "flag":
+                if isinstance(v, str) and v.lower() in ("true", "false"):
+                    v = v.lower() == "true"     # _parse_simple_yaml fallback
                 if isinstance(v, bool):
                     v = int(v)
                 if v not in (0, 1):
@@ -321,12 +351,30 @@ def parse_dynamics(block):
             elif kind == "diff6_dom":
                 if isinstance(v, bool) or v not in (0, 1, 2):
                     raise ValueError(f"dynamics.{key}: expected 0, 1 or 2, got {v!r}")
+            elif kind == "pos_dom":
+                if not isinstance(v, (int, float)) or v <= 0:
+                    raise ValueError(f"dynamics.{key}: expected a positive number, got {v!r}")
+                v = float(v)
+            elif kind == "pct_dom":
+                if not isinstance(v, int) or v <= 0:
+                    raise ValueError(f"dynamics.{key}: expected a positive integer "
+                                     f"(percent), got {v!r}")
+            elif kind == "step_dom":
+                if not isinstance(v, int) or (v <= 0 and v != -1):
+                    raise ValueError(f"dynamics.{key}: expected a positive integer "
+                                     f"(seconds) or -1 (WRF default), got {v!r}")
             elif kind == "frac_dom":
                 if not isinstance(v, (int, float)) or not 0 <= v <= 1:
                     raise ValueError(f"dynamics.{key}: expected a number in [0, 1], got {v!r}")
                 v = float(v)
             checked.append(v)
         out[key] = checked if isinstance(val, list) else checked[0]
+    adaptive_only = [k for k in out if k in _OPTIONAL_DOMAINS[1:]]
+    if adaptive_only and not out.get("use_adaptive_time_step"):
+        raise ValueError(f"dynamics: {', '.join(adaptive_only)} only apply with "
+                         f"use_adaptive_time_step: true")
+    if out.get("use_adaptive_time_step"):
+        out.setdefault("step_to_output_time", True)
     return out
 
 
@@ -729,12 +777,22 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
         """Override if given, else the generator default (both per-domain-repped)."""
         v = dyn.get(key, DYNAMICS_KEYS[key][2])
         # Per-domain WRF options are repeated per domain; the others are single.
+        if isinstance(v, bool) or (isinstance(v, list) and v and isinstance(v[0], bool)):
+            v = [(".true." if x else ".false.") for x in v] if isinstance(v, list) \
+                else (".true." if v else ".false.")
         return rep(v) if DYNAMICS_KEYS[key][1].endswith("_dom") else str(v)
 
     # Optional lines: only written when overridden, so namelists of domains
     # without a dynamics block stay byte-identical.
+    for k, v in dyn.items():
+        if isinstance(v, list) and len(v) != ndomains:
+            raise ValueError(f"dynamics.{k}: {len(v)} values for {ndomains} domains")
     extra = "".join(f" {k:<24} = {dyn_val(k)},\n"
-                    for k in ("epssm", "zadvect_implicit") if k in dyn)
+                    for k in _OPTIONAL_DYNAMICS if k in dyn)
+    extra_domains = "".join(f" {k:<24} = {dyn_val(k)},\n"
+                            for k in _OPTIONAL_DOMAINS if k in dyn)
+    if dyn.get("adaptation_domain", 1) > ndomains:
+        raise ValueError(f"dynamics.adaptation_domain: only {ndomains} domains")
 
     # Vertical levels (e_vert) — configurable via domain YAML, default 45
     e_vert = int(config.get("e_vert", 45))
@@ -808,7 +866,7 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
  parent_time_step_ratio   = {rep([d['parent_grid_ratio'] for d in domains])},
  feedback                 = 0,
  smooth_option            = 0,
-/
+{extra_domains}/
 
 &physics
  mp_physics               = {rep(physics['mp_physics'])},

@@ -1,0 +1,75 @@
+# A/B copy of pnw-soaring domains/issaquah.yaml @ fe7ca4f (main), PLUS a dynamics: block:
+# the 120 km tile whose 1.33 km nest holds Mt Rainier and blows up (NaN)
+# with the default 6*dx time step; this arm: adaptive time step + epssm 0.5.
+#
+# WA region tile: issaquah -- Home tile: Tiger / Issaquah Alps / North Bend / Snoqualmie Pass, Rainier NW.
+#
+# One of seven independent Washington tiles (README "Regions"). Every tile runs
+# the SAME chain as domains/cascades.yaml -- parent -> WRF 4 km -> WRF 1.33 km,
+# e_vert 52, DrJack physics -- with a 120 km x 120 km 1.33 km nest (the 4 km
+# parent auto-sizes to 200 km). Sites: sites/issaquah-sites.csv, each >= 15 km
+# inside the nest.
+#
+# This file is the NAM config. The forecast workflows derive the other models
+# at run time instead of keeping per-model copies:
+#   RRFS: `model: rrfs` swapped in (nothing else changes)
+#   HRRR: `model: hrrr` swapped in + the DrJack-chain override keys
+#         (direct_reader/vtable/idx subsets) from domains/cascades-hrrr.yaml
+# All three share one geometry, so one geo_em grid per tile serves them all. The
+# geo_em files are cached per tile under geo-em-issaquah-<hash of this file>-img<id>:
+# editing this file or a new windgram image invalidates the cache and the next
+# run re-runs geogrid.
+# utc_offset is deliberately unset: the pipeline derives Pacific time from
+# center_lon.
+name: issaquah
+model: nam
+
+center_lat: 47.22
+center_lon: -121.80
+
+# Shared map projection + lattice: all WA tiles use the same block so their
+# grids coincide where they overlap (needs windgram >= 0.7.0; older images
+# ignore it and centre each tile on its own projection).
+lattice:
+  truelat1: 46.0
+  truelat2: 49.0
+  stand_lon: -120.5
+  ref_lat: 47.5
+  ref_lon: -120.5
+
+# NAM 12 km -> WRF 4 km -> WRF 1.33 km (2 WRF domains, DrJack RASP PNW-WINDOW).
+outer_dx_km: 4.0
+target_dx_km: 1.33
+
+# Physical extent at finest resolution (km); parent auto-sizes to 200 km.
+inner_extent_km: 120
+
+# Nesting ratio (default 3)
+nest_ratio: 3
+
+# Vertical levels -- DrJack RASP uses 52 (vs WRF default 45)
+e_vert: 52
+
+# Static data on the runner: WPS low-res package + 30 s GMTED2010 terrain and
+# 30 s MODIS land use with lakes (same GEOG set as the A/B lab workflow).
+geog_data_res: gmted2010_30s+modis_30s_lake+lowres
+
+# Physics matched to DrJack RASP (raspnw-v2 / wxtofly.net), identical to
+# domains/cascades.yaml.
+physics:
+  mp_physics: 5         # Eta Ferrier
+  ra_lw_physics: 1      # RRTM
+  ra_sw_physics: 1      # Dudhia
+  radt: 10              # 10-min radiation calls
+  sf_sfclay_physics: 1  # MM5 similarity / Monin-Obukhov
+  bl_pbl_physics: 1     # YSU non-local PBL
+
+# Stability overrides (windgram >= 0.7.3; README "Dynamics overrides").
+dynamics:
+  use_adaptive_time_step: true   # WRF picks dt from the measured Courant numbers
+  step_to_output_time: true      # land exactly on each hourly wrfout
+  adaptation_domain: 2           # the 1.33 km nest (where Rainier is) drives dt
+  starting_time_step: [6, 2]     # tiny steps through the initial adjustment
+  max_time_step: [24, 8]         # never coarser than the 6*dx default
+  min_time_step: [3, 1]
+  epssm: 0.5
