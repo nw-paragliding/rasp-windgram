@@ -1,6 +1,6 @@
 [project]
 name = "rasp-windgram"
-version = "0.6.2"
+version = "0.7.1"
 description = "Soaring forecast windgram renderer for WRF output"
 readme = "README.md"
 license = "MIT"
@@ -47,4 +47,9 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["rasp"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
 

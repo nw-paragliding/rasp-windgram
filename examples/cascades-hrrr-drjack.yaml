@@ -21,7 +21,7 @@
 # spins up its own clouds, as it does from NAM. real.exe interpolates the soil
 # onto Noah's 4 layers, exactly as for the nest and for RRFS.
 #
-# Humidity is RH only, never SPFH (0.6.2): the stock Vtable.RAP.pressure.ncep +
+# Humidity is RH only, never SPFH (0.7.1): the stock Vtable.RAP.pressure.ncep +
 # Vtable.raphrrr pair used in 0.6.1 both read 2 m SPFH, which makes real.exe take
 # QV from specific humidity on every level and start WRF with a bone-dry column
 # (HRRR_DRJACK_AB.md section 6). Do not add SPFH back to the lists below.

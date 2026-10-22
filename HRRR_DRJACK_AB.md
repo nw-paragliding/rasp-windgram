@@ -7,9 +7,9 @@ clean arms. Branch `feat/hrrr-drjack-ab` → PR #17 (0.6.1). These pairs are the
 **James reviews the tables and montages and decides what goes live; they are an aid, not a
 verdict.**
 
-**0.6.2 correction (§6):** pairs 1–2 below ran with a humidity bug that started the HRRR arm's
+**0.7.1 correction (§6):** pairs 1–2 below ran with a humidity bug that started the HRRR arm's
 WRF with an almost dry column (QV ≈ 0 above the surface). Their LCL, T2, w* and heat-flux
-differences are that bug, not HRRR. Fixed in 0.6.2 (`Vtable.HRRR.pressure`); re-run pairs in §6.
+differences are that bug, not HRRR. Fixed in 0.7.1 (`Vtable.HRRR.pressure`); re-run pairs in §6.
 
 ## 1. Question
 
@@ -35,8 +35,8 @@ Everything is identical except the parent model and the ungrib Vtables:
 | parent | NAM 12 km, `awip3d`, 3 h | HRRR 3 km, `wrfprs` (+ `wrfsfc`), every 3rd hour |
 | WRF chain | 4 km (59²) → 1.33 km (115²), `e_vert 52`, Ferrier / RRTM / Dudhia / MM5 sfclay / YSU, `radt 10`, 3 h boundaries | same — `namelist.wps` and `namelist.input` are byte-identical (checked by generating both) |
 | geo_em | same grid (same `center`, `outer_dx_km 4.0`, `target_dx_km 1.33`, `inner_extent_km 150`) → cubes difference directly | same |
-| ungrib atmosphere | `Vtable.NAM` | 0.6.2: `Vtable.HRRR.pressure` (vendored; 0.6.1 used `Vtable.RAP.pressure.ncep`, see §6): T/U/V/RH/HGT on 40 isobaric levels (50–1013 mb), 2 m T/RH (no SPFH), 10 m wind, PSFC, PMSL, terrain, snow, skin T. **No hydrometeors** (the nest's `Vtable.HRRR.full` adds QC/QR/QI/QS/QG; not used here, so WRF spins up its own clouds, as from NAM) |
-| ungrib soil | NAM 4 layers (in `Vtable.NAM`) | 0.6.2: same single pass (`sfc_vtable: null`; 0.6.1 ran a second pass with `Vtable.raphrrr`): 9 RUC levels from `wrfprs`; `real.exe` interpolates to Noah's 4 layers (`num_metgrid_soil_levels = 9`, like RRFS) |
+| ungrib atmosphere | `Vtable.NAM` | 0.7.1: `Vtable.HRRR.pressure` (vendored; 0.6.1 used `Vtable.RAP.pressure.ncep`, see §6): T/U/V/RH/HGT on 40 isobaric levels (50–1013 mb), 2 m T/RH (no SPFH), 10 m wind, PSFC, PMSL, terrain, snow, skin T. **No hydrometeors** (the nest's `Vtable.HRRR.full` adds QC/QR/QI/QS/QG; not used here, so WRF spins up its own clouds, as from NAM) |
+| ungrib soil | NAM 4 layers (in `Vtable.NAM`) | 0.7.1: same single pass (`sfc_vtable: null`; 0.6.1 ran a second pass with `Vtable.raphrrr`): 9 RUC levels from `wrfprs`; `real.exe` interpolates to Noah's 4 layers (`num_metgrid_soil_levels = 9`, like RRFS) |
 | download | full `awip3d` files | `.idx` byte ranges: wrfprs 420 → ~215 MB (38 ranges), wrfsfc 148 → ~20 MB; full file is the fallback |
 | direct reader | n/a | off (`direct_reader: false`) |
 
@@ -199,7 +199,7 @@ Whole inner grid at 14:00 local: soaring ceiling median |Δ| 353 ft (bias −258
    that the HRRR arm does not have. Which verified on Oct 22 is checkable against the Seattle
    radar / KSEA obs; a good first live-site comparison for the beta.
 
-## 6. 0.6.2: the HRRR arm started WRF with a dry column
+## 6. 0.7.1: the HRRR arm started WRF with a dry column
 
 **Symptom.** Every HRRR-arm pair through 0.6.1 had a surface LCL 6,500–20,000 ft above the
 NAM arm's with 2 m T within a few °F (pairs 1–2 here; pnw-soaring lab run
@@ -231,7 +231,7 @@ converts RH to QV exactly as for NAM and RRFS. Nothing else changes: `MODELS["hr
 (direct reader, `Vtable.HRRR.full` nest, whose SPECHUMD covers all levels) and the NAM/RRFS
 configs are untouched. The NAM arm of the re-run 18z pair is bit-identical to the lab run's NAM arm (tc, td, PBLH, w*, T2, HFX).
 
-**Re-run pairs (0.6.2, same cycles as before), pooled afternoon, Δ = HRRR − NAM, median |Δ| (bias):**
+**Re-run pairs (the fix on the 0.6.1 base, before the 0.7.0 merge, whose lattice is opt-in and leaves this config's namelists unchanged per `tests/golden`; same cycles as before), pooled afternoon, Δ = HRRR − NAM, median |Δ| (bias):**
 
 | | 18z → Oct 22, before (lab 39725169604)¹ | 18z → Oct 22, after ([39731195125](https://github.com/nw-paragliding/rasp-windgram/actions/runs/39731195125)) | 00z → Oct 22, before (pair 2, 39711119209) | 00z → Oct 22, after ([39731237463](https://github.com/nw-paragliding/rasp-windgram/actions/runs/39731237463)) |
 |---|---|---|---|---|

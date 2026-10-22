@@ -22,6 +22,8 @@ jobs:
           print('All imports OK')
           print('Models:', list(MODELS.keys()))
           "
+      - name: Unit tests
+        run: uv run pytest -q
       - name: Test namelist generation
         run: |
           uv run python -m rasp.namelist_generator examples/cascades.yaml \

@@ -99,6 +99,45 @@ NAM-like (no hydrometeors) through the domain-level `vtable:` / `sfc_vtable:` ov
 `.idx`-subset downloads. See [HRRR_DRJACK_AB.md](HRRR_DRJACK_AB.md) for the NAM-chain vs
 HRRR-chain pairs on the production grid.
 
+### Shared lattice (several tiles, one grid)
+
+By default every domain gets its own Lambert projection centred on
+`center_lat/center_lon`, so two domains never share grid points. Add a
+`lattice:` block to make independent runs ("tiles") offset windows on one
+common grid:
+
+```yaml
+lattice:            # optional; all tiles with the same block share one grid
+  truelat1: 46.0
+  truelat2: 49.0
+  stand_lon: -120.5
+  ref_lat: 47.5     # lattice origin: a mass point of every tile's finest grid
+  ref_lon: -120.5
+```
+
+With the block present:
+
+- every domain uses `truelat1/truelat2/stand_lon` from the block
+  (`map_proj = 'lambert'`) instead of the centre-based values;
+- the outermost domain is moved by at most `dx/2` in x and y (in the shared
+  projection) so the lattice origin lands exactly on one of its mass points.
+  `namelist.wps` then gets `ref_lat/ref_lon` = the origin and integer
+  `ref_x/ref_y` = the origin's mass-grid index, which may lie outside the
+  domain (WPS accepts that);
+- nests are placed as before (integer `i/j_parent_start`,
+  `(e_we-1) % nest_ratio == 0`), which puts their mass points on the parent
+  lattice refined by the ratio. `nest_ratio` must be odd.
+
+Tiles with the same block and the same finest `dx` therefore have coincident
+finest-grid mass points wherever they overlap. The generator logs the nominal
+and snapped centre and the origin's (i, j) in each grid; `generate_namelists()`
+returns them under `"lattice"`. `namelist.input` is not affected (WRF takes the
+projection from `met_em`). Without the block, namelists are byte-identical to
+0.6.x (`tests/golden/`). Details: [ARCHITECTURE.md](ARCHITECTURE.md#shared-lattice-lattice).
+
+Note: 0.6.x ignores an unknown `lattice:` key silently and produces unaligned
+centre-based grids, so domain files using it need rasp-windgram >= 0.7.0.
+
 ## Docker
 
 The CLI wraps Docker. Images support `linux/arm64` and `linux/amd64`.
