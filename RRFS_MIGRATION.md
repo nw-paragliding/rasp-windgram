@@ -7,10 +7,10 @@ byte-range downloader (`_fetch_grib_subset`, keep-alive `http.client`), `RASP_RR
 `.github/workflows/test-ab.yml` (push to `feat/**` with `[ab phoenix 2026-10-21 18 2026-10-22]`
 in the commit message; `workflow_dispatch` only after merge to main).
 
-**Daily Cascades pairs (18z → next day) run on the arm runners through Nov 2** via
-`.github/workflows/ab-schedule.yml` (dispatches the branch's `test-ab.yml`; needs both files on
-main — PR opened). Until that merges, pairs start from a tagged push. **Phoenix is a test-only
-fixture** (`ab/phoenix.yaml`, not shipped in the image, never scheduled); Phoenix pairs run on
+**Daily pairs run on the arm runners through Nov 2 and publish to an unlisted page on the site** (`forecast.nwparagliding.com/lab/ab/`, noindex) via
+`pnw-soaring/.github/workflows/ab-pairs.yml` (builds the image from this branch; Phoenix from `ab/`; schedule needs it on
+pnw-soaring main — PR opened). Until then, pairs start from a tagged push there. `test-ab.yml` here stays the dev harness. **Phoenix is a test-only
+fixture** (`ab/phoenix.yaml`, not shipped in the image, not a site product); it appears only on the unlisted lab page. Dev pairs here run on
 demand with `[ab phoenix ...]`.
 
 **First pair (2026-10-21, Phoenix, 18z → soaring day Oct 22): reviewed by James, "looks right".**
