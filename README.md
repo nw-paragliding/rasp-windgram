@@ -93,6 +93,12 @@ default) and production (`…/rrfs/prod`). See [RRFS_MIGRATION.md](RRFS_MIGRATIO
 for the migration plan and the NAM-vs-RRFS A/B tooling (`scripts/ab_compare.py`,
 `.github/workflows/test-ab.yml`).
 
+**HRRR** can feed the same DrJack chain instead of the 3 km → 1 km nest:
+`examples/cascades-hrrr-drjack.yaml` is `cascades.yaml` with `model: hrrr`, initialised
+NAM-like (no hydrometeors) through the domain-level `vtable:` / `sfc_vtable:` overrides and
+`.idx`-subset downloads. See [HRRR_DRJACK_AB.md](HRRR_DRJACK_AB.md) for the NAM-chain vs
+HRRR-chain pairs on the production grid.
+
 ## Docker
 
 The CLI wraps Docker. Images support `linux/arm64` and `linux/amd64`.

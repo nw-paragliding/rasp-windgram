@@ -46,6 +46,7 @@ uvx --from build pyproject-build --wheel
 - **.idx byte-range downloads**: `idx_subset`/`sfc_idx_subset` in the model registry; `RASP_IDX_SUBSET=0` forces full files. Uses a keep-alive `http.client` connection (curl's `--range` is global, not per-URL).
 - **UTC offset heuristic adds a DST hour** (`_utc_offset_from_lon`); set `utc_offset:` in the domain YAML for zones without DST (Arizona) — the Phoenix A/B domain does.
 - **A/B acceptance (NAM vs RRFS)**: `ab/phoenix.yaml` + `phoenix-sites.csv`, `scripts/ab_compare.py`, `.github/workflows/test-ab.yml`. James accepts/rejects; never self-promote.
+- **Domain YAML can override registry keys** (`rasp.pipeline.DOMAIN_MODEL_OVERRIDES`: `direct_reader`, `vtable`, `sfc_vtable`, `idx_subset`, `sfc_idx_subset`, `idx_max_gap_mb`); absent keys = registry behaviour. `examples/cascades-hrrr-drjack.yaml` uses them to run HRRR through the NAM/DrJack chain without hydrometeors (A/B candidate for the HRRR product, `HRRR_DRJACK_AB.md`; not a site product). `test-ab.yml` arms: `[ab cascades <date> <cyc> <target> nam hrrr=cascades-hrrr-drjack]`.
 - **Soaring ceiling (hcrit)**: uses DrJack's nonlinear thermal penetration model from `rasp/soaring.py`, NOT the WRF W field (which doesn't resolve thermals at 1.33km)
 - **Pressure conversion**: heights ASL must be converted to AGL before dividing by 32 to get pressure delta. The bug `sfc_p - height_ASL/32` was a major source of incorrect crescent placement.
 

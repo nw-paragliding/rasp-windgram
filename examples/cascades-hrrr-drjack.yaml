@@ -1,0 +1,102 @@
+# Cascades through the DrJack chain with HRRR as the parent model.
+#
+# A/B candidate for the HRRR product (HRRR_DRJACK_AB.md). NOT scheduled and not
+# a site product: the site still runs the HRRR 3 km -> 1 km nest
+# (pnw-soaring/domains/cascades-hrrr.yaml); this file changes nothing there.
+#
+# This is examples/cascades.yaml with `model: hrrr`. Everything else in the
+# chain is identical: HRRR 3 km supplies initial/boundary conditions to the SAME
+# WRF 4 km -> 1.33 km nest (same geo_em grid, so soaring cubes difference
+# directly), e_vert 52, 3-hourly boundaries, DrJack physics. The A/B pairs it
+# with the NAM-driven cascades.yaml for one pinned cycle and soaring day:
+#   test-ab.yml arms `nam hrrr=cascades-hrrr-drjack`, or locally
+#   python3 -m rasp.pipeline examples/cascades-hrrr-drjack.yaml \
+#       --sites examples/issaquah-sites.csv --date 2026-10-21 --cycle 12 \
+#       --target-date 2026-10-21 --output-dir ./out/hrrr
+#
+# Initial state is NAM-like: ungrib reads Vtable.RAP.pressure.ncep (T/U/V/RH/HGT
+# on 40 pressure levels + near-surface and surface fields) instead of the
+# nest's Vtable.HRRR.full, so NO hydrometeors (QC/QR/QI/QS/QG) are handed to
+# WRF -- the Ferrier/YSU chain spins up its own clouds, as it does from NAM.
+# The second ungrib pass (Vtable.raphrrr, registry default) still supplies the
+# 9-level RUC soil from wrfprs; real.exe interpolates it onto Noah's 4 layers,
+# exactly as for the nest and for RRFS.
+name: cascades-hrrr-drjack
+model: hrrr
+direct_reader: false              # HRRR defaults to the direct reader; run WPS/WRF
+vtable: Vtable.RAP.pressure.ncep  # atmosphere pass (registry: Vtable.HRRR.full)
+sfc_vtable: Vtable.raphrrr        # soil pass (registry default, stated for clarity)
+
+# .idx byte-range downloads: only the records the two Vtables above read.
+# Measured on a live wrfprs: 420 MB -> ~215 MB in ~40 ranges (T/U/V/RH/HGT on
+# 40 levels, 2 m/10 m fields, surface fields, 9-level TSOIL/SOILW); wrfsfc
+# 148 MB -> ~20 MB (the Vtables read nothing from wrfsfc that wrfprs lacks; the
+# file is kept so the input set matches the nest). A missing .idx or a failed
+# range falls back to the full file; RASP_IDX_SUBSET=0 forces full files.
+idx_max_gap_mb: 2
+idx_subset:
+  - "TMP:* mb"
+  - "UGRD:* mb"
+  - "VGRD:* mb"
+  - "RH:* mb"
+  - "HGT:* mb"
+  - "TMP:2 m above ground"
+  - "RH:2 m above ground"
+  - "SPFH:2 m above ground"
+  - "UGRD:10 m above ground"
+  - "VGRD:10 m above ground"
+  - "PRES:surface"
+  - "MSLMA:mean sea level"
+  - "HGT:surface"
+  - "TMP:surface"
+  - "WEASD:surface"
+  - "SNOD:surface"
+  - "CNWAT:surface"
+  - "LAND:surface"
+  - "ICEC:surface"
+  - "TSOIL:*"
+  - "SOILW:*"
+sfc_idx_subset:
+  - "TMP:2 m above ground"
+  - "RH:2 m above ground"
+  - "SPFH:2 m above ground"
+  - "UGRD:10 m above ground"
+  - "VGRD:10 m above ground"
+  - "PRES:surface"
+  - "MSLMA:mean sea level"
+  - "HGT:surface"
+  - "TMP:surface"
+  - "WEASD:surface"
+  - "SNOD:surface"
+  - "CNWAT:surface"
+  - "LAND:surface"
+  - "ICEC:surface"
+
+# ---- everything below is byte-for-byte examples/cascades.yaml ----------------
+center_lat: 47.6
+center_lon: -121.4
+
+# Finest resolution — system builds nest chain automatically
+# Match DrJack RASP PNW-WINDOW: parent -> WRF 4km -> WRF 1.33km (2 WRF domains,
+# skipping an intermediate WRF step for cleaner boundary forcing).
+outer_dx_km: 4.0
+target_dx_km: 1.33
+
+# Physical extent at finest resolution (km)
+inner_extent_km: 150
+
+# Nesting ratio (default 3)
+nest_ratio: 3
+
+# Vertical levels — DrJack RASP uses 52 (vs WRF default 45)
+e_vert: 52
+
+# Physics matched to DrJack RASP (raspnw-v2 / wxtofly.net) for consistency
+# with the established PNW soaring community calibration.
+physics:
+  mp_physics: 5         # Eta Ferrier
+  ra_lw_physics: 1      # RRTM
+  ra_sw_physics: 1      # Dudhia
+  radt: 10              # 10-min radiation calls
+  sf_sfclay_physics: 1  # MM5 similarity / Monin-Obukhov
+  bl_pbl_physics: 1     # YSU non-local PBL
