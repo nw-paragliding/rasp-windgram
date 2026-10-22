@@ -41,7 +41,7 @@ jobs:
         run: |
           docker buildx build \
             -f docker/Dockerfile.windgram \
-            --build-arg WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-amd64 \
+            --build-arg WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-o2-amd64 \
             --load \
             -t rasp-windgram:ci .
       - name: Verify image

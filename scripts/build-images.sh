@@ -10,7 +10,8 @@
 # Environment:
 #   REGISTRY    — container registry (default: ghcr.io/nw-paragliding)
 #   PLATFORMS   — target platforms (default: linux/arm64,linux/amd64)
-#   WRF_VERSION — WRF version tag (default: 4.5.2)
+#   WRF_VERSION — WRF git tag to clone (default: v4.5.2)
+#   WRF_TAG     — wrf-compiled image tag (default: v4.5.2-o2, as build-images.yml)
 
 set -euo pipefail
 
@@ -20,10 +21,11 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 # Defaults
 REGISTRY="${REGISTRY:-ghcr.io/nw-paragliding}"
 PLATFORMS="${PLATFORMS:-linux/arm64,linux/amd64}"
-WRF_VERSION="${WRF_VERSION:-4.5.2}"
+WRF_VERSION="${WRF_VERSION:-v4.5.2}"
+WRF_TAG="${WRF_TAG:-v4.5.2-o2}"
 VERSION=$(cat "${REPO_ROOT}/VERSION" | tr -d '[:space:]')
 
-WRF_IMAGE="${REGISTRY}/wrf-compiled:${WRF_VERSION}"
+WRF_IMAGE="${REGISTRY}/wrf-compiled:${WRF_TAG}"
 WINDGRAM_IMAGE="${REGISTRY}/windgram:${VERSION}"
 WINDGRAM_LATEST="${REGISTRY}/windgram:latest"
 
@@ -53,7 +55,7 @@ ensure_builder() {
 build_wrf() {
     echo ""
     echo "============================================================"
-    echo "  Building wrf-compiled (${WRF_VERSION})"
+    echo "  Building wrf-compiled (${WRF_TAG}, WRF ${WRF_VERSION})"
     echo "  Image:     ${WRF_IMAGE}"
     echo "  Platforms: ${PLATFORMS}"
     echo "============================================================"

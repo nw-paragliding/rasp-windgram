@@ -19,7 +19,7 @@ uv run python -m rasp.namelist_generator examples/cascades.yaml --date 2026-04-0
 
 # Build Docker image locally
 docker build -f docker/Dockerfile.windgram \
-  --build-arg WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-arm64 \
+  --build-arg WRF_IMAGE=ghcr.io/nw-paragliding/wrf-compiled:v4.5.2-o2-arm64 \
   -t ghcr.io/nw-paragliding/windgram:latest .
 
 # Build Python wheel
@@ -50,6 +50,7 @@ uvx --from build pyproject-build --wheel
 - **Domain YAML can override registry keys** (`rasp.pipeline.DOMAIN_MODEL_OVERRIDES`: `direct_reader`, `vtable`, `sfc_vtable`, `idx_subset`, `sfc_idx_subset`, `idx_max_gap_mb`); absent keys = registry behaviour. `examples/cascades-hrrr-drjack.yaml` uses them to run HRRR through the NAM/DrJack chain without hydrometeors (A/B candidate for the HRRR product, `HRRR_DRJACK_AB.md`; not a site product). `test-ab.yml` arms: `[ab cascades <date> <cyc> <target> nam hrrr=cascades-hrrr-drjack]`.
 - **Shared lattice** (`lattice:` block, `rasp/lattice.py`, 0.7.0): tiles share one Lambert projection; d01 is snapped (<= dx/2) so the lattice origin is a mass point (`ref_lat/ref_lon` = origin, integer `ref_x/ref_y`, may be outside the domain). Needs odd `nest_ratio`. Without the block namelists are byte-identical to 0.6.x (`tests/golden/`, `uv run pytest`).
 - **Steep-terrain NaNs (0.7.3)**: 1.33 km nests over Rainier/Baker blow up (acoustic mode; v_cfl messages are the symptom). Fix is `dynamics: {epssm: 0.5}` in the domain YAML, not a smaller time_step (16 s and adaptive alone still NaN). `dynamics:` block = `DYNAMICS_KEYS`; absent -> byte-identical namelists. A/B arms `ab/issaquah*.yaml`.
+- **WRF build flags (0.7.4)**: base image `wrf-compiled:v4.5.2-o2` = WRF's stock `-O2 -ftree-vectorize -funroll-loops` + `-ffp-contract=off` (arm64/amd64 rounding parity). The old -O1 "9.8 fix" (`v4.5.2`, PR #15) only masked the epssm acoustic mode. Any build change = new `WRF_TAG` in `build-images.yml` (+ every `WRF_IMAGE` reference); `workflow_dispatch target=wrf` publishes the base only. A/B two bases with arms `o1=nam@v4.5.2 o2=nam@v4.5.2-o2` (`ab/baker.yaml`).
 - **Soaring ceiling (hcrit)**: uses DrJack's nonlinear thermal penetration model from `rasp/soaring.py`, NOT the WRF W field (which doesn't resolve thermals at 1.33km)
 - **Pressure conversion**: heights ASL must be converted to AGL before dividing by 32 to get pressure delta. The bug `sfc_p - height_ASL/32` was a major source of incorrect crescent placement.
 

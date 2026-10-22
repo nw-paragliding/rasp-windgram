@@ -1,0 +1,59 @@
+# A/B copy of pnw-soaring sites/baker-sites.csv @ 202c39df (main), unchanged.
+# baker region sites, domains/baker.yaml (Bellingham, Blanchard, Mt Baker, Fraser Valley south)
+# Every raspnw-v2 (wxtofly) site at least 10 km inside this tile's 1.33 km nest
+# edge, assigned to the tile where it sits deepest (airports/METAR points and
+# towns included). '# edge' marks sites only 10-15 km inside the nest edge.
+# name lat lon
+# Fraser Valley
+Bridal             49.171      -121.748
+DeRoche            49.204      -122.112
+Elk                49.12       -121.76
+HorseFly           49.281      -121.9875   # edge
+Little_Nick        49.188      -122.145
+Pattison           49.17396    -122.17672
+Ranch              49.2344     -121.928
+RUCcompare         49.14       -121.99
+SumasCa            49.121      -122.126
+Woodside           49.247      -121.89   # edge
+# North Cascades
+Church_Mt          48.927991   -121.872999
+Iron               48.48       -121.94
+Lookout_Mountain   48.55221    -121.32937
+MtBaker            48.775198   -121.811142
+Sauk               48.52       -121.6
+TableMt            48.779      -121.658
+TwinSisters        48.708182   -121.98555
+# North-West
+Anderson           48.6471     -122.2631
+AndersonLZ         48.67215    -122.264828
+BigFoot            48.7785     -122.238
+BJ                 48.86       -122.11
+BJ35               48.849      -122.059
+BJHG               48.8595     -122.097
+BJLZN              48.86       -122.145
+BJLZS              48.8535     -122.144
+BJN                48.876      -122.11
+BJPortBailoutLZ    48.813      -122.131
+Black              48.982      -122.006
+BlackLZ            48.9657     -122.07
+BlackNo            48.99       -122.042
+Blanchard          48.615      -122.4
+BlanchardLZ        48.57       -122.4
+Casino             48.83523    -122.1993
+Cultus             48.43361    -122.16248   # edge
+KBVS               48.47083    -122.42083   # edge
+Lippy1             48.9569     -122.05
+Lookout            48.68       -122.36
+Lyman              48.5948     -122.1611
+N_Nooksack_Valley  48.8895     -122.149
+NPorter            48.8352     -122.088
+Red                48.932      -122.118
+RUC_bli_compare    48.74       -122.38
+Serpentine         48.95       -122.17
+SPorter            48.813      -122.099
+Stewart            48.77       -122.27
+StewartLZ          48.77       -122.39
+StickyL            48.97       -122.02
+Sumas              48.9211     -122.229
+SumasLZ            48.92       -122.29
+SumasNE            48.93       -122.167
