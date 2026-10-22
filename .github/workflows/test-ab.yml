@@ -66,7 +66,9 @@ jobs:
           TARGET_DATE="${{ inputs.target_date }}"; MAX_HOURS="${{ inputs.max_hours }}"
           if [ "${{ github.event_name }}" = "push" ]; then
             # [ab] or [ab <domain> [<cycle_date> <cycle> [<target_date>]]]
-            TAG=$(printf '%s' "$MSG" | grep -o -m1 '\[ab[^]]*\]' | tr -d '[]')
+            # Strict form (letters/digits/dashes only) and LAST occurrence, so prose
+            # like "[ab ...]" earlier in the message cannot be mistaken for the tag.
+            TAG=$(printf '%s' "$MSG" | grep -o -E '\[ab( [A-Za-z0-9-]+)*\]' | tail -1 | tr -d '[]')
             read -r _ DOMAIN CYCLE_DATE CYCLE TARGET_DATE _ <<< "$TAG"
           fi
           [ -z "$DOMAIN" ] && DOMAIN=phoenix
@@ -183,6 +185,9 @@ jobs:
                  /opt/rasp/wps/namelist.wps /opt/rasp/wps/*.log /mnt/wrfout/ 2>/dev/null || true
               exit \$EC"
           echo "Rendered $(ls output/*.png 2>/dev/null | wc -l) windgrams"
+          # The pipeline also copies wrfout_* into /mnt/wrfout; their names contain
+          # colons, which upload-artifact rejects, and they are hundreds of MB.
+          rm -f wrfout-debug/wrfout_*
 
       - name: Upload run output
         if: always()

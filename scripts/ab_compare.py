@@ -236,7 +236,13 @@ def main():
             iya, ixa, plat, plon = nearest(ga, lat, lon)
             iyb, ixb, _, _ = nearest(gb, lat, lon)
             sa, sb = site_series(ga, iya, ixa), site_series(gb, iyb, ixb)
-            common, ia, ib = np.intersect1d(sa["time"], sb["time"], return_indices=True)
+            # Pair hours in A's chronological order (hours are UTC hour-of-day and
+            # wrap past midnight, so a numeric sort would put 00Z-03Z first).
+            tb_index = {float(t): k for k, t in enumerate(sb["time"])}
+            pairs = [(k, tb_index[float(t)]) for k, t in enumerate(sa["time"]) if float(t) in tb_index]
+            ia = np.array([p[0] for p in pairs], dtype=int)
+            ib = np.array([p[1] for p in pairs], dtype=int)
+            common = sa["time"][ia]
             local = (common + args.utc_offset) % 24
             aft = np.isin(local, list(AFTERNOON))
             row = [name, f"{sa['terrain_ft']:.0f}"]
