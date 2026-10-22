@@ -138,6 +138,48 @@ projection from `met_em`). Without the block, namelists are byte-identical to
 Note: 0.6.x ignores an unknown `lattice:` key silently and produces unaligned
 centre-based grids, so domain files using it need rasp-windgram >= 0.7.0.
 
+### Dynamics overrides (steep terrain)
+
+The generator's WRF dynamics defaults (outer `time_step = 6 * dx_km`, nests
+divided by `parent_time_step_ratio` = `nest_ratio`, `w_damping = 1`,
+`diff_6th_opt = 0`, `hybrid_opt = 0`, WRF's default `epssm` = 0.1) are stable for
+the 150 km Cascades nest but not for 1.33 km nests over the highest volcanoes
+(Rainier, Baker): within 3 minutes an acoustic instability drives w to 42 m/s
+(w-cfl 5.75) and WRF then integrates NaNs (see ARCHITECTURE.md, "Dynamics overrides"). An optional
+`dynamics:` block overrides them per domain file. For 1.33 km nests over the
+volcanoes, this is the fix (A/B-proven on the issaquah tile, no run-time cost):
+
+```yaml
+dynamics:               # optional; needs rasp-windgram >= 0.7.3
+  epssm: 0.5            # sound-wave off-centering, 0..1 (scalar or per-domain list)
+```
+
+A smaller `time_step` or the adaptive step alone does not fix it (the
+instability is acoustic, not the time step).
+
+| Key | Group | Values | Default if absent |
+|---|---|---|---|
+| `time_step` | domains | positive int, s (outer domain) | `6 * outer dx_km` |
+| `epssm` | dynamics | 0..1, scalar or per-domain list | not written (WRF 0.1) |
+| `w_damping` | dynamics | 0/1 | 1 |
+| `zadvect_implicit` | dynamics | 0/1 (implicit vertical advection, WRF >= 4.3) | not written (0) |
+| `diff_6th_opt` | dynamics | 0, 1, 2; scalar or list | 0 |
+| `diff_6th_factor` | dynamics | 0..1; scalar or list | 0.12 |
+| `hybrid_opt` | dynamics | 0 (terrain-following) or 2 (hybrid) | 0 |
+| `use_adaptive_time_step` | domains | true/false | not written (false) |
+| `step_to_output_time` | domains | true/false | `true` whenever adaptive is on |
+| `target_cfl`, `target_hcfl` | domains | > 0; scalar or list | not written (WRF 1.2 / 0.84) |
+| `max_step_increase_pct` | domains | positive int; scalar or list | not written (WRF 5, 51) |
+| `starting_time_step`, `max_time_step`, `min_time_step` | domains | positive int s or -1; scalar or list | not written (WRF dx-based) |
+| `adaptation_domain` | domains | domain id | not written (1) |
+
+Unknown keys and wrong types are rejected; the adaptive-only keys require
+`use_adaptive_time_step: true`. Per-domain lists need one value per domain.
+Without the block (or with `dynamics:` empty) namelists are byte-identical to
+0.7.2 (`tests/golden/`). Terrain smoothing of the nest (`smooth_cg_topo`) is
+deliberately not offered: it only blends d01's outer boundary rows toward the
+driving model, not the interior peaks of the nest.
+
 ### GRIB downloads (NOMADS throttling, mirrors)
 
 Each run downloads its own parent-model GRIB. Models with an `.idx` sidecar
