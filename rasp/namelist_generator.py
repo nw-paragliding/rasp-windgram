@@ -34,6 +34,10 @@ except ImportError:
 # ---------------------------------------------------------------------------
 MODELS = {
     "nam": {
+        # Retired by NCEP 2026-11-03 (replaced by "rrfs" below). NOTE: the awip3d
+        # product this entry downloads is NCEP grid 212 = 40.6 km (Lambert
+        # 185x129), not the 12 km grid 218 (awphys/awip12). "dx" is left at the
+        # nominal 12 km so existing nest chains (outer_dx_km) don't change.
         "name": "NAM (North American Mesoscale)",
         "dx": 12000.0,
         "vtable": "Vtable.NAM",

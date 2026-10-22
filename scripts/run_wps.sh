@@ -117,9 +117,14 @@ fi
 # Remove old FILE: intermediates from a previous run.
 rm -f FILE:*
 
-# Link the Vtable for NAM GRIB2 (awip3d pressure-level files).
-# WPS 4.5 provides only Vtable.NAM (Vtable.NAMb was merged/removed upstream).
-ln -sf "${WPS_DIR}/Variable_Tables/Vtable.NAM" Vtable
+# Link the Vtable for the input GRIB. Default: NAM awip3d pressure-level files
+# (WPS 4.5 provides only Vtable.NAM; Vtable.NAMb was merged/removed upstream).
+# Override with VTABLE=Vtable.RRFS (RRFS prslev + 2dfld) or any other table.
+# The Python pipeline (rasp.pipeline) picks the Vtable from the model registry;
+# this legacy script is kept for manual WPS runs.
+VTABLE="${VTABLE:-Vtable.NAM}"
+ln -sf "${WPS_DIR}/Variable_Tables/${VTABLE}" Vtable
+echo "  Vtable: ${VTABLE}"
 
 # Link GRIB files as GRIBFILE.AAA, GRIBFILE.AAB, ... (replicates link_grib.csh in bash)
 # ungrib.exe reads the 3-character suffix sequence starting at AAA.

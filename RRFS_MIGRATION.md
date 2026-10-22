@@ -13,9 +13,14 @@ pnw-soaring main — PR opened). Until then, pairs start from a tagged push ther
 fixture** (`ab/phoenix.yaml`, not shipped in the image, not a site product); it appears only on the unlisted lab page. Dev pairs here run on
 demand with `[ab phoenix ...]`.
 
+**Decision 2026-10-21 (James): acceptance testing is concluded after pair 1; proceed to release.**
+Phase 1 goes to `main` as a PR, then tag `v0.6.0` so `windgram:latest` (what the site pins)
+carries RRFS; daily lab pairs continue as review material, not as a gate. Phase 2 (site) follows.
+
 **First pair (2026-10-21, Phoenix, 18z → soaring day Oct 22): reviewed by James, "looks right".**
 Both arms completed on the arm runners in ~25 min (vs ~45 min per arm in the local 5 GiB VM);
-the local NAM arm reproduces the runner NAM arm exactly (zero difference in every metric). RRFS
+the local NAM and RRFS arms each reproduce their runner counterparts exactly (zero difference in
+every metric), so runner pairs are equivalent to local ones. RRFS
 arm: ungrib/metgrid/real all clean with `Vtable.RRFS`, 46 metgrid levels, 9 soil levels, 13
 hours, 7/7 windgrams, no NaNs. Pooled afternoon RRFS − NAM: BL top median |Δ| 698 ft (bias
 +562), w* 47 fpm (+17), ceiling 495 ft (+357), BL wind 3 kt / 9°, 2 m T +2 °F, sfc LCL +1280 ft
@@ -49,9 +54,14 @@ Defaults unless overridden: toggle label "RRFS 1.3 km", slug `rrfs`.
 - **What survives is the chain, not the model.** The product that "works better" today is
   `cascades.yaml`: WRF 4 km → 1.33 km, DrJack physics (YSU / Ferrier / RRTM+Dudhia / MM5
   sfclay), 52 levels, 3-hourly boundaries. None of that is NAM-specific. RRFS 3 km supplies
-  initial/boundary conditions instead of NAM 12 km; a 3 km parent is a *better* source for the 4 km
-  outer domain than 12 km was. The geo_em files are unchanged, so the existing release asset is
+  initial/boundary conditions instead of NAM; a 3 km parent is a far *better* source for the 4 km
+  outer domain than NAM was. The geo_em files are unchanged, so the existing release asset is
   reused.
+- **Correction (2026-10-21, verified on a cached file):** the NAM product we ingest,
+  `nam.tCCz.awip3dFF.tm00.grib2`, is NCEP **grid 212 at 40.6 km** (Lambert 185×129), not the 12 km
+  grid 218 (`awphys`/`awip12`). wxtofly's raspnw-v2 pulls the same file. So the "NAM 12 km → WRF
+  4 km" chain has really been 40 km → 4 km (10:1), and the RRFS swap raises parent resolution by
+  ~13×, not 4×. Expect part of the NAM→RRFS drift in the A/B to be resolution, not physics.
 - **Not the template:** the HRRR 3 km → 1 km nest (unstable, worse forecasts).
 - **A/B first.** Because NAM disappears on Nov 3, NAM-vs-RRFS comparisons are only possible
   until then. The Phoenix A/B has to run in the window Oct 23 – Nov 2.
@@ -69,12 +79,12 @@ Defaults unless overridden: toggle label "RRFS 1.3 km", slug `rrfs`.
 | Item | NAM (today) | RRFS v1 (replacement) |
 |---|---|---|
 | Retire / go-live | removed 2026-11-03 12Z | operational 2026-11-03 12Z |
-| Dynamics | NMMB, 12 km NA | FV3-LAM, 3 km NA; CONUS/AK subsets at 3 km |
+| Dynamics | NMMB, 12 km NA (but see "3-D file": we ingest the 40 km grid-212 product) | FV3-LAM, 3 km NA; CONUS/AK subsets at 3 km |
 | Cycles | 00/06/12/18, all to 84 h | **hourly**; 00/06/12/18 to **84 h**, other cycles to 18 h |
 | Output interval | 3 h (awip3d) | **1 h** |
 | Para/pre-cutover path | — | `https://nomads.ncep.noaa.gov/pub/data/nccf/com/rrfs/v1.0/` (also `/rrfs/para/`) |
 | Post-cutover path | `…/com/nam/prod/nam.YYYYMMDD/` (gone) | `https://nomads.ncep.noaa.gov/pub/data/nccf/com/rrfs/prod/rrfs.YYYYMMDD/CC/` |
-| 3-D file | `nam.tCCz.awip3dFF.tm00.grib2` (~11 MB; 3-D + sfc + soil in one file) | `rrfs.tCCz.prslev.3km.fFFF.conus.grib2` (**~535 MB**; pressure levels ONLY) |
+| 3-D file | `nam.tCCz.awip3dFF.tm00.grib2` (~11 MB; 3-D + sfc + soil in one file; **grid 212, 40.6 km Lambert 185×129**) | `rrfs.tCCz.prslev.3km.fFFF.conus.grib2` (**~535 MB**; pressure levels ONLY) |
 | 2-D file | (same file) | `rrfs.tCCz.2dfld.3km.fFFF.conus.grib2` (**~320 MB**; surface, soil, fluxes, 2 m / 10 m) |
 | Index | — | every file has a `.grib2.idx` (byte offsets → range-request subsetting works) |
 | Grid (CONUS) | 12 km Lambert, grid 218 | **identical to the HRRR CONUS grid**: Lambert 1799×1059, 3000 m, lat1 21.138 lon1 237.280, LoV 262.5, LatD 38.5 (verified with `grib_ls` on a live file) |
