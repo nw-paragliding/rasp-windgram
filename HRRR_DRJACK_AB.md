@@ -1,7 +1,7 @@
 # HRRR through the DrJack chain — A/B against the NAM product
 
-Status (2026-10-22): pair 1 complete, pair 2 pending. Branch `feat/hrrr-drjack-ab` → PR #17
-(0.6.1). These pairs are the evidence attached to that PR and to the pnw-soaring PR
+Status (2026-10-22): two pairs complete (12z same-day and 00z evening configurations), four
+clean arms. Branch `feat/hrrr-drjack-ab` → PR #17 (0.6.1). These pairs are the evidence attached to that PR and to the pnw-soaring PR
 `feat/hrrr-drjack-site`, which converts the site's HRRR product to this chain under the label
 "HRRR (beta)"; `examples/cascades-hrrr-drjack.yaml` is the reference config in this repo.
 **James reviews the tables and montages and decides what goes live; they are an aid, not a
@@ -60,7 +60,7 @@ same-day pair is fhr 15–27):
 | pair | cycle | soaring day | WRF window | run | status |
 |---|---|---|---|---|---|
 | 1 | 2026-10-21 12z | Wed 2026-10-21 | fhr 3–15 (15z → 03z) | [actions/runs/39705498207](https://github.com/nw-paragliding/rasp-windgram/actions/runs/39705498207) (artifacts `ab-cascades-nam`, `ab-cascades-hrrr`, `ab-compare-cascades-nam-vs-hrrr`, `ab-debug-cascades-*`; local copy `~/rasp-data/ab/pairs/cascades-hrrr-drjack-20261021-12z/`) | both arms complete, §4 |
-| 2 | 2026-10-22 00z | Thu 2026-10-22 | fhr 15–27 (15z → 03z) | starts from the tagged commit on the branch (`[ab cascades 2026-10-22 00 2026-10-22 nam hrrr=cascades-hrrr-drjack]`) at the next push | pending |
+| 2 | 2026-10-22 00z | Thu 2026-10-22 | fhr 15–27 (15z → 03z) | [actions/runs/39711119209](https://github.com/nw-paragliding/rasp-windgram/actions/runs/39711119209) (same artifact names; local copy `~/rasp-data/ab/pairs/cascades-hrrr-drjack-20261022-00z/`) | both arms complete, §4 |
 
 ## 4. Results
 
@@ -115,9 +115,50 @@ Montages (`compare/montage_<site>.png`): Tiger, PooPooPt, WestTiger3, Rattlesnak
 SiMain, SiHaystack, Teneriffe, GreenMtn, CedarButte, SquakMtn, CougarMtn, GrandRidge, BanderaMtn,
 McClellanButte; plus `diffmap_tol.png`, `compare.md`, `summary.json`.
 
-### Pair 2 — 2026-10-22 00z → Thu 2026-10-22
+### Pair 2 — 2026-10-22 00z → Thu 2026-10-22 (run 39711119209)
 
-Pending (starts on the next push of the branch).
+**Completion.** As pair 1: both arms 13 hourly steps 8 am – 8 pm PDT on the same 114 × 114
+grid, 15/15 windgrams, zero NaNs; HRRR arm `num_metgrid_levels 41` / `num_metgrid_soil_levels
+9`, `SUCCESS COMPLETE WRF` in both arms; wall time 46 min (HRRR) vs 40 min (NAM). This is the
+evening-dispatch configuration (00z cycle, window at fhr 15–27, no fhr-0 start).
+
+A more convective day than pair 1: NAM-arm w* reaches 1.2 m/s at Tiger and Mailbox at 1–3 pm,
+HRRR-arm 0.9 and 1.1 m/s.
+
+**Pooled over the 15 sites, afternoon (12:00–17:59 local), Δ = HRRR − NAM:**
+
+| Metric | n | median \|Δ\| | p90 \|Δ\| | bias |
+|---|---|---|---|---|
+| BL top (AGL) (ft) | 90 | 468 | 991 | −375 |
+| w* (fpm) | 90 | 36 | 90 | −35 |
+| Soaring ceiling (ft) | 90 | 2 | 539 | −156 |
+| BL wind speed (kt) | 90 | 2 | 5 | −0 |
+| BL wind dir (deg) | 90 | 19 | 38 | +5 |
+| 2 m temperature (F) | 90 | 4 | 5 | −4 |
+| Sfc LCL (AGL) (ft) | 90 | 8130 | 9918 | +8381 |
+| Sensible heat flux (W/m²) | 90 | 21 | 62 | −26 |
+
+Whole inner grid at 14:00 local: soaring ceiling median |Δ| 353 ft (bias −258 ft), w* median
+|Δ| 47 fpm (bias +1 fpm).
+
+**Per site (afternoon medians):**
+
+- *Tiger / Poo Poo Point / West Tiger 3* — HRRR arm BL top 420–515 ft lower, w* 55–75 fpm
+  weaker, ceiling 80–150 ft lower, 2 m T 3–4 °F cooler; BL wind within 3 kt and 20–30°. The
+  NAM arm forecasts afternoon showers at Tiger (cumulus from 9 am, precipitation hatching and
+  snow dots above 5,000 ft from 3 pm, cloud base down to ~3,000 ft); the HRRR arm has a dry
+  afternoon with a 3,000 ft stratus/RH>94 % layer in the morning only.
+- *North Bend valley (Rattlesnake, Mailbox, Si, Teneriffe, Cedar Butte)* — BL top 80–700 ft
+  lower in the HRRR arm, ceiling 140–380 ft lower at Rattlesnake / Mailbox / Si Main / Cedar
+  Butte, w* within 40 fpm, winds within 4 kt and (unlike pair 1) within 10–20° except
+  Teneriffe (59°). 2 m T 4–5 °F cooler. Pair 1's 20–25 kt mid-level band is not there today;
+  both arms have light winds below 5,000 ft.
+- *Western foothills (Squak, Cougar, Grand Ridge)* — the largest w* and ceiling differences:
+  w* 45–90 fpm weaker, ceiling 220–400 ft lower, BL top 300–530 ft lower in the HRRR arm.
+- *High terrain (Bandera, McClellan Butte)* — closest again: BL top within 220 ft, w* within
+  26 fpm, ceiling within 26 ft, 2 m T within 1 °F.
+- *All sites* — surface LCL +7,200…+9,700 ft: as in pair 1 the NAM arm is saturated at the
+  surface in the afternoon and the HRRR arm is not.
 
 ## 5. Things to look at / flags
 
@@ -142,8 +183,17 @@ Pending (starts on the next push of the branch).
 5. **Surface wind patches late afternoon at Tiger (HRRR arm).** Orange/red cells at ground level
    4–7 pm in `montage_Tiger.png` while w* is 0: a near-surface wind band, not lift. Check the
    10 m wind in the cube for those hours.
-6. **Nothing failed and nothing is NaN**: the chain is as stable with HRRR as with NAM, which
-   was the point of the conversion (the 1 km nest's instability was the reason for it).
+6. **Nothing failed and nothing is NaN** in four arms over two cycles (12z same-day and 00z
+   evening-dispatch configurations): the chain is as stable with HRRR as with NAM, which was
+   the point of the conversion (the 1 km nest's instability was the reason for it).
+7. **Consistent across both pairs:** the HRRR arm is ~35 fpm weaker in w* with 25–35 W/m² less
+   sensible heat flux, and its surface stays unsaturated where the NAM arm's is saturated (LCL
+   +6,500 / +8,400 ft). Not consistent: 2 m temperature (+1 °F in pair 1, −4 °F in pair 2), BL
+   top (+68 / −375 ft), and the pair-1 valley wind band (absent in pair 2). With only two
+   cycles that is weather, not a bias; more pairs on real thermal days are the way to tell.
+8. **Pair 2 precipitation:** the NAM arm forecasts afternoon showers at Tiger / Poo Poo (3–6 pm)
+   that the HRRR arm does not have. Which verified on Oct 22 is checkable against the Seattle
+   radar / KSEA obs; a good first live-site comparison for the beta.
 
 ## 6. Who decides, and what follows
 
