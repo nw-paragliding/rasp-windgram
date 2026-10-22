@@ -47,6 +47,7 @@ uvx --from build pyproject-build --wheel
 - **UTC offset heuristic adds a DST hour** (`_utc_offset_from_lon`); set `utc_offset:` in the domain YAML for zones without DST (Arizona) — the Phoenix A/B domain does.
 - **A/B acceptance (NAM vs RRFS)**: `ab/phoenix.yaml` + `phoenix-sites.csv`, `scripts/ab_compare.py`, `.github/workflows/test-ab.yml`. James accepts/rejects; never self-promote.
 - **Domain YAML can override registry keys** (`rasp.pipeline.DOMAIN_MODEL_OVERRIDES`: `direct_reader`, `vtable`, `sfc_vtable`, `idx_subset`, `sfc_idx_subset`, `idx_max_gap_mb`); absent keys = registry behaviour. `examples/cascades-hrrr-drjack.yaml` uses them to run HRRR through the NAM/DrJack chain without hydrometeors (A/B candidate for the HRRR product, `HRRR_DRJACK_AB.md`; not a site product). `test-ab.yml` arms: `[ab cascades <date> <cyc> <target> nam hrrr=cascades-hrrr-drjack]`.
+- **Shared lattice** (`lattice:` block, `rasp/lattice.py`, 0.7.0): tiles share one Lambert projection; d01 is snapped (<= dx/2) so the lattice origin is a mass point (`ref_lat/ref_lon` = origin, integer `ref_x/ref_y`, may be outside the domain). Needs odd `nest_ratio`. Without the block namelists are byte-identical to 0.6.x (`tests/golden/`, `uv run pytest`).
 - **Soaring ceiling (hcrit)**: uses DrJack's nonlinear thermal penetration model from `rasp/soaring.py`, NOT the WRF W field (which doesn't resolve thermals at 1.33km)
 - **Pressure conversion**: heights ASL must be converted to AGL before dividing by 32 to get pressure delta. The bug `sfc_p - height_ASL/32` was a major source of incorrect crescent placement.
 
@@ -62,6 +63,9 @@ uvx --from build pyproject-build --wheel
 ```bash
 # Quick smoke test
 uv run python -c "from rasp.soaring import calc_wstar; from rasp.windgram import render_windgram; print('OK')"
+
+# Unit tests (lattice + byte-identical namelists)
+uv run pytest -q
 
 # Namelist generation test
 uv run python -m rasp.namelist_generator examples/cascades.yaml --date 2026-04-06 --cycle 00 --output-dir /tmp/test
