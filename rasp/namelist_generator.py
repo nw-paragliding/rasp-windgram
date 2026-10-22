@@ -185,6 +185,9 @@ def load_domain_config(config_path):
         idx_subset: ["TMP:* mb", ...]   # .idx byte-range patterns (main / surface file)
         sfc_idx_subset: [...]
         idx_max_gap_mb: 2
+        dynamics:               # optional WRF stability overrides (DYNAMICS_KEYS);
+          time_step: 16         # absent keys keep the generator defaults
+          epssm: 0.5
     """
     path = Path(config_path)
     if not path.exists():
@@ -241,6 +244,12 @@ def load_domain_config(config_path):
     else:
         config.pop("lattice", None)
 
+    # WRF dynamics / stability overrides. Absent / null -> generator defaults.
+    if config.get("dynamics") is not None:
+        config["dynamics"] = parse_dynamics(config["dynamics"])
+    else:
+        config.pop("dynamics", None)
+
     if config["model"] not in MODEL_DX:
         raise ValueError(
             f"Unknown model: {config['model']}. "
@@ -248,6 +257,77 @@ def load_domain_config(config_path):
         )
 
     return config
+
+
+# Keys of the optional ``dynamics:`` block -> (namelist group, kind, default).
+# Only options WRF 4.5 honours and that bear on stability over steep terrain.
+# ``default`` is what the generator emits when the key is absent (None = the
+# key is not written, i.e. WRF's own default applies). Per-domain kinds accept a
+# scalar (all domains) or a list with one value per domain.
+DYNAMICS_KEYS = {
+    # Outer-domain step (s); nests divide it by parent_time_step_ratio.
+    # Default 6 * outer dx_km.
+    "time_step":        ("domains",  "pos_int",     None),
+    # Sound-wave off-centering (WRF default 0.1); 0.5 damps the vertically
+    # propagating acoustic modes that steep terrain excites.
+    "epssm":            ("dynamics", "frac_dom",    None),
+    # Vertical-velocity damping where the vertical Courant number nears 1.
+    "w_damping":        ("dynamics", "flag",        1),
+    # Adaptive implicit vertical advection (IEVA, WRF >= 4.3): removes the
+    # vertical-advection CFL limit; WRF guidance pairs it with w_damping.
+    "zadvect_implicit": ("dynamics", "flag",        None),
+    # 6th-order horizontal numerical diffusion (2 = monotonic, no up-gradient).
+    "diff_6th_opt":     ("dynamics", "diff6_dom",   0),
+    "diff_6th_factor":  ("dynamics", "frac_dom",    0.12),
+    # Hybrid sigma-pressure vertical coordinate (2): terrain influence on the
+    # coordinate surfaces decays with height instead of reaching the model top.
+    "hybrid_opt":       ("dynamics", "hybrid",      0),
+}
+
+
+def parse_dynamics(block):
+    """Validate a ``dynamics:`` block; returns {key: value} with WRF types."""
+    if not isinstance(block, dict):
+        raise ValueError("dynamics: expected a mapping of WRF dynamics options")
+    unknown = sorted(set(block) - set(DYNAMICS_KEYS))
+    if unknown:
+        raise ValueError(f"dynamics: unknown key(s) {', '.join(unknown)}; "
+                         f"supported: {', '.join(DYNAMICS_KEYS)}")
+    out = {}
+    for key, val in block.items():
+        if val is None:
+            continue
+        kind = DYNAMICS_KEYS[key][1]
+        vals = val if isinstance(val, list) else [val]
+        if not vals or (isinstance(val, list) and not kind.endswith("_dom")):
+            raise ValueError(f"dynamics.{key}: expected a single value, got {val!r}")
+        checked = []
+        for v in vals:
+            if isinstance(v, bool) and kind != "flag":
+                raise ValueError(f"dynamics.{key}: expected a number, got {v!r}")
+            if kind == "pos_int":
+                if not isinstance(v, int) or v <= 0:
+                    raise ValueError(f"dynamics.{key}: expected a positive integer "
+                                     f"(seconds), got {v!r}")
+            elif kind == "flag":
+                if isinstance(v, bool):
+                    v = int(v)
+                if v not in (0, 1):
+                    raise ValueError(f"dynamics.{key}: expected 0/1 (or true/false), got {v!r}")
+            elif kind == "hybrid":
+                if isinstance(v, bool) or v not in (0, 2):
+                    raise ValueError(f"dynamics.{key}: expected 0 (terrain-following) "
+                                     f"or 2 (hybrid), got {v!r}")
+            elif kind == "diff6_dom":
+                if isinstance(v, bool) or v not in (0, 1, 2):
+                    raise ValueError(f"dynamics.{key}: expected 0, 1 or 2, got {v!r}")
+            elif kind == "frac_dom":
+                if not isinstance(v, (int, float)) or not 0 <= v <= 1:
+                    raise ValueError(f"dynamics.{key}: expected a number in [0, 1], got {v!r}")
+                v = float(v)
+            checked.append(v)
+        out[key] = checked if isinstance(val, list) else checked[0]
+    return out
 
 
 def _parse_simple_yaml(text):
@@ -474,7 +554,13 @@ def check_warnings(domains):
     return warnings
 
 
-def estimate_runtime(domains, ncores=4):
+def outer_time_step(config, domains):
+    """Outer-domain WRF time step (s): ``dynamics.time_step`` or 6 * dx_km."""
+    dt = (config.get("dynamics") or {}).get("time_step")
+    return dt if dt is not None else int(6 * domains[0]["dx_km"])
+
+
+def estimate_runtime(domains, ncores=4, time_step=None):
     """Rough estimate of WRF wall-clock time.
 
     Based on ~1 second per 10,000 grid points per time step on a single core,
@@ -483,9 +569,12 @@ def estimate_runtime(domains, ncores=4):
     Returns estimated minutes.
     """
     total_cost = 0
+    # Nest steps follow parent_time_step_ratio (= parent_grid_ratio), so a
+    # custom outer step scales every domain by the same factor.
+    scale = time_step / (6 * domains[0]["dx_km"]) if time_step else 1.0
     for d in domains:
         points = d["e_we"] * d["e_sn"]
-        dt = max(6 * d["dx_km"], 1)  # time step in seconds
+        dt = max(6 * d["dx_km"] * scale, 1)  # time step in seconds
         # Assume 6-hour simulation, steps = 6*3600/dt
         steps = 6 * 3600 / dt
         cost = points * steps / 10000  # core-seconds
@@ -632,8 +721,20 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
             return ", ".join(str(v) for v in val)
         return ", ".join([str(val)] * n)
 
-    # Time step: ~6 * dx_km for the outer domain
-    dt = int(6 * domains[0]["dx_km"])
+    # Time step: ~6 * dx_km for the outer domain unless dynamics.time_step
+    dt = outer_time_step(config, domains)
+    dyn = config.get("dynamics") or {}
+
+    def dyn_val(key):
+        """Override if given, else the generator default (both per-domain-repped)."""
+        v = dyn.get(key, DYNAMICS_KEYS[key][2])
+        # Per-domain WRF options are repeated per domain; the others are single.
+        return rep(v) if DYNAMICS_KEYS[key][1].endswith("_dom") else str(v)
+
+    # Optional lines: only written when overridden, so namelists of domains
+    # without a dynamics block stay byte-identical.
+    extra = "".join(f" {k:<24} = {dyn_val(k)},\n"
+                    for k in ("epssm", "zadvect_implicit") if k in dyn)
 
     # Vertical levels (e_vert) — configurable via domain YAML, default 45
     e_vert = int(config.get("e_vert", 45))
@@ -733,12 +834,12 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
 /
 
 &dynamics
- hybrid_opt               = 0,
- w_damping                = 1,
+ hybrid_opt               = {dyn_val('hybrid_opt')},
+ w_damping                = {dyn_val('w_damping')},
  diff_opt                 = 1,
  km_opt                   = 4,
- diff_6th_opt             = {rep(0)},
- diff_6th_factor          = {rep(0.12)},
+ diff_6th_opt             = {dyn_val('diff_6th_opt')},
+ diff_6th_factor          = {dyn_val('diff_6th_factor')},
  base_temp                = 290.,
  damp_opt                 = 3,
  zdamp                    = {rep(5000.)},
@@ -748,7 +849,7 @@ def generate_namelist_input(config, domains, date, cycle, num_metgrid_levels=40,
  non_hydrostatic          = {rep('.true.')},
  moist_adv_opt            = {rep(1)},
  scalar_adv_opt           = {rep(1)},
-/
+{extra}/
 
 &bdy_control
  spec_bdy_width           = 5,
@@ -802,7 +903,7 @@ def generate_namelists(config_path, date, cycle, output_dir=None,
 
     domains = compute_nest_chain(config)
     warnings = check_warnings(domains)
-    est_minutes = estimate_runtime(domains)
+    est_minutes = estimate_runtime(domains, time_step=outer_time_step(config, domains))
 
     # Print domain summary
     print(f"\n{'='*60}")

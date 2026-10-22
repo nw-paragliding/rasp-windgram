@@ -1,0 +1,37 @@
+# Tiger area sites from raspnw-v2 (region: issaquah, domains/issaquah.yaml)
+# Index moved to sites/skykomish-sites.csv (outside this nest).
+# '# edge' marks sites only 10-15 km inside the 1.33 km nest edge.
+# name lat lon
+Tiger           47.503    -121.975
+TigerHikeLookout 47.508   -121.985
+TigerLZ         47.498    -122.021
+Poo_Poo_Point   47.49927  -122.00819
+West_Tiger_3    47.51190  -121.99032
+West_Tiger_2    47.50887  -121.98513
+West_Tiger_1    47.50394  -121.97565
+East_Tiger      47.48868  -121.94691
+Taylor_Mountain 47.45332  -121.89468
+Mitchell_Hill   47.55096  -121.93743
+Grand_Ridge_Park 47.55045 -121.98245
+Issaquah_Highlands 47.54634 -122.00423
+Rattlesnake     47.466792 -121.823934
+Green_Mtn_Launch 47.5121111 -121.6777222
+Green_Mtn_LZ    47.4874722 -121.6756111
+MtSi            47.507751 -121.739688
+Mt_Washington   47.426    -121.69885
+SquakMountain   47.50434  -122.04735
+McDonald        47.33466  -121.88212
+Carnation       47.64334  -121.93639   # edge
+5_Mile          47.6145   -121.691243
+Grand_Prospect  47.47162  -121.82094
+Bandera_Mountain 47.41984 -121.55438
+Mailbox_Peak    47.46226  -121.63947
+Bergseth        47.243289 -121.924084
+# Added: every other raspnw-v2 (wxtofly) site >= 10 km inside this nest, deepest here
+Alta_Mountain    47.44114   -121.33289
+Chimney_Rock     47.5083    -121.28903
+Crystal_Mt       46.934     -121.5
+PochPeak         46.953543  -121.929131
+Rainier          46.85284   -121.760126
+Rampart          47.38733   -121.36333
+PooPooPoint      47.4674    -121.9876
