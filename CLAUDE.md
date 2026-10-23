@@ -35,8 +35,7 @@ uvx --from build pyproject-build --wheel
 
 ## Important Context
 
-- **Docker context**: use `colima` (arm64 native), NOT `colima-x86`. Verify with `docker info --format '{{.Architecture}}'`
-- **GEOG data**: must be on internal disk (not external/USB) for Docker volume mounts via Colima
+- **No local Docker**: colima was removed on 2026-10-22; every pipeline run happens on GitHub `ubuntu-24.04-arm` runners (pnw-soaring workflows, `test-ab.yml` here). Verify changes with a branch run, not locally.
 - **wrf-python**: broken on Python 3.12/uv (numpy.distutils removed). Install with `--no-deps` in Docker only. Not a dependency for the Python package.
 - **WRF nesting**: grid dimensions must satisfy `(e_we - 1) % parent_grid_ratio == 0`
 - **gwd_opt**: cannot be per-domain in WRF 4.5 namelist — causes FATAL. Removed from generated namelists.
