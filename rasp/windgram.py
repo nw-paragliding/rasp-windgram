@@ -11,6 +11,9 @@ Produces a vertical time-series chart for a single lat/lon point showing:
 - Cloud markers at the surface LCL (where cumulus would form)
 - White cross-hatching where RH > 94% (TJ Olney's rhcut), raw hourly grid
 
+Beside each PNG it writes <date>_<site>_blipspot.json — the hourly table of
+RASP point parameters that wxtofly showed behind the image (rasp.blipspot).
+
 Usage:
     python -m rasp.windgram wrfout_d02_2026-04-01_12:00:00 \\
         --lat 47.503 --lon -121.975 --site Tiger --output-dir ./output
@@ -149,6 +152,43 @@ def _extract_site_data(wrfout_path, lat, lon):
     ter = z[0, 0]
     ter_ft = ter * 3.28084
 
+    # Extra point fields for the blipspot table (rasp.blipspot). All optional:
+    # a wrfout without one of them still renders, the table just lacks that row.
+    def _sfc(name):
+        var = nc.variables.get(name)
+        return None if var is None else np.asarray(var[:, iy, ix], dtype=np.float64)
+
+    HGT = _sfc("HGT")                       # true terrain (the chart's ter is the first mass level)
+    hgt_m = None if HGT is None else float(HGT[0])
+    U10, V10 = _sfc("U10"), _sfc("V10")
+    if U10 is not None and V10 is not None:
+        u10_kts = (U10 * cosalpha - V10 * sinalpha) * 1.94384
+        v10_kts = (U10 * sinalpha + V10 * cosalpha) * 1.94384
+    else:
+        u10_kts = v10_kts = None
+    Q2 = _sfc("Q2")
+    PSFC = _sfc("PSFC")
+    psfc_mb = None if PSFC is None else PSFC / 100.0
+    RAINC, RAINNC = _sfc("RAINC"), _sfc("RAINNC")
+    rain_1h_mm = None
+    if RAINC is not None and RAINNC is not None and ntimes > 1:
+        # WRF rain fields accumulate from the model start; the table wants the
+        # last hour's fall, so difference consecutive steps (scaled to an hour
+        # should the history interval not be hourly). The first step has no
+        # predecessor and stays NaN.
+        acc = RAINC + RAINNC
+        import datetime as _dt
+        stamps = [_dt.datetime.strptime(s[:19], "%Y-%m-%d_%H:%M:%S") for s in time_strings]
+        dt_h = np.array([max((b - a).total_seconds() / 3600.0, 1e-6)
+                         for a, b in zip(stamps[:-1], stamps[1:])])
+        rain_1h_mm = np.concatenate([[np.nan], np.maximum(np.diff(acc), 0.0) / dt_h])
+    W = nc.variables.get("W")
+    if W is not None:
+        w_stag = np.asarray(W[:, :, iy, ix], dtype=np.float64)
+        w_ms = 0.5 * (w_stag[:, :-1] + w_stag[:, 1:])      # unstagger to mass levels
+    else:
+        w_ms = None
+
     # w* (Deardorff, with virtual heat flux)
     vhf = np.maximum(HFX + 0.000245268 * T2 * np.maximum(LH, 0.0), 0.0)
     buoy = (9.81 / T2) * (vhf / 1200.0)
@@ -220,6 +260,18 @@ def _extract_site_data(wrfout_path, lat, lon):
         "ter_ft": ter_ft,
         "lat": xlat[iy, ix],
         "lon": xlon[iy, ix],
+        # point fields for the blipspot table (None when the wrfout lacks them)
+        "hgt_m": hgt_m,
+        "pblh_m": PBLH,
+        "hfx": HFX,
+        "lh": LH,
+        "t2_k": T2,
+        "u10_kts": u10_kts,
+        "v10_kts": v10_kts,
+        "q2": Q2,
+        "psfc_mb": psfc_mb,
+        "rain_1h_mm": rain_1h_mm,
+        "w_ms": w_ms,
     }
 
     # netCDF4 returns masked arrays for any field carrying a _FillValue. A
@@ -239,7 +291,8 @@ def _extract_site_data(wrfout_path, lat, lon):
 
 def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
                     p_top_mb=None, headroom_ft=4000, utc_offset=-7,
-                    start_hour=8, dpi=100, model_name=None, data=None):
+                    start_hour=8, dpi=100, model_name=None, data=None,
+                    blipspot=True):
     """Render a windgram PNG for a single site.
 
     Args:
@@ -253,6 +306,8 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
         start_hour:  earliest local hour to show (default 8, skips pre-dawn)
         dpi:         output resolution
         data:        pre-built data dict (skips WRF extraction, e.g. from HRRR direct reader)
+        blipspot:    also write <date>_<site>_blipspot.json beside the PNG — the
+                     hourly table of RASP point parameters (see rasp.blipspot)
 
     Returns:
         Path to the output PNG file.
@@ -275,11 +330,14 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
         if not np.any(keep):
             keep = np.ones(d["ntimes"], dtype=bool)  # fallback: keep all
 
-    # Slice all time-dependent arrays
+    # Slice all time-dependent arrays (the blipspot point fields included, so
+    # the table gets exactly the chart's hours)
     for key in ["ptot", "p_mid", "z_ft", "tk", "tc", "td", "rh",
                 "u_kts", "v_kts", "lapse", "wstar", "hglider_p",
-                "pbl_p", "freeze_p", "sfc_p", "hours_utc", "time_strings"]:
-        val = d[key]
+                "pbl_p", "freeze_p", "sfc_p", "hours_utc", "time_strings",
+                "pblh_m", "hfx", "lh", "t2_k", "u10_kts", "v10_kts", "q2",
+                "psfc_mb", "rain_1h_mm", "w_ms"]:
+        val = d.get(key)
         if isinstance(val, np.ndarray) and val.shape[0] == d["ntimes"]:
             d[key] = val[keep]
         elif isinstance(val, list) and len(val) == d["ntimes"]:
@@ -503,6 +561,16 @@ def render_windgram(wrfout_path, lat, lon, site_name, output_dir,
     plt.close(fig)
 
     print(f"Saved: {out_path}")
+
+    # The table behind the chart (wxtofly's blipspot). Never lets a table
+    # problem take the windgram down with it.
+    if blipspot:
+        from .blipspot import write_blipspot
+        try:
+            write_blipspot(d, site_name, output_dir, model_name=model_name,
+                           utc_offset=utc_offset)
+        except Exception as e:                      # noqa: BLE001
+            print(f"WARNING: blipspot for {site_name} failed: {e}")
     return str(out_path)
 
 
@@ -547,11 +615,13 @@ def main():
     parser.add_argument("--start-hour", type=int, default=8, help="Earliest local hour")
     parser.add_argument("--dpi", type=int, default=100, help="Output DPI")
     parser.add_argument("--model", help="Model name for title (e.g. NAM, GFS)")
+    parser.add_argument("--no-blipspot", action="store_true",
+                        help="Skip the <date>_<site>_blipspot.json table beside each PNG")
     args = parser.parse_args()
 
     kwargs = dict(p_top_mb=args.p_top, utc_offset=args.utc_offset,
                   start_hour=args.start_hour, dpi=args.dpi,
-                  model_name=args.model)
+                  model_name=args.model, blipspot=not args.no_blipspot)
 
     if args.sites:
         render_batch(args.wrfout, args.sites, args.output_dir, **kwargs)
