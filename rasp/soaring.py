@@ -458,52 +458,57 @@ def calc_blwinddiff(ua, va, z, ter, pblh):
 
 
 def calc_bltop_pottemp_variability(theta, z, ter, pblh, criterion_degc):
-    """Potential temperature variability near BL top.
+    """BL-top variability: how much higher the BL top would sit if the boundary
+    layer were *criterion_degc* warmer (m) — DrJack's "BL Top Variability".
 
-    Finds the height range around BL top where theta stays within
-    +/- criterion of the BL-top theta value. Returns the depth of
-    this zone in meters — an indicator of inversion sharpness.
-    Thinner zones = sharper inversions = less overshooting.
+    The potential temperature at the BL top (ter + pblh) is read off the
+    sounding; the result is the depth above the BL top at which the
+    environment is criterion_degc warmer in theta (linear interpolation
+    between model levels). A sharp capping inversion gives a small value
+    (the BL top is pinned), a weak cap a large one (a slightly warmer day, or
+    a local hot spot, mixes much deeper). DrJack's blipspot ran this with
+    criterion 1 °C. Where the sounding never gets that warm the column top is
+    used; the value is never negative.
 
     Args:
-        theta:          potential temperature (K), 3D
+        theta:          potential temperature (K or C — only differences matter), 3D
         z:              height ASL (m), 3D
         ter:            terrain height ASL (m), 2D
         pblh:           PBL height AGL (m), 2D
-        criterion_degc: temperature range to sample (K)
+        criterion_degc: warming to test (K)
 
     Returns:
-        BL top potential temperature variability depth (m), 2D
+        Expected BL-top rise (m), 2D
     """
     bl_top = ter + pblh
     nz = theta.shape[0]
 
-    # Interpolate theta to exact BL top
+    # theta at the BL top (interpolated; the lowest level's value below it)
     theta_bltop = np.copy(theta[0]).astype(np.float64)
     for k in range(nz - 1):
         at_bltop = (z[k] <= bl_top) & (z[k + 1] > bl_top)
         if not np.any(at_bltop):
             continue
-        frac = np.clip(
-            (bl_top - z[k]) / np.maximum(z[k + 1] - z[k], 1.0), 0.0, 1.0
-        )
-        theta_bltop = np.where(
-            at_bltop, theta[k] + frac * (theta[k + 1] - theta[k]), theta_bltop
-        )
+        frac = np.clip((bl_top - z[k]) / np.maximum(z[k + 1] - z[k], 1.0), 0.0, 1.0)
+        theta_bltop = np.where(at_bltop, theta[k] + frac * (theta[k + 1] - theta[k]), theta_bltop)
+    target = theta_bltop + criterion_degc
 
-    # Find height range where theta is within +/- criterion of BL top theta
-    z_low = np.copy(bl_top).astype(np.float64)
-    z_high = np.copy(bl_top).astype(np.float64)
+    # first level above the BL top that is at least that warm, interpolated
+    z_target = np.copy(z[nz - 1]).astype(np.float64)
+    found = np.zeros_like(ter, dtype=bool)
+    for k in range(nz - 1):
+        crosses = (~found) & (z[k + 1] > bl_top) & (theta[k + 1] >= target)
+        if not np.any(crosses):
+            continue
+        z_lo = np.maximum(z[k], bl_top)
+        th_lo = np.where(z[k] >= bl_top, theta[k], theta_bltop)
+        dth = theta[k + 1] - th_lo
+        frac = np.where(dth > 0, (target - th_lo) / np.where(dth > 0, dth, 1.0), 1.0)
+        frac = np.clip(frac, 0.0, 1.0)
+        z_target = np.where(crosses, z_lo + frac * (z[k + 1] - z_lo), z_target)
+        found = found | crosses
 
-    for k in range(nz):
-        in_range = np.abs(theta[k] - theta_bltop) < criterion_degc
-        near_bltop = np.abs(z[k] - bl_top) < pblh
-        update = in_range & near_bltop
-        z_low = np.where(update & (z[k] < z_low), z[k], z_low)
-        z_high = np.where(update & (z[k] > z_high), z[k], z_high)
-
-    variability = z_high - z_low
-    return np.maximum(variability, 0.0).astype(np.float32)
+    return np.maximum(z_target - bl_top, 0.0).astype(np.float32)
 
 
 def calc_blinteg_mixratio(qfield, ptot, psfc, z, ter, pblh):

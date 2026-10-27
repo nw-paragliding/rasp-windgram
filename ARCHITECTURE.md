@@ -35,6 +35,7 @@ rasp/           Python package (pip install rasp-windgram)
   cli.py          Host-side CLI (wraps Docker)
   soaring.py      Soaring index calculations (w*, hcrit, BL diagnostics)
   windgram.py     Windgram renderer (matplotlib)
+  blipspot.py     The hourly table beside each PNG (<date>_<site>_blipspot.json)
   namelist_generator.py   domain.yaml → namelist.wps + namelist.input
   pipeline.py     Full pipeline orchestrator (drives WPS + WRF directly)
 

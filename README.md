@@ -68,6 +68,32 @@ Configuration via environment variables:
 | Numbers at top | Thermal climb rate w* (m/s) |
 | Cyan 32°F line | Freezing level |
 
+### The table behind the chart (`*_blipspot.json`)
+
+Beside every PNG the renderer writes `<date>_<site>_blipspot.json`: the hourly
+table wxtofly.net showed when you clicked a windgram (DrJack's "blipspot" point
+extraction), for the same hours as the chart. Pass `--no-blipspot` to skip it.
+
+```json
+{"schema": 1, "site": "Tiger", "model": "nam", "date": "2026-10-27", "utc_offset": -7,
+ "terrain_ft": 1545, "hours_local": [8, 9, ..., 20], "valid_utc": ["2026-10-27_15:00:00", ...],
+ "levels_agl_ft": {"sfc": 40, "treetop": 130, "above_treetop": 320},
+ "units": {"wstar_fpm": "ft/min", ...},
+ "params": {"wstar_fpm": [0, 60, 190, ...], "bl_top_ft": [...], ...}}
+```
+
+| Section | Rows (`params` keys) |
+|---|---|
+| Wind (kt, direction the wind is from) | lowest three model levels `sfc_wind`, `treetop_wind`, `above_treetop_wind` (heights in `levels_agl_ft`), `wind10m`, BL average `bl_wind`, BL top `bltop_wind` (each `_kt` + `_dir`), `bl_shear_kt`, `bl_convergence_cms` |
+| Thermal | `bs_ratio` (buoyancy/shear, DrJack's american-units formula, capped at 20), `wstar_fpm`, `hcrit_agl_ft`, `hcrit_ft`, `hglider_ft` (cloud-limited), `bl_top_ft`, `bl_depth_ft`, `bl_top_variability_ft`, `sfc_heating_wm2`, `mslp_mb` |
+| Clouds & moisture | `bl_cloud_pct`, `rain_1h_mm`, `td2_f`, `lcl_ft`, `od_potential_ft`, `od_base_ft`, `t2_f` |
+
+Rows a model cannot feed are left out (the HRRR direct reader has no 10 m
+wind, rain, W, HFX or PSFC); missing hours are `null`. CAPE and sunshine %
+are not produced. The numbers come from `rasp/blipspot.py`, which reuses the
+DrJack ports in `rasp/soaring.py`; the site (pnw-soaring) owns titles,
+descriptions and colours.
+
 ## Domain Configuration
 
 Specify a center point and target resolution. The system auto-generates the
