@@ -146,13 +146,15 @@ MODELS = {
         # list (41 isobaric levels, 2 m / 10 m, surface, 4 soil layers), the
         # max-wind/tropopause extras left out. Measured on gfs.t00z f099
         # (2026-11-13): 743 records -> 225 kept, 154 MB exact, 186 MB in 71
-        # ranges with gaps <= 2 MB merged (file 538 MB).
+        # ranges with gaps <= 2 MB merged (file 538 MB). 0.8.1 shipped PRMSL
+        # instead of MSLET: ungrib then had no PMSL and real.exe stopped with
+        # "not enough info for a p sfc computation".
         "idx_max_gap_mb": 2,
         "idx_subset": [
             "TMP:* mb", "UGRD:* mb", "VGRD:* mb", "RH:* mb", "HGT:* mb",
             "TMP:2 m above ground", "RH:2 m above ground",
             "UGRD:10 m above ground", "VGRD:10 m above ground",
-            "PRES:surface", "PRMSL:mean sea level", "HGT:surface",
+            "PRES:surface", "MSLET:mean sea level", "HGT:surface",   # PMSL in Vtable.GFS is MSLET (0/3/192), not PRMSL
             "TMP:surface", "WEASD:surface", "SNOD:surface",
             "LAND:surface", "ICEC:surface",
             "SOILW:* below ground", "TSOIL:* below ground",
