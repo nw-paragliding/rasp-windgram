@@ -167,7 +167,10 @@ MODELS = {
         # parent), like RRFS's 3 km. Spike: the issaquah tile first.
         "name": "HRDPS (High Resolution Deterministic Prediction System)",
         "dx": 2500.0,
-        "vtable": "Vtable.HRDPS",          # vtables/: ECCC's GRIB2 codes, 2 shallow soil layers
+        "vtable": "Vtable.HRDPS",          # vtables/: ECCC's GRIB2 codes (reference; see intermediate_writer)
+        # ungrib does not read the rotated lat-lon grid ("GRIB2 Unknown Projection:
+        # 1"), so rasp/hrdps_reader.py writes the WPS intermediate files itself.
+        "intermediate_writer": "hrdps",
         "interval_seconds": 3600,          # hourly output; the WPS path takes every 3rd hour
         "forecast_hours": list(range(0, 49)),
         "cycles": [0, 6, 12, 18],
