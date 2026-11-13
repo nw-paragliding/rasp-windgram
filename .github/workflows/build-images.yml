@@ -171,6 +171,12 @@ jobs:
           docker buildx imagetools create -t "${REGISTRY}/windgram:${VERSION}" \
             "${REGISTRY}/windgram:${VERSION}-amd64" \
             "${REGISTRY}/windgram:${VERSION}-arm64"
-          docker buildx imagetools create -t "${REGISTRY}/windgram:latest" \
-            "${REGISTRY}/windgram:${VERSION}-amd64" \
-            "${REGISTRY}/windgram:${VERSION}-arm64"
+          # A pre-release VERSION (anything with a hyphen, e.g. 0.9.0-hrdps.1) is
+          # a branch build for one workflow to pin: it never moves :latest, which
+          # every production forecast workflow pulls.
+          case "$VERSION" in
+            *-*) echo "pre-release ${VERSION}: :latest left alone" ;;
+            *) docker buildx imagetools create -t "${REGISTRY}/windgram:latest" \
+                 "${REGISTRY}/windgram:${VERSION}-amd64" \
+                 "${REGISTRY}/windgram:${VERSION}-arm64" ;;
+          esac

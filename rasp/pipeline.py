@@ -127,9 +127,10 @@ def _cycle_files_ready(model_cfg, date_compact, cycle, fhrs):
     if model_cfg.get("sfc_url_pattern"):
         patterns.append((model_cfg["sfc_url_pattern"], model_cfg.get("sfc_idx_subset")))
     subset = os.environ.get("RASP_IDX_SUBSET", "1") != "0"
+    field = model_cfg.get("probe_field", "")   # one-file-per-field models (HRDPS): probe one field
     for fhr in fhrs:
         for pat, idx in patterns:
-            url = pat.format(date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr)
+            url = pat.format(date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr, field=field)
             if not _remote_exists(url) or (idx and subset and not _remote_exists(url + ".idx")):
                 return False
     return True
@@ -355,15 +356,32 @@ def _fetch_grib_subset(url, dest, patterns, max_gap):
         client.close()
 
 
-def _curl_once(url, dest):
-    """One full-file curl download. Returns on success, raises _NotFound/RuntimeError."""
+USER_AGENT = "rasp-windgram (github.com/nw-paragliding/rasp-windgram)"   # MSC asks for a meaningful one
+
+
+def _is_grib(path):
+    try:
+        with open(path, "rb") as f:
+            return f.read(4) == b"GRIB"
+    except OSError:
+        return False
+
+
+def _curl_once(url, dest, min_bytes=1_000_000):
+    """One full-file curl download. Returns on success, raises _NotFound/RuntimeError.
+
+    A file counts as complete when it is at least min_bytes AND starts with the
+    GRIB magic: NOMADS/AWS files are many MB, but an HRDPS field file can be a
+    few hundred KB, so the size floor is per model (min_file_bytes).
+    """
     # No -L: a 302 from NOMADS is throttling, not a mirror to follow.
     result = subprocess.run(
-        ["curl", "--http1.1", "-sS", "-o", str(dest), "-w", "%{http_code}", url],
+        ["curl", "--http1.1", "-sS", "-A", USER_AGENT, "-o", str(dest), "-w", "%{http_code}", url],
         stdout=subprocess.PIPE, stderr=sys.stderr, text=True,
     )
     status = (result.stdout or "").strip()[-3:]
-    ok = result.returncode == 0 and status == "200" and dest.exists() and dest.stat().st_size > 1_000_000
+    ok = (result.returncode == 0 and status == "200" and dest.exists()
+          and dest.stat().st_size >= min_bytes and _is_grib(dest))
     if ok:
         return
     if dest.exists():
@@ -375,23 +393,24 @@ def _curl_once(url, dest):
     raise RuntimeError(f"HTTP {status}" if status != "200" else "HTTP 200 but file < 1MB")
 
 
-def _fetch_grib(url, dest, patterns=None, max_gap=0):
+def _fetch_grib(url, dest, patterns=None, max_gap=0, min_bytes=1_000_000, quiet=False):
     """Download one GRIB file (subset via .idx when patterns are given), with backoff."""
     dest = Path(dest)
     fname = dest.name
-    if dest.exists() and dest.stat().st_size > 1_000_000:
-        print(f"  {fname}: cached ({dest.stat().st_size // 1_000_000}MB)")
+    say = (lambda *a, **k: None) if quiet else print
+    if dest.exists() and dest.stat().st_size >= min_bytes and _is_grib(dest):
+        say(f"  {fname}: cached ({dest.stat().st_size // 1_000_000}MB)")
         return True
 
-    print(f"  Downloading {fname}...", flush=True)
+    say(f"  Downloading {fname}...", flush=True)
     try:
         if patterns and os.environ.get("RASP_IDX_SUBSET", "1") != "0":
             if _fetch_grib_subset(url, dest, patterns, max_gap):
-                print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB, subset)")
+                say(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB, subset)")
                 return True
 
-        _with_backoff(fname, lambda: _curl_once(url, dest))
-        print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB)")
+        _with_backoff(fname, lambda: _curl_once(url, dest, min_bytes))
+        say(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB)")
         return True
     except (_NotFound, _Throttled) as ex:
         print(f"  ERROR: {fname} download failed: {ex}")
@@ -412,6 +431,33 @@ def _download_grib(model_cfg, date, cycle, fhours, dest_dir):
     Path(dest_dir).mkdir(parents=True, exist_ok=True)
     date_compact = date.replace("-", "")
     max_gap = int(model_cfg.get("idx_max_gap_mb", 4) * 1_000_000)
+
+    fields = model_cfg.get("fields")
+    if fields:
+        # One-file-per-field layout (HRDPS on the MSC Datamart): every field is a
+        # small whole file, so no .idx subsetting; ~150 files per hour. Fetched
+        # with a pool of workers: one at a time took 35 min for 770 files
+        # (2026-11-13), a dozen at once a few minutes. Still ~800 requests per
+        # leg, well under MSC's 1-request-per-second guidance averaged over a day.
+        from concurrent.futures import ThreadPoolExecutor
+        min_bytes = model_cfg.get("min_file_bytes", 1_000_000)
+        workers = int(os.environ.get("RASP_DOWNLOAD_WORKERS", model_cfg.get("download_workers", 12)))
+        total = 0
+        for fhr in fhours:
+            jobs = []
+            for field in fields:
+                url = model_cfg["url_pattern"].format(date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr, field=field)
+                jobs.append((url, Path(dest_dir) / url.split("/")[-1]))
+            with ThreadPoolExecutor(max_workers=workers) as pool:
+                results = list(pool.map(lambda j: _fetch_grib(j[0], j[1], None, 0, min_bytes, quiet=True), jobs))
+            failed = [j[0].split("/")[-1] for j, ok in zip(jobs, results) if not ok]
+            if failed:
+                print(f"  ERROR: f{fhr:03d}: {len(failed)} field(s) failed, e.g. {failed[0]}")
+                sys.exit(1)
+            total += len(jobs)
+            print(f"  f{fhr:03d}: {len(jobs)} fields", flush=True)
+        print(f"\n  Downloaded {total} files ({len(fhours)} hours x {len(fields)} fields) to {dest_dir}")
+        return
 
     jobs = [("", model_cfg["url_pattern"], model_cfg.get("idx_subset"))]
     if model_cfg.get("sfc_url_pattern"):
@@ -442,7 +488,7 @@ def _detect_latest_cycle(model, date=None, model_cfg=None):
     if model_cfg is None:
         model_cfg = _resolve_model_urls(dict(MODELS[model]), model)
 
-    if model_cfg.get("source") != "nomads":
+    if model_cfg.get("source") not in ("nomads", "msc_datamart"):
         return date, "00"
 
     # Try each known cycle (newest first) and check if a sample file exists
@@ -453,7 +499,7 @@ def _detect_latest_cycle(model, date=None, model_cfg=None):
         dc = try_date.replace("-", "")
         for cyc in known_cycles:
             # Check if a low forecast hour file exists (fhr 3 as probe)
-            probe_url = url_pattern.format(date=dc, cycle=f"{cyc:02d}", fhr=3)
+            probe_url = url_pattern.format(date=dc, cycle=f"{cyc:02d}", fhr=3, field=model_cfg.get("probe_field", ""))
             if _remote_exists(probe_url):
                 print(f"  Auto-detected latest cycle: {try_date} {cyc:02d}z")
                 return try_date, f"{cyc:02d}"
@@ -802,49 +848,63 @@ def run_pipeline(config_path, date=None, cycle=None, target_date=None,
     else:
         print(f"  geogrid: cached (geo_em files exist)")
 
-    # 3b. Link GRIB files
-    grib_files = sorted(
-        list(Path(grib_dir).glob("*.grib2")) +
-        list(Path(grib_dir).glob("*.pgrb2*"))
-    )
-    if not grib_files:
-        print(f"  ERROR: No GRIB2 files found in {grib_dir}")
-        sys.exit(1)
+    if model_cfg.get("intermediate_writer") == "hrdps":
+        # 3b-d'. HRDPS: ungrib cannot read its rotated lat-lon grid ("GRIB2
+        # Unknown Projection: 1"), so the intermediate files are written directly
+        # (rasp/hrdps_reader.py), sampled onto a lat-lon box around the tile;
+        # metgrid takes it from there exactly as after ungrib.
+        from .hrdps_reader import write_intermediate
+        for f in Path(wps_dir).glob("FILE:*"):
+            f.unlink()
+        cycle_dt = datetime.strptime(f"{date}_{int(cycle):02d}", "%Y-%m-%d_%H")
+        valid = {cycle_dt + timedelta(hours=int(h)) for h in download_fhours}
+        file_count = write_intermediate(grib_dir, wps_dir, config["center_lat"], config["center_lon"], valid)
+        print(f"  intermediate (HRDPS reader): OK ({file_count} files)")
+    else:
+        # 3b. Link GRIB files
+        grib_files = sorted(
+            list(Path(grib_dir).glob("*.grib2")) +
+            list(Path(grib_dir).glob("*.pgrb2*"))
+        )
+        if not grib_files:
+            print(f"  ERROR: No GRIB2 files found in {grib_dir}")
+            sys.exit(1)
 
-    for f in Path(wps_dir).glob("GRIBFILE.*"):
-        f.unlink()
-    for i, f in enumerate(grib_files):
-        c1 = chr(65 + i // 676)
-        c2 = chr(65 + (i % 676) // 26)
-        c3 = chr(65 + i % 26)
-        link = Path(wps_dir) / f"GRIBFILE.{c1}{c2}{c3}"
-        link.symlink_to(f)
-    print(f"  Linked {len(grib_files)} GRIB files")
+        for f in Path(wps_dir).glob("GRIBFILE.*"):
+            f.unlink()
+        for i, f in enumerate(grib_files):
+            c1 = chr(65 + i // 676)
+            c2 = chr(65 + (i % 676) // 26)
+            c3 = chr(65 + i % 26)
+            link = Path(wps_dir) / f"GRIBFILE.{c1}{c2}{c3}"
+            link.symlink_to(f)
+        print(f"  Linked {len(grib_files)} GRIB files")
 
-    # 3c. Link Vtable
-    # Use wrf_vtable if available (single-pass: atmosphere + soil + hydrometeors)
-    vtable_name = model_cfg.get("wrf_vtable", model_cfg["vtable"])
-    vtable_src = Path(wps_dir) / "Variable_Tables" / vtable_name
-    vtable_dst = Path(wps_dir) / "Vtable"
-    if vtable_dst.exists() or vtable_dst.is_symlink():
-        vtable_dst.unlink()
-    vtable_dst.symlink_to(vtable_src)
-    print(f"  Vtable: {vtable_name}")
+        # 3c. Link Vtable
+        # Use wrf_vtable if available (single-pass: atmosphere + soil + hydrometeors)
+        vtable_name = model_cfg.get("wrf_vtable", model_cfg["vtable"])
+        vtable_src = Path(wps_dir) / "Variable_Tables" / vtable_name
+        vtable_dst = Path(wps_dir) / "Vtable"
+        if vtable_dst.exists() or vtable_dst.is_symlink():
+            vtable_dst.unlink()
+        vtable_dst.symlink_to(vtable_src)
+        print(f"  Vtable: {vtable_name}")
 
-    # 3d. ungrib (atmosphere)
-    _run_exe(["./ungrib.exe"], "ungrib", cwd=wps_dir)
-    file_count = len(list(Path(wps_dir).glob("FILE:*")))
-    if file_count == 0:
-        print("  ERROR: ungrib produced no FILE:* intermediates (Vtable/GRIB mismatch?)")
-        _tail_log(Path(wps_dir) / "ungrib.log")
-        sys.exit(1)
-    print(f"  ungrib: OK ({file_count} intermediate files)")
+        # 3d. ungrib (atmosphere)
+        _run_exe(["./ungrib.exe"], "ungrib", cwd=wps_dir)
+        file_count = len(list(Path(wps_dir).glob("FILE:*")))
+        if file_count == 0:
+            print("  ERROR: ungrib produced no FILE:* intermediates (Vtable/GRIB mismatch?)")
+            _tail_log(Path(wps_dir) / "ungrib.log")
+            sys.exit(1)
+        print(f"  ungrib: OK ({file_count} intermediate files)")
 
     # 3d'. Second ungrib pass — extract soil fields with a different Vtable.
     # Vtable.raphrrr extracts soil data from wrfprs at below-ground levels
     # (atmosphere fields don't match due to hybrid vs pressure level types).
     sfc_vtable_name = model_cfg.get("sfc_vtable")
     if sfc_vtable_name:
+        vtable_dst = Path(wps_dir) / "Vtable"
         # GRIB files are already linked — just switch Vtable and prefix
         vtable_src = Path(wps_dir) / "Variable_Tables" / sfc_vtable_name
         if vtable_dst.is_symlink():

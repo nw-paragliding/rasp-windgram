@@ -146,28 +146,60 @@ MODELS = {
         # list (41 isobaric levels, 2 m / 10 m, surface, 4 soil layers), the
         # max-wind/tropopause extras left out. Measured on gfs.t00z f099
         # (2026-11-13): 743 records -> 225 kept, 154 MB exact, 186 MB in 71
-        # ranges with gaps <= 2 MB merged (file 538 MB).
+        # ranges with gaps <= 2 MB merged (file 538 MB). 0.8.1 shipped PRMSL
+        # instead of MSLET: ungrib then had no PMSL and real.exe stopped with
+        # "not enough info for a p sfc computation".
         "idx_max_gap_mb": 2,
         "idx_subset": [
             "TMP:* mb", "UGRD:* mb", "VGRD:* mb", "RH:* mb", "HGT:* mb",
             "TMP:2 m above ground", "RH:2 m above ground",
             "UGRD:10 m above ground", "VGRD:10 m above ground",
-            "PRES:surface", "PRMSL:mean sea level", "HGT:surface",
+            "PRES:surface", "MSLET:mean sea level", "HGT:surface",   # PMSL in Vtable.GFS is MSLET (0/3/192), not PRMSL
             "TMP:surface", "WEASD:surface", "SNOD:surface",
             "LAND:surface", "ICEC:surface",
             "SOILW:* below ground", "TSOIL:* below ground",
         ],
     },
     "hrdps": {
+        # ECCC's 2.5 km continental run: 4 cycles a day to 48 h, complete ~3 h
+        # after cycle time, on a rotated lat-lon grid (GRIB2 template 3.1,
+        # 2540 x 1290 at 0.0225 deg, southern pole 36.09S 114.69W) that reaches
+        # from ~41.3N to the Arctic: the driver for BC sites north of the HRRR
+        # and RRFS grids. Feeds the same DrJack chain (2.5 km onto the 4 km
+        # parent), like RRFS's 3 km. Spike: the issaquah tile first.
         "name": "HRDPS (High Resolution Deterministic Prediction System)",
         "dx": 2500.0,
-        "vtable": "Vtable.HRDPS",      # TODO: create or find
-        "interval_seconds": 3600,
+        "vtable": "Vtable.HRDPS",          # vtables/: ECCC's GRIB2 codes (reference; see intermediate_writer)
+        # ungrib does not read the rotated lat-lon grid ("GRIB2 Unknown Projection:
+        # 1"), so rasp/hrdps_reader.py writes the WPS intermediate files itself.
+        "intermediate_writer": "hrdps",
+        "interval_seconds": 3600,          # hourly output; the WPS path takes every 3rd hour
         "forecast_hours": list(range(0, 49)),
         "cycles": [0, 6, 12, 18],
-        "coverage": "Canada",
+        "coverage": "Canada and the northern US (continental domain)",
         "source": "msc_datamart",
-        "url_pattern": "https://dd.weather.gc.ca/model_hrdps/continental/2.5km/{cycle}/{fhr:03d}/",
+        # One file per field per hour on the Datamart (no bundles, no .idx), so
+        # the entry lists the FIELDS a leg needs and the pattern takes {field}.
+        # {root}: RASP_HRDPS_ROOT, else the Datamart's rolling /today/ tree;
+        # the HPFX mirror (hpfx.collab.science.gc.ca/today/model_hrdps/...)
+        # has the same layout with more bandwidth at peak.
+        "root": "https://dd.weather.gc.ca/today/model_hrdps/continental/2.5km",
+        "url_pattern": "{root}/{cycle}/{fhr:03d}/{date}T{cycle}Z_MSC_HRDPS_{field}_RLatLon0.0225_PT{fhr:03d}H.grib2",
+        # Vtable.HRDPS's fields: 5 variables x 28 isobaric levels (1015-50 hPa),
+        # 2 m / 10 m, surface pressure, MSLP, terrain, skin T, snow, and the one
+        # standard-named soil layer ECCC publishes (0-10 cm; the reader copies
+        # it down to 10-40 cm for real.exe). ~152 files, ~300 MB per hour.
+        "fields": (
+            [f"{v}_ISBL_{lvl:04d}" for lvl in (1015, 1000, 985, 970, 950, 925, 900, 875, 850, 800, 750, 700, 650,
+                                                 600, 550, 500, 450, 400, 350, 300, 275, 250, 225, 200, 175, 150, 100, 50)
+             for v in ("TMP", "HGT", "RH", "UGRD", "VGRD")]
+            + ["TMP_AGL-2m", "RH_AGL-2m", "UGRD_AGL-10m", "VGRD_AGL-10m",
+               "PRES_Sfc", "PRMSL_MSL", "HGT_Sfc", "SKINT_Sfc",
+               "TSOIL_DBS-0-10cm", "SOILW_DBS-0-10cm",
+               "SNOD_Sfc", "SDWE_Sfc"]
+        ),
+        "probe_field": "VGRD_ISBL_0050",   # readiness probe: one field per hour stands for the set
+        "min_file_bytes": 100_000,         # a field file is 0.3-4 MB (the default floor of 1 MB would reject the small ones)
     },
 }
 
