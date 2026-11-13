@@ -123,6 +123,9 @@ MODELS = {
         "sfc_glob": "*2dfld*.grib2",
     },
     "gfs": {
+        # Days 3+ outlook driver: RRFS reaches 84 h, GFS 384 h. It feeds the same
+        # DrJack chain as NAM did (25 km onto the 4 km parent is a smaller jump
+        # than NAM's actual 40 km grid 212), with NAM-style 4-layer soil.
         "name": "GFS (Global Forecast System)",
         "dx": 25000.0,
         "vtable": "Vtable.GFS",
@@ -131,7 +134,29 @@ MODELS = {
         "cycles": [0, 6, 12, 18],
         "coverage": "Global",
         "source": "nomads",
-        "url_pattern": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.{date}/{cycle}/atmos/gfs.t{cycle}z.pgrb2.0p25.f{fhr:03d}",
+        # {root}: RASP_GFS_ROOT env var, else "root" below. NOAA's Open Data
+        # mirror noaa-gfs-bdp-pds has the same gfs.YYYYMMDD/HH/atmos/ layout and
+        # .idx sidecars, ~1-4 min behind NOMADS, no throttling; NOMADS would be
+        # https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod.
+        "root": "https://noaa-gfs-bdp-pds.s3.amazonaws.com",
+        "url_pattern": "{root}/gfs.{date}/{cycle}/atmos/gfs.t{cycle}z.pgrb2.0p25.f{fhr:03d}",
+        # One file per hour holds atmosphere and surface alike, but it is global
+        # and ~540 MB (743 records): byte-range subsetting through the .idx is
+        # essential. Patterns fnmatch "VAR:LEVEL"; this is Vtable.GFS's field
+        # list (41 isobaric levels, 2 m / 10 m, surface, 4 soil layers), the
+        # max-wind/tropopause extras left out. Measured on gfs.t00z f099
+        # (2026-11-13): 743 records -> 225 kept, 154 MB exact, 186 MB in 71
+        # ranges with gaps <= 2 MB merged (file 538 MB).
+        "idx_max_gap_mb": 2,
+        "idx_subset": [
+            "TMP:* mb", "UGRD:* mb", "VGRD:* mb", "RH:* mb", "HGT:* mb",
+            "TMP:2 m above ground", "RH:2 m above ground",
+            "UGRD:10 m above ground", "VGRD:10 m above ground",
+            "PRES:surface", "PRMSL:mean sea level", "HGT:surface",
+            "TMP:surface", "WEASD:surface", "SNOD:surface",
+            "LAND:surface", "ICEC:surface",
+            "SOILW:* below ground", "TSOIL:* below ground",
+        ],
     },
     "hrdps": {
         "name": "HRDPS (High Resolution Deterministic Prediction System)",
