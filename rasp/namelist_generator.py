@@ -159,15 +159,42 @@ MODELS = {
         ],
     },
     "hrdps": {
+        # ECCC's 2.5 km continental run: 4 cycles a day to 48 h, complete ~3 h
+        # after cycle time, on a rotated lat-lon grid (GRIB2 template 3.1,
+        # 2540 x 1290 at 0.0225 deg, southern pole 36.09S 114.69W) that reaches
+        # from ~41.3N to the Arctic: the driver for BC sites north of the HRRR
+        # and RRFS grids. Feeds the same DrJack chain (2.5 km onto the 4 km
+        # parent), like RRFS's 3 km. Spike: the issaquah tile first.
         "name": "HRDPS (High Resolution Deterministic Prediction System)",
         "dx": 2500.0,
-        "vtable": "Vtable.HRDPS",      # TODO: create or find
-        "interval_seconds": 3600,
+        "vtable": "Vtable.HRDPS",          # vtables/: ECCC's GRIB2 codes, 2 shallow soil layers
+        "interval_seconds": 3600,          # hourly output; the WPS path takes every 3rd hour
         "forecast_hours": list(range(0, 49)),
         "cycles": [0, 6, 12, 18],
-        "coverage": "Canada",
+        "coverage": "Canada and the northern US (continental domain)",
         "source": "msc_datamart",
-        "url_pattern": "https://dd.weather.gc.ca/model_hrdps/continental/2.5km/{cycle}/{fhr:03d}/",
+        # One file per field per hour on the Datamart (no bundles, no .idx), so
+        # the entry lists the FIELDS a leg needs and the pattern takes {field}.
+        # {root}: RASP_HRDPS_ROOT, else the Datamart's rolling /today/ tree;
+        # the HPFX mirror (hpfx.collab.science.gc.ca/today/model_hrdps/...)
+        # has the same layout with more bandwidth at peak.
+        "root": "https://dd.weather.gc.ca/today/model_hrdps/continental/2.5km",
+        "url_pattern": "{root}/{cycle}/{fhr:03d}/{date}T{cycle}Z_MSC_HRDPS_{field}_RLatLon0.0225_PT{fhr:03d}H.grib2",
+        # Vtable.HRDPS's fields: 5 variables x 28 isobaric levels (1015-50 hPa),
+        # 2 m / 10 m, surface pressure, MSLP, terrain, skin T, snow, and the two
+        # soil layers ECCC publishes (0-1 and 0-10 cm; no deeper ones exist).
+        # ~154 files, ~300 MB per hour.
+        "fields": (
+            [f"{v}_ISBL_{lvl:04d}" for lvl in (1015, 1000, 985, 970, 950, 925, 900, 875, 850, 800, 750, 700, 650,
+                                                 600, 550, 500, 450, 400, 350, 300, 275, 250, 225, 200, 175, 150, 100, 50)
+             for v in ("TMP", "HGT", "RH", "UGRD", "VGRD")]
+            + ["TMP_AGL-2m", "RH_AGL-2m", "UGRD_AGL-10m", "VGRD_AGL-10m",
+               "PRES_Sfc", "PRMSL_MSL", "HGT_Sfc", "SKINT_Sfc",
+               "TSOIL_Sfc", "TSOIL_DBS-0-10cm", "SOILW_DBS-0-1cm", "SOILW_DBS-0-10cm",
+               "SNOD_Sfc", "SDWE_Sfc"]
+        ),
+        "probe_field": "VGRD_ISBL_0050",   # readiness probe: one field per hour stands for the set
+        "min_file_bytes": 100_000,         # a field file is 0.3-4 MB (the default floor of 1 MB would reject the small ones)
     },
 }
 

@@ -1,0 +1,36 @@
+GRIB1| Level| From |  To  | metgrid  | metgrid | metgrid                                 |GRIB2|GRIB2|GRIB2|GRIB2|
+Param| Type |Level1|Level2| Name     | Units   | Description                             |Discp|Catgy|Param|Level|
+-----+------+------+------+----------+---------+-----------------------------------------+-----------------------+
+  11 | 100  |   *  |      | TT       | K       | Temperature                             |  0  |  0  |  0  | 100 |
+  33 | 100  |   *  |      | UU       | m s-1   | U                                       |  0  |  2  |  2  | 100 |
+  34 | 100  |   *  |      | VV       | m s-1   | V                                       |  0  |  2  |  3  | 100 |
+  52 | 100  |   *  |      | RH       | %       | Relative Humidity                       |  0  |  1  |  1  | 100 |
+   7 | 100  |   *  |      | HGT      | m       | Height                                  |  0  |  3  |  5  | 100 |
+  11 | 105  |   2  |      | TT       | K       | Temperature       at 2 m                |  0  |  0  |  0  | 103 |
+  52 | 105  |   2  |      | RH       | %       | Relative Humidity at 2 m                |  0  |  1  |  1  | 103 |
+  33 | 105  |  10  |      | UU       | m s-1   | U                 at 10 m               |  0  |  2  |  2  | 103 |
+  34 | 105  |  10  |      | VV       | m s-1   | V                 at 10 m               |  0  |  2  |  3  | 103 |
+   1 |   1  |   0  |      | PSFC     | Pa      | Surface Pressure                        |  0  |  3  |  0  |   1 |
+   2 | 102  |   0  |      | PMSL     | Pa      | Sea-level Pressure (PRMSL)              |  0  |  3  |  1  | 101 |
+ 144 | 112  |   0  |   1  | SM000001 | fraction| Soil Moist 0-1 cm below ground          |  2  |  0  | 25  | 106 |
+ 144 | 112  |   0  |  10  | SM000010 | fraction| Soil Moist 0-10 cm below ground         |  2  |  0  | 25  | 106 |
+  85 | 112  |   0  |  10  | ST000010 | K       | Soil Temp 0-10 cm below ground          |  2  |  0  |  2  | 106 |
+  85 |   1  |   0  |      | ST000000 | K       | Soil surface temperature (TSOIL_Sfc)    |  2  |  0  |  2  |   1 |
+   7 |   1  |   0  |      | SOILHGT  | m       | Terrain field of source analysis        |  0  |  3  |  5  |   1 |
+  11 |   1  |   0  |      | SKINTEMP | K       | Skin temperature (SKINT)                |  0  |  0  | 17  |   1 |
+  65 |   1  |   0  |      | SNOW     | kg m-2  | Water equivalent snow depth (SDWE)      |  0  |  1  | 60  |   1 |
+  66 |   1  |   0  |      | SNOWH    | m       | Physical Snow Depth (SNOD)              |  0  |  1  | 11  |   1 |
+-----+------+------+------+----------+---------+-----------------------------------------+-----------------------+
+#
+# Vtable.HRDPS -- ECCC HRDPS continental 2.5 km, GRIB2 (one field per file on
+# the MSC Datamart). Codes read from the files themselves (2026-11-13):
+#   isobaric TMP 0/0/0, HGT 0/3/5, RH 0/1/1, UGRD 0/2/2, VGRD 0/2/3 at level 100;
+#   2 m TMP/RH and 10 m UGRD/VGRD at 103; PRES_Sfc 0/3/0 @1; PRMSL 0/3/1 @101;
+#   HGT_Sfc 0/3/5 @1; SKINT 0/0/17 @1; SNOD 0/1/11 @1; SDWE 0/1/60 @1;
+#   TSOIL 2/0/2 (@106 0-0.1 m, and @1 as TSOIL_Sfc); SOILW 2/0/25 @106 0-0.01 / 0-0.1 m.
+# Soil: ECCC publishes only two shallow moisture layers and one temperature
+# layer plus the soil surface, so real.exe interpolates Noah's four layers from
+# 0-1 / 0-10 cm (SM) and 0 / 0-10 cm (ST). HRDPS has no LANDSEA or SEAICE
+# field: the land mask comes from geogrid, sea ice is absent (none in the PNW
+# soaring season). RH is used for moisture (SPFH also exists). The GRIB1
+# columns are nominal; ungrib matches on the GRIB2 columns.

@@ -127,9 +127,10 @@ def _cycle_files_ready(model_cfg, date_compact, cycle, fhrs):
     if model_cfg.get("sfc_url_pattern"):
         patterns.append((model_cfg["sfc_url_pattern"], model_cfg.get("sfc_idx_subset")))
     subset = os.environ.get("RASP_IDX_SUBSET", "1") != "0"
+    field = model_cfg.get("probe_field", "")   # one-file-per-field models (HRDPS): probe one field
     for fhr in fhrs:
         for pat, idx in patterns:
-            url = pat.format(date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr)
+            url = pat.format(date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr, field=field)
             if not _remote_exists(url) or (idx and subset and not _remote_exists(url + ".idx")):
                 return False
     return True
@@ -355,15 +356,32 @@ def _fetch_grib_subset(url, dest, patterns, max_gap):
         client.close()
 
 
-def _curl_once(url, dest):
-    """One full-file curl download. Returns on success, raises _NotFound/RuntimeError."""
+USER_AGENT = "rasp-windgram (github.com/nw-paragliding/rasp-windgram)"   # MSC asks for a meaningful one
+
+
+def _is_grib(path):
+    try:
+        with open(path, "rb") as f:
+            return f.read(4) == b"GRIB"
+    except OSError:
+        return False
+
+
+def _curl_once(url, dest, min_bytes=1_000_000):
+    """One full-file curl download. Returns on success, raises _NotFound/RuntimeError.
+
+    A file counts as complete when it is at least min_bytes AND starts with the
+    GRIB magic: NOMADS/AWS files are many MB, but an HRDPS field file can be a
+    few hundred KB, so the size floor is per model (min_file_bytes).
+    """
     # No -L: a 302 from NOMADS is throttling, not a mirror to follow.
     result = subprocess.run(
-        ["curl", "--http1.1", "-sS", "-o", str(dest), "-w", "%{http_code}", url],
+        ["curl", "--http1.1", "-sS", "-A", USER_AGENT, "-o", str(dest), "-w", "%{http_code}", url],
         stdout=subprocess.PIPE, stderr=sys.stderr, text=True,
     )
     status = (result.stdout or "").strip()[-3:]
-    ok = result.returncode == 0 and status == "200" and dest.exists() and dest.stat().st_size > 1_000_000
+    ok = (result.returncode == 0 and status == "200" and dest.exists()
+          and dest.stat().st_size >= min_bytes and _is_grib(dest))
     if ok:
         return
     if dest.exists():
@@ -375,11 +393,11 @@ def _curl_once(url, dest):
     raise RuntimeError(f"HTTP {status}" if status != "200" else "HTTP 200 but file < 1MB")
 
 
-def _fetch_grib(url, dest, patterns=None, max_gap=0):
+def _fetch_grib(url, dest, patterns=None, max_gap=0, min_bytes=1_000_000):
     """Download one GRIB file (subset via .idx when patterns are given), with backoff."""
     dest = Path(dest)
     fname = dest.name
-    if dest.exists() and dest.stat().st_size > 1_000_000:
+    if dest.exists() and dest.stat().st_size >= min_bytes and _is_grib(dest):
         print(f"  {fname}: cached ({dest.stat().st_size // 1_000_000}MB)")
         return True
 
@@ -390,7 +408,7 @@ def _fetch_grib(url, dest, patterns=None, max_gap=0):
                 print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB, subset)")
                 return True
 
-        _with_backoff(fname, lambda: _curl_once(url, dest))
+        _with_backoff(fname, lambda: _curl_once(url, dest, min_bytes))
         print(f"  {fname}: OK ({dest.stat().st_size // 1_000_000}MB)")
         return True
     except (_NotFound, _Throttled) as ex:
@@ -412,6 +430,24 @@ def _download_grib(model_cfg, date, cycle, fhours, dest_dir):
     Path(dest_dir).mkdir(parents=True, exist_ok=True)
     date_compact = date.replace("-", "")
     max_gap = int(model_cfg.get("idx_max_gap_mb", 4) * 1_000_000)
+
+    fields = model_cfg.get("fields")
+    if fields:
+        # One-file-per-field layout (HRDPS on the MSC Datamart): every field is a
+        # small whole file, so no .idx subsetting; ~150 files per hour.
+        total = 0
+        for fhr in fhours:
+            got = 0
+            for field in fields:
+                url = model_cfg["url_pattern"].format(date=date_compact, cycle=f"{int(cycle):02d}", fhr=fhr, field=field)
+                dest = Path(dest_dir) / url.split("/")[-1]
+                if not _fetch_grib(url, dest, None, 0, model_cfg.get("min_file_bytes", 1_000_000)):
+                    sys.exit(1)
+                got += 1
+            total += got
+            print(f"  f{fhr:03d}: {got} fields", flush=True)
+        print(f"\n  Downloaded {total} files ({len(fhours)} hours x {len(fields)} fields) to {dest_dir}")
+        return
 
     jobs = [("", model_cfg["url_pattern"], model_cfg.get("idx_subset"))]
     if model_cfg.get("sfc_url_pattern"):
@@ -442,7 +478,7 @@ def _detect_latest_cycle(model, date=None, model_cfg=None):
     if model_cfg is None:
         model_cfg = _resolve_model_urls(dict(MODELS[model]), model)
 
-    if model_cfg.get("source") != "nomads":
+    if model_cfg.get("source") not in ("nomads", "msc_datamart"):
         return date, "00"
 
     # Try each known cycle (newest first) and check if a sample file exists
@@ -453,7 +489,7 @@ def _detect_latest_cycle(model, date=None, model_cfg=None):
         dc = try_date.replace("-", "")
         for cyc in known_cycles:
             # Check if a low forecast hour file exists (fhr 3 as probe)
-            probe_url = url_pattern.format(date=dc, cycle=f"{cyc:02d}", fhr=3)
+            probe_url = url_pattern.format(date=dc, cycle=f"{cyc:02d}", fhr=3, field=model_cfg.get("probe_field", ""))
             if _remote_exists(probe_url):
                 print(f"  Auto-detected latest cycle: {try_date} {cyc:02d}z")
                 return try_date, f"{cyc:02d}"
