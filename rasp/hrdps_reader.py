@@ -44,11 +44,26 @@ SFC = {
     "SKINT_Sfc": ("SKINTEMP", "K", "Skin temperature"),
     "SDWE_Sfc": ("SNOW", "kg m-2", "Water equivalent snow depth"),
     "SNOD_Sfc": ("SNOWH", "m", "Physical Snow Depth"),
-    "SOILW_DBS-0-1cm": ("SM000001", "fraction", "Soil Moist 0-1 cm below ground"),
     "SOILW_DBS-0-10cm": ("SM000010", "fraction", "Soil Moist 0-10 cm below ground"),
-    "TSOIL_Sfc": ("ST000000", "K", "Soil temperature at the surface"),
     "TSOIL_DBS-0-10cm": ("ST000010", "K", "Soil Temp 0-10 cm below ground"),
 }
+# metgrid counts only the soil layers METGRID.TBL names (SM000010, SM010040, ...),
+# and real.exe insists on at least two. HRDPS publishes one usable layer (0-10
+# cm; the 0-1 cm moisture and the "surface" soil temperature have no standard
+# name), so the 0-10 cm values are carried down into a 10-40 cm layer: a uniform
+# profile real.exe can interpolate Noah's four layers from. WRF's deep-soil
+# temperature comes from geogrid's TMN regardless.
+DEEP_LAYERS = (("SM000010", "SM010040", "Soil Moist 10-40 cm (copied from 0-10 cm: HRDPS has no deeper layer)"),
+               ("ST000010", "ST010040", "Soil Temp 10-40 cm (copied from 0-10 cm: HRDPS has no deeper layer)"))
+
+
+def add_deep_soil_layers(fields):
+    """Add the 10-40 cm layers to a {(name, level): (slab, units, desc)} dict, in place."""
+    for src, dst, desc in DEEP_LAYERS:
+        if (src, SURFACE) in fields and (dst, SURFACE) not in fields:
+            slab, units, _ = fields[(src, SURFACE)]
+            fields[(dst, SURFACE)] = (slab.copy(), units, desc)
+    return fields
 _FNAME = re.compile(r"(\d{8})T(\d{2})Z_MSC_HRDPS_(.+)_RLatLon[\d.]+_PT(\d{3})H\.grib2$")
 
 
@@ -229,6 +244,7 @@ def write_intermediate(grib_dir, wps_dir, center_lat, center_lon, valid_times=No
                 ve = u * np.sin(theta) + v * np.cos(theta)
                 fields[("UU", xlvl)] = (ue, uu, ud)
                 fields[("VV", xlvl)] = (ve, vu, vd)
+        add_deep_soil_layers(fields)
         hdate = valid.strftime("%Y-%m-%d_%H:%M:%S")
         out = Path(wps_dir) / f"{prefix}:{valid.strftime('%Y-%m-%d_%H')}"
         with open(out, "wb") as fh:

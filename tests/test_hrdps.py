@@ -5,7 +5,7 @@ from io import BytesIO
 
 import numpy as np
 
-from rasp.hrdps_reader import RotatedGrid, classify, target_box, write_slab, SURFACE
+from rasp.hrdps_reader import RotatedGrid, add_deep_soil_layers, classify, target_box, write_slab, SURFACE
 
 # The continental grid as read from a 2026-11-13 file.
 GRID = RotatedGrid(2540, 1290, -12.302501, 345.17878, 0.0225, 0.0225, -36.08852, 245.305142)
@@ -60,3 +60,12 @@ def test_write_slab_is_a_version_5_record_sequence():
     assert (xlvl, nx, ny, iproj) == (85000.0, 4, 3, 0)
     assert recs[2][:8] == b"SWCORNER" and struct.unpack(">i", recs[3])[0] == 1
     assert np.array_equal(np.frombuffer(recs[4], dtype=">f4").reshape(3, 4), slab)
+
+
+def test_deep_soil_layers_are_copied_from_the_shallow_ones():
+    sm = np.full((2, 2), 0.3); st = np.full((2, 2), 280.0)
+    fields = {("SM000010", SURFACE): (sm, "fraction", "x"), ("ST000010", SURFACE): (st, "K", "y"), ("TT", 85000.0): (st, "K", "z")}
+    add_deep_soil_layers(fields)
+    assert np.array_equal(fields[("SM010040", SURFACE)][0], sm) and np.array_equal(fields[("ST010040", SURFACE)][0], st)
+    assert sum(1 for n, _ in fields if n.startswith("SM")) == 2 and sum(1 for n, _ in fields if n.startswith("ST")) == 2
+    assert classify("20261113T06Z_MSC_HRDPS_SOILW_DBS-0-1cm_RLatLon0.0225_PT012H.grib2") is None

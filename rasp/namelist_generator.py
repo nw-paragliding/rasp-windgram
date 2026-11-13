@@ -184,16 +184,16 @@ MODELS = {
         "root": "https://dd.weather.gc.ca/today/model_hrdps/continental/2.5km",
         "url_pattern": "{root}/{cycle}/{fhr:03d}/{date}T{cycle}Z_MSC_HRDPS_{field}_RLatLon0.0225_PT{fhr:03d}H.grib2",
         # Vtable.HRDPS's fields: 5 variables x 28 isobaric levels (1015-50 hPa),
-        # 2 m / 10 m, surface pressure, MSLP, terrain, skin T, snow, and the two
-        # soil layers ECCC publishes (0-1 and 0-10 cm; no deeper ones exist).
-        # ~154 files, ~300 MB per hour.
+        # 2 m / 10 m, surface pressure, MSLP, terrain, skin T, snow, and the one
+        # standard-named soil layer ECCC publishes (0-10 cm; the reader copies
+        # it down to 10-40 cm for real.exe). ~152 files, ~300 MB per hour.
         "fields": (
             [f"{v}_ISBL_{lvl:04d}" for lvl in (1015, 1000, 985, 970, 950, 925, 900, 875, 850, 800, 750, 700, 650,
                                                  600, 550, 500, 450, 400, 350, 300, 275, 250, 225, 200, 175, 150, 100, 50)
              for v in ("TMP", "HGT", "RH", "UGRD", "VGRD")]
             + ["TMP_AGL-2m", "RH_AGL-2m", "UGRD_AGL-10m", "VGRD_AGL-10m",
                "PRES_Sfc", "PRMSL_MSL", "HGT_Sfc", "SKINT_Sfc",
-               "TSOIL_Sfc", "TSOIL_DBS-0-10cm", "SOILW_DBS-0-1cm", "SOILW_DBS-0-10cm",
+               "TSOIL_DBS-0-10cm", "SOILW_DBS-0-10cm",
                "SNOD_Sfc", "SDWE_Sfc"]
         ),
         "probe_field": "VGRD_ISBL_0050",   # readiness probe: one field per hour stands for the set
